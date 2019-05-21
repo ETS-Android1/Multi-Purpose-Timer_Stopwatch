@@ -16,7 +16,7 @@
         android:layout_centerVertical="true"
         android:progress="80"
         android:progressDrawable="@drawable/circle"
-        tools:targetApi="11" />
+        tools:targetApi="24" />
 
     <TextView
         android:id="@+id/text_view_countdown"
