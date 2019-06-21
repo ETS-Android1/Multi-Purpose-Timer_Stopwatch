@@ -2,10 +2,12 @@ package com.armcomptech.akash.simpletimer4;
 
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.SharedPreferences;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +19,12 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements  ExampleDialog.ExmapleDialogListner{
@@ -49,8 +57,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
     MediaPlayer player;
 
-
-    private Button mDonate;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +65,15 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //mDonate = findViewById(R.id.Donate);
+        //ad stuff
+        MobileAds.initialize(this,getString(R.string.admob_app_id));
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.interstital_ad_id));
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
+
+
         mButtonSetTimer = findViewById(R.id.setTimer);
         mProgressBar = findViewById(R.id.progressBar);
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
@@ -93,6 +108,11 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 timeRepeatCount = 1;
                 timesRepeat = 1;
                 resetTimer();
+                if (mInterstitialAd.isLoaded()) {
+                    mInterstitialAd.show();
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
+                }
             }
         });
 
@@ -188,7 +208,9 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                                 }
                                 else {
                                     alternate++;
-                                    mProgressBar.setProgress((int)mStartTimeInMillis, false);
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        mProgressBar.setProgress((int)mStartTimeInMillis, false); //can also be standalone without if statement
+                                    }
                                 }
                             }
                         });

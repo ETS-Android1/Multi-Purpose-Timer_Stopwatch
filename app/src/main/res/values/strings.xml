@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Heartbeat Timer</string>
+
+    <string name="admob_app_id">ca-app-pub-1322514661797614~1070608823</string>
+    <string name="interstital_ad_id">ca-app-pub-1322514661797614/4211777488</string>
+    <!--<string name="interstital_ad_id">ca-app-pub-3940256099942544/1033173712</string>-->
 </resources>
