@@ -3,8 +3,8 @@
     package="com.armcomptech.akash.simpletimer4">
 
     <supports-screens
-        android:normalScreens="true"
         android:largeScreens="true"
+        android:normalScreens="true"
         android:xlargeScreens="true" />
 
     <application
@@ -14,16 +14,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".statisticsActiivty"></activity>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/admob_app_id"/>
+            android:value="@string/admob_app_id" />
     </application>
 
 </manifest>

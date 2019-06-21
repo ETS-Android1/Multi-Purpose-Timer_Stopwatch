@@ -31,4 +31,11 @@
         app:showAsAction="never"
         android:visible="false"/>
 
+    <item
+        android:id="@+id/statistics_activity"
+        android:title="Statistics"
+        />
+
+
+
 </menu>

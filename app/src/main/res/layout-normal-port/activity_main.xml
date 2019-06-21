@@ -77,46 +77,14 @@
         android:text=""
         tools:visibility="invisible"/>
 
-    <!--<Button-->
-        <!--android:id="@+id/Donate"-->
-        <!--android:layout_width="100dp"-->
-        <!--android:layout_height="50dp"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_marginTop="20dp"-->
-        <!--android:text="Donate"-->
-        <!--/>-->
-
-    <!--<Switch-->
-        <!--android:id="@+id/switch2"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_above="@+id/progressBar"-->
-        <!--android:layout_marginStart="30dp"-->
-        <!--android:layout_marginBottom="1dp"-->
-        <!--android:layout_toEndOf="@+id/repeat"-->
-        <!--android:text=""-->
-        <!--android:tooltipText="turn repeat on" />-->
-
-    <!--<TextView-->
-        <!--android:id="@+id/repeat"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_above="@+id/progressBar"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:text="Repeats"-->
-        <!--android:textSize="17dp"/>-->
-
-    <!--<EditText-->
-        <!--android:id="@+id/repeat_text"-->
-        <!--android:layout_width="60dp"-->
-        <!--android:layout_height="40dp"-->
-        <!--android:layout_above="@+id/progressBar"-->
-        <!--android:layout_marginEnd="20dp"-->
-        <!--android:layout_marginRight="20dp"-->
-        <!--android:layout_marginBottom="-5dp"-->
-        <!--android:layout_toStartOf="@+id/repeat"-->
-        <!--android:ems="10"-->
-        <!--android:inputType="number"-->
-        <!--android:text="2"/>-->
+    <EditText
+    android:id="@+id/timerName"
+    android:layout_width="250dp"
+    android:layout_height="50dp"
+    android:layout_above="@+id/progressBar"
+    android:layout_centerHorizontal="true"
+    android:layout_marginBottom="62dp"
+    android:hint="@string/enter_timer_name_optional"
+    android:text="" />
 
 </RelativeLayout>

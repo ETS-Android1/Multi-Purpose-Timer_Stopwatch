@@ -1,5 +1,6 @@
 package com.armcomptech.akash.simpletimer4;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -14,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,24 +34,18 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     private Button mButtonSetTimer;
     private CountDownTimer mCountDownTimer;
     private TextView mMillis;
-    private EditText mRepeatText;
 
     private boolean mTimerRunning;
     private boolean BlinkTimerStopRequest;
-    private boolean keepRepeating;
-    private boolean onceMore;
 
 
     private boolean heartbeatChecked;
     private boolean soundChecked;
-    private boolean repeatTimerChecked;
 
     private long mStartTimeInMillis;
     private long mTimeLeftInMillis;
     private long mEndTime;
     private int alternate;
-    private int timesRepeat;
-    private int timeRepeatCount;
 
     MediaPlayer player;
 
@@ -80,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
         mMillis = findViewById(R.id.millis);
-        mRepeatText = findViewById(R.id.repeat_text);
 
         mButtonSetTimer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,8 +96,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         mButtonReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timeRepeatCount = 1;
-                timesRepeat = 1;
                 resetTimer();
                 if (mInterstitialAd.isLoaded()) {
                     mInterstitialAd.show();
@@ -117,9 +108,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
         heartbeatChecked = true;
         soundChecked = true;
-        repeatTimerChecked = true;
-        timesRepeat = 1;
-        timeRepeatCount = 0;
     }
 
     @Override
@@ -148,79 +136,13 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 soundChecked = !soundChecked;
                 break;
 
-            case R.id.repeat_timer:
-                repeatTimerChecked = !repeatTimerChecked;
+            case R.id.statistics_activity:
+                startActivity(new Intent(this, statisticsActiivty.class));
 
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void repeatTimeUp() {
-        stopPlayer();
-        player = MediaPlayer.create(this, R.raw.tune1);
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mButtonReset.performClick();
-                mButtonStartPause.performClick();
-            }
-        });
-    }
-
-    public void repeatTimeUpp() {
-        if (soundChecked) {
-            if (player != null) {
-                stopPlayer();
-            } else {
-                player = MediaPlayer.create(this, R.raw.tune1);
-                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        //stopPlayer();
-                        BlinkTimerStopRequest = true;
-                        mCountDownTimer.cancel();
-                        mCountDownTimer.start();
-                    }
-                });
-            }
-            player.start();
-        }
-
-        alternate = 0;
-        BlinkTimerStopRequest = false;
-        Thread blink = new Thread() {
-            @Override
-            public  void run() {
-                for (int i = 0; i < 2; i++) {
-                    try {
-                        Thread.sleep(400);
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (alternate % 2 == 0) {
-                                    alternate++;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        mProgressBar.setProgress(0, false);
-                                    }
-                                }
-                                else {
-                                    alternate++;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        mProgressBar.setProgress((int)mStartTimeInMillis, false); //can also be standalone without if statement
-                                    }
-                                }
-                            }
-                        });
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        blink.start();
     }
 
     public void timeUp() {
@@ -275,11 +197,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         blink.start();
     }
 
-    boolean under5 = false;
-    boolean under15 = false;
-    boolean under35 = false;
-    boolean over35 = false;
-
     public void heartbeat() {
         if (heartbeatChecked) {
 
@@ -293,69 +210,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
             });
             player.start();
         }
-    }
-
-    public void heartbeatTemp() {
-        double mdTimeLeftInMillis = (double)mTimeLeftInMillis;
-        double mdStartTimeInMillis = (double)mStartTimeInMillis;
-        double percentThroughTimer = mdTimeLeftInMillis/mdStartTimeInMillis * 100;
-
-        if (percentThroughTimer < 5) {
-            under5 = true;
-        } else if (percentThroughTimer < 15) {
-            under15 = true;
-        } else if (percentThroughTimer < 35) {
-            under35 = true;
-        } else {
-            over35 = true;
-        }
-
-        if ((percentThroughTimer < 5) && (under5)) {
-            Toast.makeText(this, "Under 5", Toast.LENGTH_SHORT).show();
-            stopPlayer();
-            player = MediaPlayer.create(this, R.raw.heartbeatfastest);
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    player.seekTo(0);
-                    player.start();
-                }
-            });
-        } else if ((percentThroughTimer < 5) && (under15)) {
-            Toast.makeText(this, "Under 15", Toast.LENGTH_SHORT).show();
-            stopPlayer();
-            player = MediaPlayer.create(this, R.raw.heartbeatfast);
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    player.seekTo(0);
-                    player.start();
-                }
-            });
-        } else if ((percentThroughTimer < 5) && (under35)) {
-            Toast.makeText(this, "Under 35", Toast.LENGTH_SHORT).show();
-            stopPlayer();
-            player = MediaPlayer.create(this, R.raw.heartbeatnormal);
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    player.seekTo(0);
-                    player.start();
-                }
-            });
-        } else {
-            stopPlayer();
-            player = MediaPlayer.create(this, R.raw.heartbeatslow);
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    player.seekTo(0);
-                    player.start();
-                }
-            });
-        }
-
-        player.start();
     }
 
     private void setBlinkTimerStopRequest() {
@@ -408,75 +262,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
     }
 
-    private void onceMore() {
-        if (onceMore) {
-            stopPlayer();
-            player = MediaPlayer.create(this, R.raw.tune1);
-            player.start();
-
-            mCountDownTimer = new CountDownTimer(2000, 400) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    if (alternate % 2 == 0) {
-                        alternate++;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            mProgressBar.setProgress(0, false);
-                        }
-                    }
-                    else {
-                        alternate++;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            mProgressBar.setProgress((int)mStartTimeInMillis, false);
-                        }
-                    }
-                }
-
-                @Override
-                public void onFinish() {
-                    Toast toast = Toast.makeText(getApplicationContext(),
-                            "Timer Repeat Count: " + timeRepeatCount + " Times to repeat: " + timesRepeat + " Done ",
-                            Toast.LENGTH_SHORT);
-
-                    toast.show();
-                }
-            };
-
-//            Thread wait = new Thread() {
-//
-//                public void run() {
-//                        try {
-//                            Thread.sleep(400);
-//
-//                            runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    if (alternate % 2 == 0) {
-//                                        alternate++;
-//                                        mProgressBar.setProgress(0, false);
-//                                    }
-//                                    else {
-//                                        alternate++;
-//                                        mProgressBar.setProgress((int)mStartTimeInMillis, false);
-//                                    }
-//                                }
-//                            });
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                }
-//            };
-//            wait.start();
-
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    "Timer Repeat Count: " + timeRepeatCount + " Times to repeat: " + timesRepeat,
-                    Toast.LENGTH_SHORT);
-
-            toast.show();
-            //mCountDownTimer.start();
-            stopPlayer();
-        }
-    }
-
     private void startTimer() {
         mEndTime = System.currentTimeMillis() + mTimeLeftInMillis;
         heartbeat();
@@ -491,7 +276,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
             @Override
             public void onFinish() {
-                timeRepeatCount++;
                 mTimerRunning = false;
                 updateWatchInterface();
                 mTimeLeftInMillis = 0;
@@ -501,15 +285,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 }
                 stopPlayer();
                 timeUp();
-
-//                if (repeatTimerChecked && (timeRepeatCount < timesRepeat)) {
-//                    onceMore = true;
-//                    repeatTimeUp();
-//                }
-//                else {
-//                    onceMore = false;
-//                    timeUp();
-//                }
             }
         }.start();
 
@@ -533,10 +308,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         stopPlayer();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mProgressBar.setProgress((int)mStartTimeInMillis,true);
-        }
-
-        if (!onceMore) {
-            timeRepeatCount = 0;
         }
     }
 

@@ -38,15 +38,6 @@
         android:text="000"
         android:textSize="25dp"/>
 
-    <!--<Button-->
-    <!--android:id="@+id/button_start_pause"-->
-    <!--android:layout_width="75dp"-->
-    <!--android:layout_height="70dp"-->
-    <!--android:background="@drawable/pauseicon"-->
-    <!--android:layout_below="@+id/progressBar"-->
-    <!--android:layout_centerHorizontal="true"-->
-    <!--android:text="" />-->
-
     <Button
         android:id="@+id/button_start_pause"
         android:layout_width="110dp"
@@ -76,5 +67,15 @@
         android:layout_centerVertical="true"
         android:text=""
         tools:visibility="invisible"/>
+
+    <EditText
+        android:id="@+id/timerName"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:layout_above="@+id/progressBar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="62dp"
+        android:hint="@string/enter_timer_name_optional"
+        android:text="" />
 
 </RelativeLayout>
