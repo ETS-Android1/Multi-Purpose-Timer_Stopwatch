@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,7 +19,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -204,7 +202,9 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                             public void run() {
                                 if (alternate % 2 == 0) {
                                     alternate++;
-                                    mProgressBar.setProgress(0, false);
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        mProgressBar.setProgress(0, false);
+                                    }
                                 }
                                 else {
                                     alternate++;
@@ -254,11 +254,15 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                           public void run() {
                               if (alternate % 2 == 0) {
                                   alternate++;
-                                  mProgressBar.setProgress(0, false);
+                                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                      mProgressBar.setProgress(0, false);
+                                  }
                               }
                               else {
                                   alternate++;
-                                  mProgressBar.setProgress((int)mStartTimeInMillis, false);
+                                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                      mProgressBar.setProgress((int)mStartTimeInMillis, false);
+                                  }
                               }
                           }
                       });
@@ -415,11 +419,15 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 public void onTick(long millisUntilFinished) {
                     if (alternate % 2 == 0) {
                         alternate++;
-                        mProgressBar.setProgress(0, false);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            mProgressBar.setProgress(0, false);
+                        }
                     }
                     else {
                         alternate++;
-                        mProgressBar.setProgress((int)mStartTimeInMillis, false);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            mProgressBar.setProgress((int)mStartTimeInMillis, false);
+                        }
                     }
                 }
 
@@ -488,7 +496,9 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 updateWatchInterface();
                 mTimeLeftInMillis = 0;
                 mMillis.setText("000");
-                mProgressBar.setProgress(0, true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    mProgressBar.setProgress(0, true);
+                }
                 stopPlayer();
                 timeUp();
 
@@ -521,7 +531,9 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         mButtonStartPause.setBackgroundResource(R.drawable.playicon);
         setBlinkTimerStopRequest();
         stopPlayer();
-        mProgressBar.setProgress((int)mStartTimeInMillis,true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mProgressBar.setProgress((int)mStartTimeInMillis,true);
+        }
 
         if (!onceMore) {
             timeRepeatCount = 0;
@@ -559,7 +571,9 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         mTextViewCountDown.setText(timeLeftFormatted);
         mMillis.setText(millisFormatted);
         mProgressBar.setMax((int)mStartTimeInMillis);
-        mProgressBar.setProgress((int)mTimeLeftInMillis,true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mProgressBar.setProgress((int)mTimeLeftInMillis,true);
+        }
 
     }
 
