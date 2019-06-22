@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     private int alternate;
 
     MediaPlayer player;
-
     private InterstitialAd mInterstitialAd;
 
     @Override

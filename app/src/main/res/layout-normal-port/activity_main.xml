@@ -83,7 +83,7 @@
     android:layout_height="50dp"
     android:layout_above="@+id/progressBar"
     android:layout_centerHorizontal="true"
-    android:layout_marginBottom="62dp"
+    android:layout_marginBottom="30dp"
     android:hint="@string/enter_timer_name_optional"
     android:text="" />
 
