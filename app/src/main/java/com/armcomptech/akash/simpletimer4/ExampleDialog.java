@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class ExampleDialog extends AppCompatDialogFragment {
     private EditText editTextTimer;
@@ -37,7 +38,10 @@ public class ExampleDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String time = editTextTimer.getText().toString();
-                        listner.applyText(time);
+
+                        if (!(time.matches(""))) {
+                            listner.applyText(time);
+                        }
                     }
                 });
 

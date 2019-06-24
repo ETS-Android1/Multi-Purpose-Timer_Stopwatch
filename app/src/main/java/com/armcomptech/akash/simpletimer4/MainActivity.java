@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +23,11 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements  ExampleDialog.ExmapleDialogListner{
@@ -34,11 +39,11 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     private Button mButtonSetTimer;
     private CountDownTimer mCountDownTimer;
     private TextView mMillis;
+    private EditText mTimerNameEditText;
+    private TextView mTimerNameTextView;
 
     private boolean mTimerRunning;
     private boolean BlinkTimerStopRequest;
-
-
     private boolean heartbeatChecked;
     private boolean soundChecked;
 
@@ -49,6 +54,18 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
     MediaPlayer player;
     private InterstitialAd mInterstitialAd;
+
+    ArrayList<String> timerNames = new ArrayList<String>();
+    ArrayList<Integer> count = new ArrayList<Integer>();
+    ArrayList<Integer> timeInSeconds = new ArrayList<Integer>();
+//    String[] timerName = {"timerName", "timerName2"};
+
+
+    public String currentTimerName;
+    public int currentTimerNamePosition;
+    public int ticksToPass;
+    public int counter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,13 +80,15 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         mInterstitialAd.setAdUnitId(getString(R.string.interstital_ad_id));
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
-
-
         mButtonSetTimer = findViewById(R.id.setTimer);
         mProgressBar = findViewById(R.id.progressBar);
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
         mButtonStartPause = findViewById(R.id.button_start_pause);
         mButtonReset = findViewById(R.id.button_reset);
+        mTimerNameEditText = findViewById(R.id.timerNameEditText);
+
+        mTimerNameTextView = findViewById(R.id.timerNameTextView);
+        mTimerNameTextView.setVisibility(View.INVISIBLE );
 
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
         mMillis = findViewById(R.id.millis);
@@ -88,6 +107,35 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                     pauseTimer();
                 } else {
                     startTimer();
+
+                    //only update during the start
+                    if (mProgressBar.getProgress() == mStartTimeInMillis) {
+                        currentTimerName = getTimerName();
+
+                        //get position of timer name and -1 if it doesn't exist
+                        currentTimerNamePosition = timerNamePosition(currentTimerName, timerNames);
+
+                        if (currentTimerNamePosition == -1) {
+                            timerNames.add(currentTimerName);
+                            count.add(1);
+                            timeInSeconds.add(0);
+                            currentTimerNamePosition = timeInSeconds.size() - 1; //make a new position since adding new value which is at the end
+                        } else {
+                            //increment count
+                            count.set(currentTimerNamePosition, count.get(currentTimerNamePosition) + 1);
+                        }
+                        saveData(); //save data
+
+                        //just to be safe because sometimes second is one less in statistics
+                        if (mStartTimeInMillis >= 4000) { //when timer is set more than 4 seconds
+                            timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
+                        }
+
+                        //update interface to show timer name
+                        mTimerNameTextView.setVisibility(View.VISIBLE);
+                        mTimerNameTextView.setText(currentTimerName);
+                        mTimerNameEditText.setVisibility(View.INVISIBLE);
+                    }
                 }
             }
         });
@@ -96,6 +144,10 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
             @Override
             public void onClick(View v) {
                 resetTimer();
+
+                mTimerNameTextView.setVisibility(View.INVISIBLE);
+                mTimerNameEditText.setVisibility(View.VISIBLE);
+
                 if (mInterstitialAd.isLoaded()) {
                     mInterstitialAd.show();
                 } else {
@@ -103,10 +155,46 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 }
             }
         });
-
-
         heartbeatChecked = true;
         soundChecked = true;
+    }
+
+    private String getTimerName() {
+        String timerName = mTimerNameEditText.getText().toString();
+        if (timerName.matches("")) {
+            timerName = "General";
+        }
+        return timerName;
+    }
+
+    private int timerNamePosition(String currentTimerName, ArrayList<String> timerNames) {
+        if (timerNames == null) {
+            return -1;
+        }
+
+        for (int i = 0; i < timerNames.size(); i++) {
+            if (timerNames.get(i).matches(currentTimerName)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void saveData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+
+        String timerNameJson = gson.toJson(timerNames);
+        editor.putString("timer name", timerNameJson);
+
+        String countJson = gson.toJson(count);
+        editor.putString("count", countJson);
+
+        String timeInSecondsJson = gson.toJson(timeInSeconds);
+        editor.putString("timeInSeconds", timeInSecondsJson);
+
+        editor.apply();
     }
 
     @Override
@@ -164,34 +252,34 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         alternate = 0;
         BlinkTimerStopRequest = false;
         Thread blink = new Thread() {
-          @Override
-          public void run() {
-              while((!isInterrupted()) && (!BlinkTimerStopRequest)) {
-                  try {
-                      Thread.sleep(400);
+            @Override
+            public void run() {
+                while((!isInterrupted()) && (!BlinkTimerStopRequest)) {
+                    try {
+                        Thread.sleep(400);
 
-                      runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                              if (alternate % 2 == 0) {
-                                  alternate++;
-                                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                      mProgressBar.setProgress(0, false);
-                                  }
-                              }
-                              else {
-                                  alternate++;
-                                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                      mProgressBar.setProgress((int)mStartTimeInMillis, false);
-                                  }
-                              }
-                          }
-                      });
-                  } catch (InterruptedException e) {
-                      e.printStackTrace();
-                  }
-              }
-          }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (alternate % 2 == 0) {
+                                    alternate++;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        mProgressBar.setProgress(0, false);
+                                    }
+                                }
+                                else {
+                                    alternate++;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        mProgressBar.setProgress((int)mStartTimeInMillis, false);
+                                    }
+                                }
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         };
         blink.start();
     }
@@ -258,19 +346,32 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         mStartTimeInMillis = milliseconds;
         resetTimer();
         closeKeyboard();
-
     }
 
     private void startTimer() {
         mEndTime = System.currentTimeMillis() + mTimeLeftInMillis;
         heartbeat();
-        //timesRepeat = Integer.parseInt(mRepeatText.getText().toString());
+        int countDownInterval = 100;
+        if (mStartTimeInMillis <= 30000) {
+            countDownInterval = 50;
+        }
 
-        mCountDownTimer = new CountDownTimer(mTimeLeftInMillis, 50) {
+        ticksToPass = 1000 / countDownInterval;
+        counter = 0;
+
+        mCountDownTimer = new CountDownTimer(mTimeLeftInMillis, countDownInterval) {
             @Override
             public void onTick(long millisUntilFinished) {
                 mTimeLeftInMillis = millisUntilFinished;
                 updateCountDownText();
+
+                //basically increment by one every second
+                counter++;
+                if (ticksToPass == counter) {
+                    timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
+                    saveData();
+                    counter = 0;
+                }
             }
 
             @Override
@@ -344,6 +445,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mProgressBar.setProgress((int)mTimeLeftInMillis,true);
         }
+
 
     }
 

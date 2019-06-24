@@ -76,6 +76,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="62dp"
         android:hint="@string/enter_timer_name_optional"
-        android:text="" />
+        android:text=""
+        android:visibility="invisible" />
 
 </RelativeLayout>
