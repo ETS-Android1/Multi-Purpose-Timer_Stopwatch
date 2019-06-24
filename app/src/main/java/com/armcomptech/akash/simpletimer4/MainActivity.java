@@ -3,6 +3,8 @@ package com.armcomptech.akash.simpletimer4;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +35,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static java.util.logging.Level.OFF;
 import static java.util.logging.Level.parse;
 
 public class MainActivity extends AppCompatActivity implements  ExampleDialog.ExmapleDialogListner{
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     private TextView mMillis;
     private EditText mTimerNameEditText;
     private TextView mTimerNameTextView;
+    private Switch mRepeatSwitch;
 
     private boolean mTimerRunning;
     private boolean BlinkTimerStopRequest;
@@ -57,7 +62,8 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     private int alternate;
 
     MediaPlayer player;
-    private InterstitialAd mInterstitialAd;
+    private InterstitialAd mResetButtonInterstitialAd;
+    private InterstitialAd mHappyButtonInterstitialAd;
 
     ArrayList<String> timerNames = new ArrayList<String>();
     ArrayList<Integer> count = new ArrayList<Integer>();
@@ -81,22 +87,30 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         //ad stuff
         MobileAds.initialize(this,getString(R.string.admob_app_id));
 
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId(getString(R.string.interstital_ad_id));
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        //TODO: Enable the ad
+        //reset button ad
+        mResetButtonInterstitialAd = new InterstitialAd(this);
+        mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
+        //mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
 
-        mButtonSetTimer = findViewById(R.id.setTimer);
+        //happy face ad
+        mHappyButtonInterstitialAd = new InterstitialAd(this);
+        mHappyButtonInterstitialAd.setAdUnitId(getString(R.string.happyButton_interstital_ad_id));
+        mHappyButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+
         mProgressBar = findViewById(R.id.progressBar);
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
         mButtonStartPause = findViewById(R.id.button_start_pause);
         mButtonReset = findViewById(R.id.button_reset);
         mTimerNameEditText = findViewById(R.id.timerNameEditText);
+        mMillis = findViewById(R.id.millis);
+        mRepeatSwitch = findViewById(R.id.repeat_Switch);
 
         mTimerNameTextView = findViewById(R.id.timerNameTextView);
         mTimerNameTextView.setVisibility(View.INVISIBLE );
 
+        mButtonSetTimer = findViewById(R.id.setTimer);
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
-        mMillis = findViewById(R.id.millis);
 
         mButtonSetTimer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,8 +168,8 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 mTimerNameTextView.setVisibility(View.INVISIBLE);
                 mTimerNameEditText.setVisibility(View.VISIBLE);
 
-                if (mInterstitialAd.isLoaded()) {
-                    mInterstitialAd.show();
+                if (mResetButtonInterstitialAd.isLoaded()) {
+                    mResetButtonInterstitialAd.show();
                 } else {
                     Log.d("TAG", "The interstitial wasn't loaded yet.");
                 }
@@ -243,6 +257,14 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 startActivity(myWebLink);
                 break;
 
+            case R.id.ad_button:
+                if (mHappyButtonInterstitialAd.isLoaded()) {
+                    mHappyButtonInterstitialAd.show();
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
+                }
+                break;
+
             default:
                 break;
         }
@@ -254,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
             if (player != null) {
                 stopPlayer();
             } else {
-                player = MediaPlayer.create(this, R.raw.tune1);
+                player = MediaPlayer.create(this, R.raw.endsong);
                 player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
@@ -304,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     public void heartbeat() {
         if (heartbeatChecked) {
 
-            player = MediaPlayer.create(this, R.raw.heartbeatnormal2);
+            player = MediaPlayer.create(this, R.raw.heartbeat);
             player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
@@ -392,15 +414,30 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
             @Override
             public void onFinish() {
-                mTimerRunning = false;
-                updateWatchInterface();
-                mTimeLeftInMillis = 0;
-                mMillis.setText("000");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    mProgressBar.setProgress(0, true);
+                if (mRepeatSwitch.isChecked()) {
+                    resetTimer();
+                    mTimerRunning = false;
+
+                    try {
+                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                        r.play();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    mButtonStartPause.performClick();
+                } else {
+                    mTimerRunning = false;
+                    updateWatchInterface();
+                    mTimeLeftInMillis = 0;
+                    mMillis.setText("000");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        mProgressBar.setProgress(0, true);
+                    }
+                    stopPlayer();
+                    timeUp();
                 }
-                stopPlayer();
-                timeUp();
             }
         }.start();
 

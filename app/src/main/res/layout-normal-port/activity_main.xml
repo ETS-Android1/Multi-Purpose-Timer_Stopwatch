@@ -151,4 +151,25 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Switch
+        android:id="@+id/repeat_Switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="44dp"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toStartOf="@+id/button_start_pause"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
+
+    <TextView
+        android:id="@+id/repeat_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/repeat"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/repeat_Switch"
+        app:layout_constraintStart_toStartOf="@+id/repeat_Switch"
+        app:layout_constraintTop_toBottomOf="@+id/repeat_Switch" />
+
 </android.support.constraint.ConstraintLayout>

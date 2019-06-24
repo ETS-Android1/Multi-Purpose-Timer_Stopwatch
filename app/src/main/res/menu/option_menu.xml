@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/ad_button"
+        android:icon="@drawable/ic_tag_faces_white_24dp"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/check_heartbeat"
         android:checkable="true"
         android:enabled="true"
@@ -23,12 +28,10 @@
 
     <item
         android:id="@+id/statistics_activity"
-        android:title="Statistics"
-        />
+        android:title="Statistics" />
 
     <item
         android:id="@+id/privacy_policy"
-        android:title="Privacy Policy"
-        />
+        android:title="Privacy Policy" />
 
 </menu>

@@ -113,7 +113,6 @@
         android:layout_marginBottom="92dp"
         android:hint="@string/enter_timer_name_optional"
         android:text=""
-        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -135,5 +134,29 @@
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Switch
+        android:id="@+id/repeat_Switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="152dp"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toStartOf="@+id/button_start_pause"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/progressBar"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
+
+    <TextView
+        android:id="@+id/repeat_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/repeat"
+        android:textColor="#000000"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/repeat_Switch"
+        app:layout_constraintStart_toStartOf="@+id/repeat_Switch"
+        app:layout_constraintTop_toBottomOf="@+id/repeat_Switch" />
 
 </android.support.constraint.ConstraintLayout>

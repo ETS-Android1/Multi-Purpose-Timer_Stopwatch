@@ -2,7 +2,9 @@
     <string name="app_name">Heartbeat Timer</string>
 
     <string name="admob_app_id">ca-app-pub-1322514661797614~1070608823</string>
-    <string name="interstital_ad_id">ca-app-pub-1322514661797614/4211777488</string>
+    <string name="resetButton_interstital_ad_id">ca-app-pub-1322514661797614/4211777488</string>
+    <string name="happyButton_interstital_ad_id">ca-app-pub-1322514661797614/4798256372</string>
 
     <string name="enter_timer_name_optional">Enter Timer Name (Optional)</string>
+    <string name="repeat">Repeat</string>
 </resources>
