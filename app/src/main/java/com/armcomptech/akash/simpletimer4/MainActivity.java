@@ -3,6 +3,7 @@ package com.armcomptech.akash.simpletimer4;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +31,8 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
+
+import static java.util.logging.Level.parse;
 
 public class MainActivity extends AppCompatActivity implements  ExampleDialog.ExmapleDialogListner{
 
@@ -72,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //ad stuff
         MobileAds.initialize(this,getString(R.string.admob_app_id));
@@ -107,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                     pauseTimer();
                 } else {
                     startTimer();
+                    counter = 0;
 
                     //only update during the start
                     if (mProgressBar.getProgress() == mStartTimeInMillis) {
@@ -217,6 +223,10 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         switch (id) {
             case R.id.check_heartbeat:
                 heartbeatChecked = !heartbeatChecked;
+
+                //refresh the heartbeat sound
+                mButtonStartPause.performClick();
+                mButtonStartPause.performClick();
                 break;
 
             case R.id.check_sound:
@@ -225,6 +235,13 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
             case R.id.statistics_activity:
                 startActivity(new Intent(this, statisticsActiivty.class));
+                break;
+
+            case R.id.privacy_policy:
+                Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
+                myWebLink.setData(Uri.parse("https://docs.google.com/document/d/18fpGAZNNOtF02_4no_UD208NmVh_mk6YPTaQBwilxwM/edit#heading=h.ojpotbumetb"));
+                startActivity(myWebLink);
+                break;
 
             default:
                 break;
@@ -357,7 +374,6 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         }
 
         ticksToPass = 1000 / countDownInterval;
-        counter = 0;
 
         mCountDownTimer = new CountDownTimer(mTimeLeftInMillis, countDownInterval) {
             @Override
