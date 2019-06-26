@@ -5,7 +5,8 @@
     <item
         android:id="@+id/ad_button"
         android:icon="@drawable/ic_tag_faces_white_24dp"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom"
+        android:title="Smiley Face" />
 
     <item
         android:id="@+id/check_heartbeat"
@@ -33,5 +34,10 @@
     <item
         android:id="@+id/privacy_policy"
         android:title="Privacy Policy" />
+
+    <item
+        android:id="@+id/setting"
+        android:title="Setting"
+        android:visible="false"/>
 
 </menu>

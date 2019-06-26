@@ -1,15 +1,14 @@
 package com.armcomptech.akash.simpletimer4;
 
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -20,15 +19,11 @@ public class statisticsActiivty extends AppCompatActivity{
     ArrayList<Integer> count = new ArrayList<Integer>();
     ArrayList<Integer> timeInSeconds = new ArrayList<Integer>();
 
-    //    String[] timerName = {"timerName"};
-//    int[] count = {2, 1};
-//    int[] timeInSeconds = {36001, 3661};
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics_actiivty);
-        getSupportActionBar().setTitle("statistics");
+        getSupportActionBar().setTitle("Statistics");
 
         //testing
         loadData();

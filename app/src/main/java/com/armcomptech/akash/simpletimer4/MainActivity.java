@@ -7,7 +7,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.SharedPreferences;
 import android.os.CountDownTimer;
@@ -25,18 +25,21 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applovin.sdk.AppLovinSdk;
+import com.chartboost.sdk.Chartboost;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static java.util.logging.Level.OFF;
-import static java.util.logging.Level.parse;
+import com.applovin.sdk.AppLovinSdk;
 
 public class MainActivity extends AppCompatActivity implements  ExampleDialog.ExmapleDialogListner{
 
@@ -65,10 +68,9 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     private InterstitialAd mResetButtonInterstitialAd;
     private InterstitialAd mHappyButtonInterstitialAd;
 
-    ArrayList<String> timerNames = new ArrayList<String>();
+    ArrayList<String> timerName = new ArrayList<String>();
     ArrayList<Integer> count = new ArrayList<Integer>();
     ArrayList<Integer> timeInSeconds = new ArrayList<Integer>();
-//    String[] timerName = {"timerName", "timerName2"};
 
 
     public String currentTimerName;
@@ -83,20 +85,32 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        loadData(); //load saved data when opening the app
 
         //ad stuff
         MobileAds.initialize(this,getString(R.string.admob_app_id));
 
-        //TODO: Enable the ad
+        Chartboost.startWithAppId(this, "5d12507d18272d0bbe13eced", "e750c201ec23522c7ea3c688bb971ef68823ad5f");
+        Chartboost.onCreate(this);
+
+        SdkConfiguration mResetButtonInterstitialAdMoPub = new SdkConfiguration.Builder("7d26297661ba4a1784b331a6f3bde078").build();
+        SdkConfiguration mHappyButtonInterstitialAdMoPub = new SdkConfiguration.Builder("a692a5880d0d48ce9463f1e8b4348a22").build();
+        MoPub.initializeSdk(getApplication().getApplicationContext(), mResetButtonInterstitialAdMoPub, null);
+        MoPub.initializeSdk(getApplication().getApplicationContext(), mHappyButtonInterstitialAdMoPub, null);
+
+        AppLovinSdk.initializeSdk(getApplication().getApplicationContext());
+
         //reset button ad
         mResetButtonInterstitialAd = new InterstitialAd(this);
         mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
-        //mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+        mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+//        mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("E5CC1736905A67B0077760DE2AFF519D").build());//test device
 
         //happy face ad
         mHappyButtonInterstitialAd = new InterstitialAd(this);
         mHappyButtonInterstitialAd.setAdUnitId(getString(R.string.happyButton_interstital_ad_id));
         mHappyButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+//        mHappyButtonInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("E5CC1736905A67B0077760DE2AFF519D").build());//test device
 
         mProgressBar = findViewById(R.id.progressBar);
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
@@ -133,10 +147,10 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                         currentTimerName = getTimerName();
 
                         //get position of timer name and -1 if it doesn't exist
-                        currentTimerNamePosition = timerNamePosition(currentTimerName, timerNames);
+                        currentTimerNamePosition = timerNamePosition(currentTimerName, timerName);
 
                         if (currentTimerNamePosition == -1) {
-                            timerNames.add(currentTimerName);
+                            timerName.add(currentTimerName);
                             count.add(1);
                             timeInSeconds.add(0);
                             currentTimerNamePosition = timeInSeconds.size() - 1; //make a new position since adding new value which is at the end
@@ -177,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         });
         heartbeatChecked = true;
         soundChecked = true;
+
     }
 
     private String getTimerName() {
@@ -187,13 +202,13 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         return timerName;
     }
 
-    private int timerNamePosition(String currentTimerName, ArrayList<String> timerNames) {
-        if (timerNames == null) {
+    private int timerNamePosition(String currentTimerName, ArrayList<String> timerName) {
+        if (timerName == null) {
             return -1;
         }
 
-        for (int i = 0; i < timerNames.size(); i++) {
-            if (timerNames.get(i).matches(currentTimerName)) {
+        for (int i = 0; i < timerName.size(); i++) {
+            if (timerName.get(i).matches(currentTimerName)) {
                 return i;
             }
         }
@@ -205,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
 
-        String timerNameJson = gson.toJson(timerNames);
+        String timerNameJson = gson.toJson(timerName);
         editor.putString("timer name", timerNameJson);
 
         String countJson = gson.toJson(count);
@@ -221,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
+        resetTimer(); //reset the timer when the app starts up
         return true;
     }
 
@@ -253,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
             case R.id.privacy_policy:
                 Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
-                myWebLink.setData(Uri.parse("https://docs.google.com/document/d/18fpGAZNNOtF02_4no_UD208NmVh_mk6YPTaQBwilxwM/edit#heading=h.ojpotbumetb"));
+                myWebLink.setData(Uri.parse("https://timerpolicy.blogspot.com/2019/06/privacy-policy-armcomptech-built.html"));
                 startActivity(myWebLink);
                 break;
 
@@ -331,10 +347,20 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     player.seekTo(0);
-                    player.start();
+                    //player.start();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        player.setPlaybackParams(player.getPlaybackParams().setSpeed(Float.parseFloat("1.0")));
+                    } else {
+                        player.start();
+                    }
                 }
             });
-            player.start();
+            //player.start();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                player.setPlaybackParams(player.getPlaybackParams().setSpeed(Float.parseFloat("1.0")));
+            } else {
+                player.start();
+            }
         }
     }
 
@@ -388,6 +414,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     }
 
     private void startTimer() {
+
         mEndTime = System.currentTimeMillis() + mTimeLeftInMillis;
         heartbeat();
         int countDownInterval = 100;
@@ -584,5 +611,22 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 startTimer();
             }
         }
+    }
+
+    private void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+
+        String timerNameJson = sharedPreferences.getString("timer name", null);
+        Type timerNameType = new TypeToken<ArrayList<String>>() {}.getType();
+        timerName = gson.fromJson(timerNameJson, timerNameType);
+
+        String countJson = sharedPreferences.getString("count", null);
+        Type countType = new TypeToken<ArrayList<Integer>>() {}.getType();
+        count = gson.fromJson(countJson, countType);
+
+        String timeInSecondsJson = sharedPreferences.getString("timeInSeconds", null);
+        Type timeInSecondsType = new TypeToken<ArrayList<Integer>>() {}.getType();
+        timeInSeconds = gson.fromJson(timeInSecondsJson, timeInSecondsType);
     }
 }
