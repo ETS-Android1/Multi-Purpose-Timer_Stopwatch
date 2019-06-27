@@ -15,15 +15,15 @@ import java.util.*;
 public class statisticsActiivty extends AppCompatActivity{
     RecyclerView recyclerView;
 
-    ArrayList<String> timerName = new ArrayList<String>();
-    ArrayList<Integer> count = new ArrayList<Integer>();
-    ArrayList<Integer> timeInSeconds = new ArrayList<Integer>();
+    ArrayList<String> timerName = new ArrayList<>();
+    ArrayList<Integer> count = new ArrayList<>();
+    ArrayList<Integer> timeInSeconds = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics_actiivty);
-        getSupportActionBar().setTitle("Statistics");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Statistics");
 
         //testing
         loadData();

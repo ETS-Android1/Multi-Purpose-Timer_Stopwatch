@@ -42,7 +42,7 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (count.get(position) == 1) {
             ((Item)viewHolder).textViewCount.setText("Used only once");
         } else {
-            ((Item)viewHolder).textViewCount.setText("Used " + Integer.toString(count.get(position)) + " times");
+            ((Item)viewHolder).textViewCount.setText("Used " + count.get(position) + " times");
         }
 
         //prints total time this timer was used

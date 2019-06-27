@@ -1,5 +1,8 @@
 package com.armcomptech.akash.simpletimer4;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -8,6 +11,9 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
 import android.os.Bundle;
 import android.content.SharedPreferences;
 import android.os.CountDownTimer;
@@ -21,11 +27,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RemoteViews;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.applovin.sdk.AppLovinSdk;
+import com.armcomptech.NotificationReceiver;
 import com.chartboost.sdk.Chartboost;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -39,7 +47,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import com.applovin.sdk.AppLovinSdk;
+import static com.App.CHANNEL_ID;
 
 public class MainActivity extends AppCompatActivity implements  ExampleDialog.ExmapleDialogListner{
 
@@ -65,12 +73,13 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     private int alternate;
 
     MediaPlayer player;
+    private NotificationManagerCompat notificationManager;
     private InterstitialAd mResetButtonInterstitialAd;
     private InterstitialAd mHappyButtonInterstitialAd;
 
-    ArrayList<String> timerName = new ArrayList<String>();
-    ArrayList<Integer> count = new ArrayList<Integer>();
-    ArrayList<Integer> timeInSeconds = new ArrayList<Integer>();
+    ArrayList<String> timerName = new ArrayList<>();
+    ArrayList<Integer> count = new ArrayList<>();
+    ArrayList<Integer> timeInSeconds = new ArrayList<>();
 
 
     public String currentTimerName;
@@ -78,14 +87,21 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     public int ticksToPass;
     public int counter;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        notificationManager = NotificationManagerCompat.from(this);
+
         loadData(); //load saved data when opening the app
+
+        if (timerName == null) {
+            timerName = new ArrayList<>();
+            count = new ArrayList<>();
+            timeInSeconds = new ArrayList<>();
+        }
 
         //ad stuff
         MobileAds.initialize(this,getString(R.string.admob_app_id));
@@ -95,10 +111,10 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
         SdkConfiguration mResetButtonInterstitialAdMoPub = new SdkConfiguration.Builder("7d26297661ba4a1784b331a6f3bde078").build();
         SdkConfiguration mHappyButtonInterstitialAdMoPub = new SdkConfiguration.Builder("a692a5880d0d48ce9463f1e8b4348a22").build();
-        MoPub.initializeSdk(getApplication().getApplicationContext(), mResetButtonInterstitialAdMoPub, null);
-        MoPub.initializeSdk(getApplication().getApplicationContext(), mHappyButtonInterstitialAdMoPub, null);
+        MoPub.initializeSdk(this, mResetButtonInterstitialAdMoPub, null);
+        MoPub.initializeSdk(this, mHappyButtonInterstitialAdMoPub, null);
 
-        AppLovinSdk.initializeSdk(getApplication().getApplicationContext());
+        AppLovinSdk.initializeSdk(this);
 
         //reset button ad
         mResetButtonInterstitialAd = new InterstitialAd(this);
@@ -126,67 +142,58 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         mButtonSetTimer = findViewById(R.id.setTimer);
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
 
-        mButtonSetTimer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDialog();
-            }
-        });
+        mButtonSetTimer.setOnClickListener(v -> openDialog());
 
-        mButtonStartPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mTimerRunning) {
-                    pauseTimer();
-                } else {
-                    startTimer();
-                    counter = 0;
+        mButtonStartPause.setOnClickListener(v -> {
 
-                    //only update during the start
-                    if (mProgressBar.getProgress() == mStartTimeInMillis) {
-                        currentTimerName = getTimerName();
+            if (mTimerRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+                counter = 0;
 
-                        //get position of timer name and -1 if it doesn't exist
-                        currentTimerNamePosition = timerNamePosition(currentTimerName, timerName);
+                //only update during the start
+                // mProgressBar.getProgress() ==
+                if (mTimeLeftInMillis == mStartTimeInMillis) {
+                    currentTimerName = getTimerName();
 
-                        if (currentTimerNamePosition == -1) {
-                            timerName.add(currentTimerName);
-                            count.add(1);
-                            timeInSeconds.add(0);
-                            currentTimerNamePosition = timeInSeconds.size() - 1; //make a new position since adding new value which is at the end
-                        } else {
-                            //increment count
-                            count.set(currentTimerNamePosition, count.get(currentTimerNamePosition) + 1);
-                        }
-                        saveData(); //save data
+                    //get position of timer name and -1 if it doesn't exist
+                    currentTimerNamePosition = timerNamePosition(currentTimerName, timerName);
 
-                        //just to be safe because sometimes second is one less in statistics
-                        if (mStartTimeInMillis >= 4000) { //when timer is set more than 4 seconds
-                            timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
-                        }
-
-                        //update interface to show timer name
-                        mTimerNameTextView.setVisibility(View.VISIBLE);
-                        mTimerNameTextView.setText(currentTimerName);
-                        mTimerNameEditText.setVisibility(View.INVISIBLE);
+                    if (currentTimerNamePosition == -1) {
+                        timerName.add(currentTimerName);
+                        count.add(1);
+                        timeInSeconds.add(0);
+                        currentTimerNamePosition = timeInSeconds.size() - 1; //make a new position since adding new value which is at the end
+                    } else {
+                        //increment count
+                        count.set(currentTimerNamePosition, count.get(currentTimerNamePosition) + 1);
                     }
+                    saveData(); //save data
+
+                    //just to be safe because sometimes second is one less in statistics
+                    if (mStartTimeInMillis >= 4000) { //when timer is set more than 4 seconds
+                        timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
+                    }
+
+                    //update interface to show timer name
+                    mTimerNameTextView.setVisibility(View.VISIBLE);
+                    mTimerNameTextView.setText(currentTimerName);
+                    mTimerNameEditText.setVisibility(View.INVISIBLE);
                 }
             }
         });
 
-        mButtonReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetTimer();
+        mButtonReset.setOnClickListener(v -> {
+            resetTimer();
 
-                mTimerNameTextView.setVisibility(View.INVISIBLE);
-                mTimerNameEditText.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setVisibility(View.INVISIBLE);
+            mTimerNameEditText.setVisibility(View.VISIBLE);
 
-                if (mResetButtonInterstitialAd.isLoaded()) {
-                    mResetButtonInterstitialAd.show();
-                } else {
-                    Log.d("TAG", "The interstitial wasn't loaded yet.");
-                }
+            if (mResetButtonInterstitialAd.isLoaded()) {
+                mResetButtonInterstitialAd.show();
+            } else {
+                Log.d("TAG", "The interstitial wasn't loaded yet.");
             }
         });
         heartbeatChecked = true;
@@ -255,8 +262,10 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 heartbeatChecked = !heartbeatChecked;
 
                 //refresh the heartbeat sound
-                mButtonStartPause.performClick();
-                mButtonStartPause.performClick();
+                if (mTimerRunning) {
+                    mButtonStartPause.performClick();
+                    mButtonStartPause.performClick();
+                }
                 break;
 
             case R.id.check_sound:
@@ -275,6 +284,12 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
 
             case R.id.ad_button:
                 if (mHappyButtonInterstitialAd.isLoaded()) {
+
+                    //pause the timer when the ad is opened
+                    if (mTimerRunning) {
+                        pauseTimer();
+                    }
+
                     mHappyButtonInterstitialAd.show();
                 } else {
                     Log.d("TAG", "The interstitial wasn't loaded yet.");
@@ -293,12 +308,9 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 stopPlayer();
             } else {
                 player = MediaPlayer.create(this, R.raw.endsong);
-                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        player.seekTo(0);
-                        player.start();
-                    }
+                player.setOnCompletionListener(mp -> {
+                    player.seekTo(0);
+                    player.start();
                 });
             }
             player.start();
@@ -313,20 +325,17 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                     try {
                         Thread.sleep(400);
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (alternate % 2 == 0) {
-                                    alternate++;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        mProgressBar.setProgress(0, false);
-                                    }
+                        runOnUiThread(() -> {
+                            if (alternate % 2 == 0) {
+                                alternate++;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    mProgressBar.setProgress(0, false);
                                 }
-                                else {
-                                    alternate++;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        mProgressBar.setProgress((int)mStartTimeInMillis, false);
-                                    }
+                            }
+                            else {
+                                alternate++;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    mProgressBar.setProgress((int)mStartTimeInMillis, false);
                                 }
                             }
                         });
@@ -343,16 +352,13 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         if (heartbeatChecked) {
 
             player = MediaPlayer.create(this, R.raw.heartbeat);
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    player.seekTo(0);
-                    //player.start();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        player.setPlaybackParams(player.getPlaybackParams().setSpeed(Float.parseFloat("1.0")));
-                    } else {
-                        player.start();
-                    }
+            player.setOnCompletionListener(mp -> {
+                player.seekTo(0);
+                //player.start();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    player.setPlaybackParams(player.getPlaybackParams().setSpeed(Float.parseFloat("1.0")));
+                } else {
+                    player.start();
                 }
             });
             //player.start();
@@ -439,6 +445,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
                 }
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
             public void onFinish() {
                 if (mRepeatSwitch.isChecked()) {
@@ -526,7 +533,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
             mProgressBar.setProgress((int)mTimeLeftInMillis,true);
         }
 
-
+        //showNotification(timeLeftFormatted);
     }
 
     private void updateWatchInterface() {
@@ -570,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         super.onStop();
         stopPlayer();
 
-        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("currentTimer", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putLong("startTimeInMillis", mStartTimeInMillis);
@@ -589,7 +596,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     protected void onStart() {
         super.onStart();
 
-        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("currrentTimer", MODE_PRIVATE);
 
         mStartTimeInMillis = prefs.getLong("startTimeInMillis", 600000);
         mTimeLeftInMillis = prefs.getLong("millisLeft", mStartTimeInMillis);
@@ -628,5 +635,31 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
         String timeInSecondsJson = sharedPreferences.getString("timeInSeconds", null);
         Type timeInSecondsType = new TypeToken<ArrayList<Integer>>() {}.getType();
         timeInSeconds = gson.fromJson(timeInSecondsJson, timeInSecondsType);
+    }
+
+
+
+    public void showNotification(String timeLeft) {
+        RemoteViews collapsedView = new RemoteViews(getPackageName(), R.layout.notificaiton_collapsed_heartbeat);
+        RemoteViews expendedView = new RemoteViews(getPackageName(), R.layout.notification_expanded_heartbeat);
+
+        Intent clickIntent = new Intent(this, NotificationReceiver.class);
+        PendingIntent clickPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
+
+        expendedView.setOnClickPendingIntent(R.id.text_view_expanded, clickPendingIntent);
+
+        collapsedView.setTextViewText(R.id.text_view_collapsed, timeLeft);
+        expendedView.setTextViewText(R.id.text_view_expanded, timeLeft);
+
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setCustomContentView(collapsedView)
+                .setCustomBigContentView(expendedView)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .build();
+
+        notificationManager.notify(1, notification);
+
+        DataHolder.getInstance().setNotificationUp(true);
     }
 }
