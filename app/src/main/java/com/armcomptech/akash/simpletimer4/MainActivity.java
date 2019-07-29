@@ -1,5 +1,6 @@
 package com.armcomptech.akash.simpletimer4;
 
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -533,7 +534,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
             mProgressBar.setProgress((int)mTimeLeftInMillis,true);
         }
 
-        showNotification(timeLeftFormatted);
+        //showNotification(timeLeftFormatted);
     }
 
     private void updateWatchInterface() {
