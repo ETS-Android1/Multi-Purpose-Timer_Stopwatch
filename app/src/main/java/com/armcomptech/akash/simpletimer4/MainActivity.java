@@ -533,7 +533,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
             mProgressBar.setProgress((int)mTimeLeftInMillis,true);
         }
 
-        //showNotification(timeLeftFormatted);
+        showNotification(timeLeftFormatted);
     }
 
     private void updateWatchInterface() {
