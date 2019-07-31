@@ -4,18 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
 import android.os.Bundle;
-import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Menu;
@@ -31,6 +27,10 @@ import android.widget.RemoteViews;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.applovin.sdk.AppLovinSdk;
 import com.armcomptech.NotificationReceiver;
@@ -596,7 +596,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
     protected void onStart() {
         super.onStart();
 
-        SharedPreferences prefs = getSharedPreferences("currrentTimer", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("currentTimer", MODE_PRIVATE);
 
         mStartTimeInMillis = prefs.getLong("startTimeInMillis", 600000);
         mTimeLeftInMillis = prefs.getLong("millisLeft", mStartTimeInMillis);
