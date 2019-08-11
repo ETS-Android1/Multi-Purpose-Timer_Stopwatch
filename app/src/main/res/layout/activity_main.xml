@@ -35,7 +35,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="00:00:00"
+        android:text="@string/_00_00_00"
         android:textColor="@android:color/black"
         android:textSize="54sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -50,8 +50,8 @@
         android:layout_below="@+id/text_view_countdown"
         android:layout_alignEnd="@+id/text_view_countdown"
         android:layout_marginEnd="24dp"
-        android:text="000"
-        android:textSize="25dp"
+        android:text="@string/_000"
+        android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="@+id/setTimer"
         app:layout_constraintTop_toBottomOf="@+id/text_view_countdown" />
 
@@ -63,40 +63,6 @@
     <!--android:layout_below="@+id/progressBar"-->
     <!--android:layout_centerHorizontal="true"-->
     <!--android:text="" />-->
-
-    <Button
-        android:id="@+id/button_start_pause"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_below="@+id/progressBar"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/playicon"
-        android:text=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
-
-    <Button
-        android:id="@+id/button_reset"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_below="@+id/progressBar"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
-        android:layout_toEndOf="@+id/button_start_pause"
-        android:background="@drawable/reseticon"
-        android:text=""
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="@+id/progressBar"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/button_start_pause"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        tools:visibility="visible" />
 
     <Button
         android:id="@+id/setTimer"
@@ -116,6 +82,7 @@
         tools:visibility="invisible" />
 
     <EditText
+        android:inputType="text"
         android:id="@+id/timerNameEditText"
         android:layout_width="250dp"
         android:layout_height="50dp"
@@ -124,13 +91,15 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="32dp"
+        android:autofillHints="@string/enter_timer_name_optional"
         android:hint="@string/enter_timer_name_optional"
         android:text=""
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:targetApi="o" />
 
     <TextView
         android:id="@+id/timerNameTextView"
@@ -141,7 +110,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="32dp"
-        android:hint="Timer Name"
+        android:hint="@string/timer_name"
         android:gravity="center"
         android:text=""
         android:textSize="25sp"
@@ -155,11 +124,17 @@
         android:id="@+id/repeat_Switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="44dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:textColor="#000000"
-        app:layout_constraintEnd_toStartOf="@+id/button_start_pause"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.202"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/repeat_text"
@@ -171,5 +146,59 @@
         app:layout_constraintEnd_toEndOf="@+id/repeat_Switch"
         app:layout_constraintStart_toStartOf="@+id/repeat_Switch"
         app:layout_constraintTop_toBottomOf="@+id/repeat_Switch" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:backgroundTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/ic_play" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:backgroundTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/ic_pause" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:backgroundTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/progressBar"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/ic_replay" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

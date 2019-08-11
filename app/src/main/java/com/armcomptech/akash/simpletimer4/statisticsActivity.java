@@ -12,7 +12,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public class statisticsActiivty extends AppCompatActivity{
+public class statisticsActivity extends AppCompatActivity{
     RecyclerView recyclerView;
 
     ArrayList<String> timerName = new ArrayList<>();
@@ -22,7 +22,7 @@ public class statisticsActiivty extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_statistics_actiivty);
+        setContentView(R.layout.activity_statistics_activity);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Statistics");
 
         //testing

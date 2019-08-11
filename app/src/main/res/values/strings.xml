@@ -13,4 +13,7 @@
     <string name="enter_timer_name_optional">Enter Timer Name (Optional)</string>
     <string name="repeat">Repeat</string>
     <string name="title_activity_main2">MainActivity2</string>
+    <string name="_00_00_00">00:00:00</string>
+    <string name="_000">000</string>
+    <string name="timer_name">Timer Name</string>
 </resources>

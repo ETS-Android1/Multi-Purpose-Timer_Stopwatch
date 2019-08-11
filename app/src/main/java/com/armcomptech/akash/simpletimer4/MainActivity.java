@@ -38,6 +38,7 @@ import com.chartboost.sdk.Chartboost;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mopub.common.MoPub;
@@ -52,8 +53,9 @@ import static com.App.CHANNEL_ID;
 public class MainActivity extends AppCompatActivity implements ExampleDialog.ExmapleDialogListner{
 
     private TextView mTextViewCountDown;
-    private Button mButtonStartPause;
-    private Button mButtonReset;
+    private FloatingActionButton mButtonStart;
+    private FloatingActionButton mButtonPause;
+    private FloatingActionButton mButtonReset;
     private ProgressBar mProgressBar;
     private Button mButtonSetTimer;
     private CountDownTimer mCountDownTimer;
@@ -130,7 +132,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
         mProgressBar = findViewById(R.id.progressBar);
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
-        mButtonStartPause = findViewById(R.id.button_start_pause);
+        mButtonStart = findViewById(R.id.button_start);
+        mButtonPause = findViewById(R.id.button_pause);
         mButtonReset = findViewById(R.id.button_reset);
         mTimerNameEditText = findViewById(R.id.timerNameEditText);
         mMillis = findViewById(R.id.millis);
@@ -144,7 +147,55 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
         mButtonSetTimer.setOnClickListener(v -> openDialog());
 
-        mButtonStartPause.setOnClickListener(v -> {
+        mButtonPause.hide();
+
+        mButtonStart.setOnClickListener( v -> {
+            mButtonStart.hide();
+            mButtonPause.show();
+            mButtonReset.hide();
+
+            if (mTimerRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+                counter = 0;
+
+                //only update during the start
+                // mProgressBar.getProgress() ==
+                if (mTimeLeftInMillis == mStartTimeInMillis) {
+                    currentTimerName = getTimerName();
+
+                    //get position of timer name and -1 if it doesn't exist
+                    currentTimerNamePosition = timerNamePosition(currentTimerName, timerName);
+
+                    if (currentTimerNamePosition == -1) {
+                        timerName.add(currentTimerName);
+                        count.add(1);
+                        timeInSeconds.add(0);
+                        currentTimerNamePosition = timeInSeconds.size() - 1; //make a new position since adding new value which is at the end
+                    } else {
+                        //increment count
+                        count.set(currentTimerNamePosition, count.get(currentTimerNamePosition) + 1);
+                    }
+                    saveData(); //save data
+
+                    //just to be safe because sometimes second is one less in statistics
+                    if (mStartTimeInMillis >= 4000) { //when timer is set more than 4 seconds
+                        timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
+                    }
+
+                    //update interface to show timer name
+                    mTimerNameTextView.setVisibility(View.VISIBLE);
+                    mTimerNameTextView.setText(currentTimerName);
+                    mTimerNameEditText.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        mButtonPause.setOnClickListener( v -> {
+            mButtonPause.hide();
+            mButtonStart.show();
+            mButtonReset.show();
 
             if (mTimerRunning) {
                 pauseTimer();
@@ -185,6 +236,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         });
 
         mButtonReset.setOnClickListener(v -> {
+            mButtonStart.show();
+            mButtonStart.hide();
             resetTimer();
 
             mTimerNameTextView.setVisibility(View.INVISIBLE);
@@ -263,8 +316,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
                 //refresh the heartbeat sound
                 if (mTimerRunning) {
-                    mButtonStartPause.performClick();
-                    mButtonStartPause.performClick();
+                    mButtonPause.performClick();
+                    mButtonStart.performClick();
                 }
                 break;
 
@@ -273,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
                 break;
 
             case R.id.statistics_activity:
-                startActivity(new Intent(this, statisticsActiivty.class));
+                startActivity(new Intent(this, statisticsActivity.class));
                 break;
 
             case R.id.privacy_policy:
@@ -460,7 +513,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
                         e.printStackTrace();
                     }
 
-                    mButtonStartPause.performClick();
+                    mButtonStart.performClick();
                 } else {
                     mTimerRunning = false;
                     updateWatchInterface();
@@ -490,7 +543,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         mTimeLeftInMillis = mStartTimeInMillis;
         updateCountDownText();
         updateWatchInterface();
-        mButtonStartPause.setBackgroundResource(R.drawable.playicon);
+        mButtonPause.hide();
+        mButtonStart.show();
         setBlinkTimerStopRequest();
         stopPlayer();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -539,27 +593,23 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     private void updateWatchInterface() {
         if (mTimerRunning) {
             mButtonSetTimer.setVisibility(View.INVISIBLE);
-            mButtonReset.setVisibility(View.INVISIBLE);
-            mButtonStartPause.setBackgroundResource(R.drawable.pauseicon6);
+            mButtonReset.hide();
+            mButtonStart.hide();
+            mButtonPause.show();
         } else {
             mButtonSetTimer.setVisibility(View.VISIBLE);
-            if (mCountDownTimer != null)
-            {
-                mButtonStartPause.setBackgroundResource(R.drawable.playicon);
-            } else {
-                mButtonStartPause.setBackgroundResource(R.drawable.playicon);
-            }
+            mButtonStart.show();
+            mButtonPause.hide();
 
             if (mTimeLeftInMillis < 100) {
-                mButtonStartPause.setVisibility(View.INVISIBLE);
-            } else {
-                mButtonStartPause.setVisibility(View.VISIBLE);
+                mButtonStart.hide();
+                mButtonPause.hide();
             }
 
             if (mTimeLeftInMillis < mStartTimeInMillis) {
-                mButtonReset.setVisibility(View.VISIBLE);
+                mButtonReset.show();
             } else {
-                mButtonReset.setVisibility(View.INVISIBLE);
+                mButtonReset.hide();
             }
         }
     }
