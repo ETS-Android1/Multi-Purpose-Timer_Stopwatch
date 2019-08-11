@@ -11,11 +11,11 @@
         android:name="com.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".statisticsActiivty"></activity>
+        <activity android:name=".statisticsActiivty" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
@@ -26,45 +26,52 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.armcomptech.NotificationReceiver"/>
+        <receiver android:name="com.armcomptech.NotificationReceiver" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
 
-
-        <activity android:name="com.adcolony.sdk.AdColonyInterstitialActivity"
+        <activity
+            android:name="com.adcolony.sdk.AdColonyInterstitialActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:hardwareAccelerated="true"/>
-
-
-        <activity android:name="com.mopub.mobileads.MoPubActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
-        <activity android:name="com.mopub.mobileads.MraidActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
-        <activity android:name="com.mopub.common.MoPubBrowser"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
-        <activity android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
-        <activity android:name="com.mopub.mobileads.RewardedMraidActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
-
-
-        <meta-data android:name="applovin.sdk.key"
-            android:value="T8WDmCss75wZncLJoLo1VeQUiIC8nll5B1F0EAq-t8adoVyEyl7mPm1gVFvd5LnbR6L4cHmT0EUpJhZTHrQfPD" />
-        <activity android:name="com.applovin.adview.AppLovinInterstitialActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name="com.applovin.adview.AppLovinConfirmationActivity"
-            android:configChanges="orientation|screenSize"/>
-
-        <activity android:name="com.chartboost.sdk.CBImpressionActivity"
-            android:excludeFromRecents="true"
-            android:hardwareAccelerated="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:hardwareAccelerated="true" />
+        <activity
+            android:name="com.mopub.mobileads.MoPubActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="com.mopub.mobileads.MraidActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="com.mopub.common.MoPubBrowser"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="com.mopub.mobileads.RewardedMraidActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
-        <meta-data android:name="applovin.sdk.key"
-            android:value="T8WDmCss75wZncLJoLo1VeQUiIC8nll5B1F0EAq-t8adoVyEyl7mPm1gVFvd5LnbR6L4cHmT0EUpJhZTHrQfPD"  />
+        <meta-data
+            android:name="applovin.sdk.key"
+            android:value="T8WDmCss75wZncLJoLo1VeQUiIC8nll5B1F0EAq-t8adoVyEyl7mPm1gVFvd5LnbR6L4cHmT0EUpJhZTHrQfPD" />
+
+        <activity
+            android:name="com.applovin.adview.AppLovinInterstitialActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name="com.applovin.adview.AppLovinConfirmationActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name="com.chartboost.sdk.CBImpressionActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:excludeFromRecents="true"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+
+        <meta-data
+            android:name="applovin.sdk.key"
+            android:value="T8WDmCss75wZncLJoLo1VeQUiIC8nll5B1F0EAq-t8adoVyEyl7mPm1gVFvd5LnbR6L4cHmT0EUpJhZTHrQfPD" />
     </application>
 
 </manifest>

@@ -12,4 +12,5 @@
 
     <string name="enter_timer_name_optional">Enter Timer Name (Optional)</string>
     <string name="repeat">Repeat</string>
+    <string name="title_activity_main2">MainActivity2</string>
 </resources>

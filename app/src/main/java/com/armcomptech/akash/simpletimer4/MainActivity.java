@@ -49,7 +49,7 @@ import java.util.Locale;
 
 import static com.App.CHANNEL_ID;
 
-public class MainActivity extends AppCompatActivity implements  ExampleDialog.ExmapleDialogListner{
+public class MainActivity extends AppCompatActivity implements ExampleDialog.ExmapleDialogListner{
 
     private TextView mTextViewCountDown;
     private Button mButtonStartPause;
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements  ExampleDialog.Ex
             mTimerNameEditText.setVisibility(View.VISIBLE);
 
             if (mResetButtonInterstitialAd.isLoaded()) {
-                mResetButtonInterstitialAd.show();
+                //mResetButtonInterstitialAd.show();
             } else {
                 Log.d("TAG", "The interstitial wasn't loaded yet.");
             }

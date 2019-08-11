@@ -1,5 +1,5 @@
 <?xml version="2.0.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -14,8 +14,16 @@
         android:layout_height="300dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:progress="80"
         android:progressDrawable="@drawable/circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:targetApi="24" />
 
     <TextView
@@ -23,9 +31,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:text="00:00:00"
         android:textColor="@android:color/black"
-        android:textSize="54sp" />
+        android:textSize="54sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/millis"
@@ -33,39 +49,53 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/text_view_countdown"
         android:layout_alignEnd="@+id/text_view_countdown"
-        android:layout_marginTop="-2dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="24dp"
         android:text="000"
-        android:textSize="25dp"/>
+        android:textSize="25dp"
+        app:layout_constraintEnd_toEndOf="@+id/setTimer"
+        app:layout_constraintTop_toBottomOf="@+id/text_view_countdown" />
 
     <!--<Button-->
-        <!--android:id="@+id/button_start_pause"-->
-        <!--android:layout_width="75dp"-->
-        <!--android:layout_height="70dp"-->
-        <!--android:background="@drawable/pauseicon"-->
-        <!--android:layout_below="@+id/progressBar"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:text="" />-->
+    <!--android:id="@+id/button_start_pause"-->
+    <!--android:layout_width="75dp"-->
+    <!--android:layout_height="70dp"-->
+    <!--android:background="@drawable/pauseicon"-->
+    <!--android:layout_below="@+id/progressBar"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:text="" />-->
 
     <Button
         android:id="@+id/button_start_pause"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:background="@drawable/playicon"
         android:layout_below="@+id/progressBar"
         android:layout_centerHorizontal="true"
-        android:text="" />
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/playicon"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
     <Button
         android:id="@+id/button_reset"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:background="@drawable/reseticon"
         android:layout_below="@+id/progressBar"
-        android:layout_marginStart="30dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
         android:layout_toEndOf="@+id/button_start_pause"
+        android:background="@drawable/reseticon"
         android:text=""
         android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/progressBar"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/button_start_pause"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
         tools:visibility="visible" />
 
     <Button
@@ -74,40 +104,72 @@
         android:layout_height="130dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:text=""
-        tools:visibility="invisible"/>
-
-    <Switch
-        android:id="@+id/switch2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/progressBar"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="1dp"
-        android:layout_toEndOf="@+id/repeat"
-        android:text=""
-        android:tooltipText="turn repeat on" />
-
-    <TextView
-        android:id="@+id/repeat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/progressBar"
-        android:layout_centerHorizontal="true"
-        android:text="Repeats"
-        android:textSize="17dp"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="invisible" />
 
     <EditText
-        android:id="@+id/repeat_text"
-        android:layout_width="60dp"
-        android:layout_height="40dp"
+        android:id="@+id/timerNameEditText"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
         android:layout_above="@+id/progressBar"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="-5dp"
-        android:layout_toStartOf="@+id/repeat"
-        android:ems="10"
-        android:inputType="number"
-        android:text="2"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="32dp"
+        android:hint="@string/enter_timer_name_optional"
+        android:text=""
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/timerNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_above="@+id/progressBar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="32dp"
+        android:hint="Timer Name"
+        android:gravity="center"
+        android:text=""
+        android:textSize="25sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Switch
+        android:id="@+id/repeat_Switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="44dp"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toStartOf="@+id/button_start_pause"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
+
+    <TextView
+        android:id="@+id/repeat_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/repeat"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/repeat_Switch"
+        app:layout_constraintStart_toStartOf="@+id/repeat_Switch"
+        app:layout_constraintTop_toBottomOf="@+id/repeat_Switch" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
