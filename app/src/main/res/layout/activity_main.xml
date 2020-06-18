@@ -55,15 +55,6 @@
         app:layout_constraintEnd_toEndOf="@+id/setTimer"
         app:layout_constraintTop_toBottomOf="@+id/text_view_countdown" />
 
-    <!--<Button-->
-    <!--android:id="@+id/button_start_pause"-->
-    <!--android:layout_width="75dp"-->
-    <!--android:layout_height="70dp"-->
-    <!--android:background="@drawable/pauseicon"-->
-    <!--android:layout_below="@+id/progressBar"-->
-    <!--android:layout_centerHorizontal="true"-->
-    <!--android:text="" />-->
-
     <Button
         android:id="@+id/setTimer"
         android:layout_width="210dp"

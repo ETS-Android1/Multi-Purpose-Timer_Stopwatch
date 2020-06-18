@@ -1,8 +1,10 @@
 package com.armcomptech.akash.simpletimer4;
 
 import android.content.SharedPreferences;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,7 +12,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class statisticsActivity extends AppCompatActivity{
     RecyclerView recyclerView;
@@ -23,9 +26,11 @@ public class statisticsActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics_activity);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("Statistics");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("   Statistics");
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.drawable.ic_data_usage_white);
 
-        //testing
         loadData();
 
         recyclerView = findViewById(R.id.timersRecyclerView);

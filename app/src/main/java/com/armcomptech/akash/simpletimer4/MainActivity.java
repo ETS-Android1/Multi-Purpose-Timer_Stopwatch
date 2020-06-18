@@ -2,10 +2,10 @@ package com.armcomptech.akash.simpletimer4;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -13,6 +13,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +26,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.RemoteViews;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +35,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.applovin.sdk.AppLovinSdk;
-import com.armcomptech.NotificationReceiver;
 import com.chartboost.sdk.Chartboost;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -48,7 +49,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static com.App.CHANNEL_ID;
+import static com.App.MAIN_CHANNEL_ID;
 
 public class MainActivity extends AppCompatActivity implements ExampleDialog.ExmapleDialogListner{
 
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     private boolean BlinkTimerStopRequest;
     private boolean heartbeatChecked;
     private boolean soundChecked;
+    private boolean showNotification;
 
     private long mStartTimeInMillis;
     private long mTimeLeftInMillis;
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     ArrayList<Integer> count = new ArrayList<>();
     ArrayList<Integer> timeInSeconds = new ArrayList<>();
 
-
+    private static MainActivity instance;
     public String currentTimerName;
     public int currentTimerNamePosition;
     public int ticksToPass;
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        instance = this;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -148,6 +151,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         mButtonSetTimer.setOnClickListener(v -> openDialog());
 
         mButtonPause.hide();
+
+        setTime(100000); //default 1 minute timer
 
         mButtonStart.setOnClickListener( v -> {
             mButtonStart.hide();
@@ -251,7 +256,40 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         });
         heartbeatChecked = true;
         soundChecked = true;
+        showNotification = true;
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        notificationManager.cancel(1);
+        showNotification = false;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        notificationManager.cancel(1);
+        showNotification = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        notificationManager.cancel(1);
+        showNotification = false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        notificationManager.cancel(1);
+        showNotification = true;
+    }
+
+    public static MainActivity getInstance() {
+        return instance;
     }
 
     private String getTimerName() {
@@ -296,8 +334,23 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
-        resetTimer(); //reset the timer when the app starts up
+        //resetTimer(); //reset the timer when the app starts up
+
+        menu.add(0, R.id.privacy_policy, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
+        menu.add(0, R.id.statistics_activity, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
+        menu.add(0, Menu.NONE, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
+
         return true;
+    }
+
+    private CharSequence menuIconWithText(Drawable r, String title) {
+
+        r.setBounds(0, 0, r.getIntrinsicWidth(), r.getIntrinsicHeight());
+        SpannableString sb = new SpannableString("    " + title);
+        ImageSpan imageSpan = new ImageSpan(r, ImageSpan.ALIGN_BOTTOM);
+        sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        return sb;
     }
 
     @Override
@@ -356,6 +409,10 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     }
 
     public void timeUp() {
+        Intent openMainActivity = new Intent(this, MainActivity.class);
+        openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivityIfNeeded(openMainActivity, 0);
+
         if (soundChecked) {
             if (player != null) {
                 stopPlayer();
@@ -472,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         closeKeyboard();
     }
 
-    private void startTimer() {
+    public void startTimer() {
 
         mEndTime = System.currentTimeMillis() + mTimeLeftInMillis;
         heartbeat();
@@ -532,14 +589,15 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         updateWatchInterface();
     }
 
-    private void pauseTimer() {
+    public void pauseTimer() {
         mCountDownTimer.cancel();
         mTimerRunning = false;
         updateWatchInterface();
         stopPlayer();
+//        pauseNotification(getTimeLeftFormatted());
     }
 
-    private void resetTimer() {
+    public void resetTimer() {
         mTimeLeftInMillis = mStartTimeInMillis;
         updateCountDownText();
         updateWatchInterface();
@@ -550,10 +608,10 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mProgressBar.setProgress((int)mStartTimeInMillis,true);
         }
+        notificationManager.cancel(1);
     }
 
-
-    private void updateCountDownText() {
+    public String getTimeLeftFormatted() {
         int hours = (int) (mTimeLeftInMillis / 1000) / 3600;
         int minutes = (int) ((mTimeLeftInMillis / 1000) % 3600) / 60;
         int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
@@ -576,6 +634,12 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
             mMillis.setTextSize(30);
         }
 
+        return timeLeftFormatted;
+    }
+
+    private void updateCountDownText() {
+        String timeLeftFormatted = getTimeLeftFormatted();
+
         String millisFormatted;
         millisFormatted = String.format(Locale.getDefault(), "%02d", (mTimeLeftInMillis % 1000));
 
@@ -587,7 +651,11 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
             mProgressBar.setProgress((int)mTimeLeftInMillis,true);
         }
 
-        showNotification(timeLeftFormatted);
+        if (showNotification) {
+            showNotification(timeLeftFormatted);
+        } else {
+            notificationManager.cancel(1);
+        }
     }
 
     private void updateWatchInterface() {
@@ -622,53 +690,60 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        stopPlayer();
+    //cancel notification when application is closed
+//    @Override
+//    protected void onTaskRemoved() {
+//        super.onTaskRemoved();
+//        pauseNotification(getTimeLeftFormatted());
+//    }
 
-        SharedPreferences prefs = getSharedPreferences("currentTimer", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        stopPlayer();
+//
+//        SharedPreferences prefs = getSharedPreferences("currentTimer", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = prefs.edit();
+//
+//        editor.putLong("startTimeInMillis", mStartTimeInMillis);
+//        editor.putLong("millisLeft", mTimeLeftInMillis);
+//        editor.putBoolean("timerRunning", mTimerRunning);
+//        editor.putLong("endTime", mEndTime);
+//
+//        editor.apply();
+//
+//        if (mCountDownTimer != null) {
+//            mCountDownTimer.cancel();
+//        }
+//    }
 
-        editor.putLong("startTimeInMillis", mStartTimeInMillis);
-        editor.putLong("millisLeft", mTimeLeftInMillis);
-        editor.putBoolean("timerRunning", mTimerRunning);
-        editor.putLong("endTime", mEndTime);
-
-        editor.apply();
-
-        if (mCountDownTimer != null) {
-            mCountDownTimer.cancel();
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        SharedPreferences prefs = getSharedPreferences("currentTimer", MODE_PRIVATE);
-
-        mStartTimeInMillis = prefs.getLong("startTimeInMillis", 600000);
-        mTimeLeftInMillis = prefs.getLong("millisLeft", mStartTimeInMillis);
-        mTimerRunning = prefs.getBoolean("timerRunning", false);
-
-        updateCountDownText();
-        updateWatchInterface();
-
-        if (mTimerRunning) {
-            mEndTime = prefs.getLong("endTime", 0);
-            mTimeLeftInMillis = mEndTime - System.currentTimeMillis();
-
-            if (mTimeLeftInMillis < 0) {
-                mTimeLeftInMillis = 0;
-                mTimerRunning = false;
-                updateCountDownText();
-                updateWatchInterface();
-            } else {
-                startTimer();
-            }
-        }
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//
+//        SharedPreferences prefs = getSharedPreferences("currentTimer", MODE_PRIVATE);
+//
+//        mStartTimeInMillis = prefs.getLong("startTimeInMillis", 600000);
+//        mTimeLeftInMillis = prefs.getLong("millisLeft", mStartTimeInMillis);
+//        mTimerRunning = prefs.getBoolean("timerRunning", false);
+//
+//        updateCountDownText();
+//        updateWatchInterface();
+//
+//        if (mTimerRunning) {
+//            mEndTime = prefs.getLong("endTime", 0);
+//            mTimeLeftInMillis = mEndTime - System.currentTimeMillis();
+//
+//            if (mTimeLeftInMillis < 0) {
+//                mTimeLeftInMillis = 0;
+//                mTimerRunning = false;
+//                updateCountDownText();
+//                updateWatchInterface();
+//            } else {
+//                startTimer();
+//            }
+//        }
+//    }
 
     private void loadData() {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
@@ -687,29 +762,20 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         timeInSeconds = gson.fromJson(timeInSecondsJson, timeInSecondsType);
     }
 
-
-
+    //testing
     public void showNotification(String timeLeft) {
-        RemoteViews collapsedView = new RemoteViews(getPackageName(), R.layout.notificaiton_collapsed_heartbeat);
-        RemoteViews expendedView = new RemoteViews(getPackageName(), R.layout.notification_expanded_heartbeat);
-
-        Intent clickIntent = new Intent(this, NotificationReceiver.class);
-        PendingIntent clickPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
-
-        expendedView.setOnClickPendingIntent(R.id.text_view_expanded, clickPendingIntent);
-
-        collapsedView.setTextViewText(R.id.text_view_collapsed, timeLeft);
-        expendedView.setTextViewText(R.id.text_view_expanded, timeLeft);
-
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setCustomContentView(collapsedView)
-                .setCustomBigContentView(expendedView)
-                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+        Notification notification = new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_timer)
+                .setContentTitle("Testing Title")
+                .setContentText(timeLeft)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setAutoCancel(true)
+                .setOngoing(false)
+                .setOnlyAlertOnce(true)
+                .setSound(null)
                 .build();
 
         notificationManager.notify(1, notification);
-
-        DataHolder.getInstance().setNotificationUp(true);
     }
 }

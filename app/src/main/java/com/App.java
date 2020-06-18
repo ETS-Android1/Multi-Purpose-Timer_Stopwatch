@@ -3,29 +3,30 @@ package com;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Build;
 
 public class App extends Application {
-    public static final String CHANNEL_ID = "timerRunningChannel";
+    public static final String MAIN_CHANNEL_ID = "mainChannel";
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        createNotificationChannel();
+        createNotificationChannels();
     }
 
-    private void createNotificationChannel() {
-        NotificationChannel channel = null;
+    private void createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channel = new NotificationChannel(CHANNEL_ID, "Notification Channel", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel mainChannel = new NotificationChannel(MAIN_CHANNEL_ID, "Main Channel", NotificationManager.IMPORTANCE_LOW);
+            mainChannel.setDescription("This is the main Channel");
+
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(mainChannel);
         }
-        NotificationManager manager = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            manager = getSystemService(NotificationManager.class);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createNotificationChannel(channel);
-        }
+    }
+
+    public NotificationManager getManager() {
+        return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 }
