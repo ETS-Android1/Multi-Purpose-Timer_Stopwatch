@@ -766,8 +766,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     public void showNotification(String timeLeft) {
         Notification notification = new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_timer)
-                .setContentTitle("Testing Title")
-                .setContentText(timeLeft)
+                .setContentTitle(timeLeft)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setAutoCancel(true)
