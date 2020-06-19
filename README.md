@@ -9,6 +9,5 @@ ScreenShots of the Application:
 <br>
 <img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-201700.jpg" width="300">
 <img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235229.jpg" width="300">
-![ScreenShot](https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235229.jpg)
-![ScreenShot](https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235241.jpg)
-![ScreenShot](https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235250.jpg)
+<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235241.jpg" width="300">
+<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235250.jpg" width="300">
