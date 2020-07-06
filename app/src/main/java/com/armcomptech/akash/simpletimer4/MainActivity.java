@@ -73,18 +73,17 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
     private long mStartTimeInMillis;
     private long mTimeLeftInMillis;
-    private long mEndTime;
     private int alternate;
 
     MediaPlayer player;
     private NotificationManagerCompat notificationManager;
-    private InterstitialAd mResetButtonInterstitialAd;
     private InterstitialAd mHappyButtonInterstitialAd;
 
     ArrayList<String> timerName = new ArrayList<>();
     ArrayList<Integer> count = new ArrayList<>();
     ArrayList<Integer> timeInSeconds = new ArrayList<>();
 
+    @SuppressLint("StaticFieldLeak")
     private static MainActivity instance;
     public String currentTimerName;
     public int currentTimerNamePosition;
@@ -109,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         }
 
         //ad stuff
+        //noinspection deprecation
         MobileAds.initialize(this,getString(R.string.admob_app_id));
 
         Chartboost.startWithAppId(this, "5d12507d18272d0bbe13eced", "e750c201ec23522c7ea3c688bb971ef68823ad5f");
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         AppLovinSdk.initializeSdk(this);
 
         //reset button ad
-        mResetButtonInterstitialAd = new InterstitialAd(this);
+        InterstitialAd mResetButtonInterstitialAd = new InterstitialAd(this);
         mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
         mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
 //        mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("E5CC1736905A67B0077760DE2AFF519D").build());//test device
@@ -248,11 +248,11 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
             mTimerNameTextView.setVisibility(View.INVISIBLE);
             mTimerNameEditText.setVisibility(View.VISIBLE);
 
-            if (mResetButtonInterstitialAd.isLoaded()) {
-                //mResetButtonInterstitialAd.show();
-            } else {
-                Log.d("TAG", "The interstitial wasn't loaded yet.");
-            }
+//            if (mResetButtonInterstitialAd.isLoaded()) {
+//                //mResetButtonInterstitialAd.show();
+//            } else {
+//                Log.d("TAG", "The interstitial wasn't loaded yet.");
+//            }
         });
         heartbeatChecked = true;
         soundChecked = true;
@@ -330,11 +330,11 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         editor.apply();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
-        //resetTimer(); //reset the timer when the app starts up
 
         menu.add(0, R.id.privacy_policy, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
         menu.add(0, R.id.statistics_activity, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
@@ -531,7 +531,6 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
     public void startTimer() {
 
-        mEndTime = System.currentTimeMillis() + mTimeLeftInMillis;
         heartbeat();
         int countDownInterval = 100;
         if (mStartTimeInMillis <= 30000) {

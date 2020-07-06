@@ -3,7 +3,6 @@ package com;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.os.Build;
 
 public class App extends Application {
@@ -26,7 +25,4 @@ public class App extends Application {
         }
     }
 
-    public NotificationManager getManager() {
-        return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    }
 }

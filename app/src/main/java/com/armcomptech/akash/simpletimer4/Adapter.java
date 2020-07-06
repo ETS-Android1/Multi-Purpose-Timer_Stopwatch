@@ -2,13 +2,14 @@ package com.armcomptech.akash.simpletimer4;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import java.lang.*;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 
 public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -118,7 +119,7 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return timerName.size();
     }
 
-    public class Item extends RecyclerView.ViewHolder {
+    public static class Item extends RecyclerView.ViewHolder {
         TextView textViewTimerName;
         TextView textViewCount;
         TextView textViewTimeInSeconds;
