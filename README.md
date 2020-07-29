@@ -1,4 +1,4 @@
-# Heartbeat-Timer
+# Heartbeat Timer
 This is an android project of a unique heartbeat timer.
 There is an option to play a subtle heartbeat sound when the timer is running.
 The user can also name the timer they set and look back at the statistics of all the timer set by name including the total time and how many times the timer was used.
