@@ -5,7 +5,7 @@ The user can also name the timer they set and look back at the statistics of all
 
 Link to the application on Google Play Store: <a href="https://play.google.com/store/apps/details?id=com.armcomptech.akash.simpletimer4">Heartbeat Timer</a>
 
-ScreenShots of the Application:
+Screenshots of the Application:
 <br>
 <img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-201700.jpg" width="300">
 <img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235229.jpg" width="300">
