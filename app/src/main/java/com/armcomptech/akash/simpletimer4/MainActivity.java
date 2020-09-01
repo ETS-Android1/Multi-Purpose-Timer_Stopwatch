@@ -151,7 +151,11 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         setTime(100000); //default 1 minute timer
 
         mButtonStart.setOnClickListener( v -> {
-            logFirebaseAnalyticsEvents("Started Timer");
+            Bundle bundle = new Bundle();
+            bundle.putString("Event", "Start Timer");
+            bundle.putString("Time", String.valueOf(mTimeLeftInMillis/1000));
+            bundle.putString("Name", getTimerName());
+            mFirebaseAnalytics.logEvent("Start_Timer", bundle);
 
             mButtonStart.hide();
             mButtonPause.show();
@@ -431,8 +435,10 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     }
 
     public void timeUp() {
+        //TODO: Wake up screen if off
         Intent openMainActivity = new Intent(this, MainActivity.class);
         openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        logFirebaseAnalyticsEvents("Time Up");
         startActivityIfNeeded(openMainActivity, 0);
 
         if (soundChecked) {
