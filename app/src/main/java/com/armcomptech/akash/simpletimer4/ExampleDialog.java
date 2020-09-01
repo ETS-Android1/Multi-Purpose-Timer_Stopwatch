@@ -46,6 +46,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
         editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            assert imm != null;
             imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
         }));
         editTextTimer.requestFocus();

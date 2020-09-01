@@ -34,16 +34,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.applovin.sdk.AppLovinSdk;
-import com.chartboost.sdk.Chartboost;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.mopub.common.MoPub;
-import com.mopub.common.SdkConfiguration;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -90,6 +87,10 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     public int ticksToPass;
     public int counter;
 
+    //TODO: Change disableFirebaseLogging to false when releasing
+    private static Boolean disableFirebaseLogging = true;
+    private static FirebaseAnalytics mFirebaseAnalytics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         instance = this;
@@ -101,6 +102,13 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
         loadData(); //load saved data when opening the app
 
+        if (!disableFirebaseLogging) {
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "App Opened");
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle);
+        }
+
         if (timerName == null) {
             timerName = new ArrayList<>();
             count = new ArrayList<>();
@@ -111,27 +119,14 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         //noinspection deprecation
         MobileAds.initialize(this,getString(R.string.admob_app_id));
 
-        Chartboost.startWithAppId(this, "5d12507d18272d0bbe13eced", "e750c201ec23522c7ea3c688bb971ef68823ad5f");
-        Chartboost.onCreate(this);
-
-        SdkConfiguration mResetButtonInterstitialAdMoPub = new SdkConfiguration.Builder("7d26297661ba4a1784b331a6f3bde078").build();
-        SdkConfiguration mHappyButtonInterstitialAdMoPub = new SdkConfiguration.Builder("a692a5880d0d48ce9463f1e8b4348a22").build();
-        MoPub.initializeSdk(this, mResetButtonInterstitialAdMoPub, null);
-        MoPub.initializeSdk(this, mHappyButtonInterstitialAdMoPub, null);
-
-        AppLovinSdk.initializeSdk(this);
-
         //reset button ad
         InterstitialAd mResetButtonInterstitialAd = new InterstitialAd(this);
         mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
-        mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
-//        mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("E5CC1736905A67B0077760DE2AFF519D").build());//test device
-
-        //happy face ad
-        mHappyButtonInterstitialAd = new InterstitialAd(this);
-        mHappyButtonInterstitialAd.setAdUnitId(getString(R.string.happyButton_interstital_ad_id));
-        mHappyButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
-//        mHappyButtonInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("E5CC1736905A67B0077760DE2AFF519D").build());//test device
+        if (!disableFirebaseLogging) {
+            mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+        } else {
+            mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("E5CC1736905A67B0077760DE2AFF519D").build());//test device
+        }
 
         mProgressBar = findViewById(R.id.progressBar);
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
@@ -141,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         mTimerNameEditText = findViewById(R.id.timerNameEditText);
         mMillis = findViewById(R.id.millis);
         mRepeatSwitch = findViewById(R.id.repeat_Switch);
+        mRepeatSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logFirebaseAnalyticsEvents("Repeat Switch: " + isChecked));
 
         mTimerNameTextView = findViewById(R.id.timerNameTextView);
         mTimerNameTextView.setVisibility(View.INVISIBLE );
@@ -155,6 +151,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         setTime(100000); //default 1 minute timer
 
         mButtonStart.setOnClickListener( v -> {
+            logFirebaseAnalyticsEvents("Started Timer");
+
             mButtonStart.hide();
             mButtonPause.show();
             mButtonReset.hide();
@@ -198,6 +196,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         });
 
         mButtonPause.setOnClickListener( v -> {
+            logFirebaseAnalyticsEvents("Timer Paused");
+
             mButtonPause.hide();
             mButtonStart.show();
             mButtonReset.show();
@@ -241,6 +241,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         });
 
         mButtonReset.setOnClickListener(v -> {
+            logFirebaseAnalyticsEvents("Reset Timer");
+
             mButtonStart.show();
             mButtonStart.hide();
             resetTimer();
@@ -248,16 +250,25 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
             mTimerNameTextView.setVisibility(View.INVISIBLE);
             mTimerNameEditText.setVisibility(View.VISIBLE);
 
-//            if (mResetButtonInterstitialAd.isLoaded()) {
-//                //mResetButtonInterstitialAd.show();
-//            } else {
-//                Log.d("TAG", "The interstitial wasn't loaded yet.");
-//            }
+            if (mResetButtonInterstitialAd.isLoaded()) {
+                mResetButtonInterstitialAd.show();
+                logFirebaseAnalyticsEvents("Showed Ad");
+            } else {
+                Log.d("TAG", "The interstitial wasn't loaded yet.");
+                logFirebaseAnalyticsEvents("Ad not loaded");
+            }
         });
         heartbeatChecked = true;
         soundChecked = true;
         showNotification = true;
+    }
 
+    public static void logFirebaseAnalyticsEvents(String eventName) {
+        if (!disableFirebaseLogging) {
+            Bundle bundle = new Bundle();
+            bundle.putString("Event", eventName);
+            mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
+        }
     }
 
     @Override
@@ -297,6 +308,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         if (timerName.matches("")) {
             timerName = "General";
         }
+
+        logFirebaseAnalyticsEvents("TimerName: " + timerName);
         return timerName;
     }
 
@@ -330,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         editor.apply();
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @SuppressWarnings("deprecation")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -338,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
         menu.add(0, R.id.privacy_policy, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
         menu.add(0, R.id.statistics_activity, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
-        menu.add(0, Menu.NONE, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
+//        menu.add(0, Menu.NONE, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
 
         return true;
     }
@@ -366,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         switch (id) {
             case R.id.check_heartbeat:
                 heartbeatChecked = !heartbeatChecked;
+                logFirebaseAnalyticsEvents("Heartbeat Checked: " + heartbeatChecked);
 
                 //refresh the heartbeat sound
                 if (mTimerRunning) {
@@ -376,13 +391,17 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
             case R.id.check_sound:
                 soundChecked = !soundChecked;
+                logFirebaseAnalyticsEvents("Sound Checked: " + heartbeatChecked);
+
                 break;
 
             case R.id.statistics_activity:
+                logFirebaseAnalyticsEvents("Opened Statistics");
                 startActivity(new Intent(this, statisticsActivity.class));
                 break;
 
             case R.id.privacy_policy:
+                logFirebaseAnalyticsEvents("Opened Privacy Policy");
                 Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
                 myWebLink.setData(Uri.parse("https://timerpolicy.blogspot.com/2019/06/privacy-policy-armcomptech-built.html"));
                 startActivity(myWebLink);
@@ -685,6 +704,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         View view = this.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            assert imm != null;
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
