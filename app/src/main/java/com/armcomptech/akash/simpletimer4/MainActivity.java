@@ -275,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     protected void onDestroy() {
         super.onDestroy();
         notificationManager.cancel(1);
+        stopPlayer();
         showNotification = false;
     }
 
@@ -282,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     protected void onStop() {
         super.onStop();
         notificationManager.cancel(1);
+        stopPlayer();
         showNotification = true;
     }
 
@@ -296,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     protected void onPause() {
         super.onPause();
         notificationManager.cancel(1);
+        stopPlayer();
         showNotification = true;
     }
 
