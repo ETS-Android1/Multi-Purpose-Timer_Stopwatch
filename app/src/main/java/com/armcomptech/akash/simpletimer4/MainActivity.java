@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     public int counter;
 
     //TODO: Change disableFirebaseLogging to false when releasing
-    private static Boolean disableFirebaseLogging = true;
+    private static Boolean disableFirebaseLogging = false;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
