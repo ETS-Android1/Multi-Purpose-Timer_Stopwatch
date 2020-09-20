@@ -48,7 +48,7 @@ import java.util.Locale;
 
 import static com.App.MAIN_CHANNEL_ID;
 
-public class MainActivity extends AppCompatActivity implements ExampleDialog.ExmapleDialogListner{
+public class SingleTimerActivity extends AppCompatActivity implements setTimerDialog.ExmapleDialogListner{
 
     private TextView mTextViewCountDown;
     private FloatingActionButton mButtonStart;
@@ -74,21 +74,20 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
     MediaPlayer player;
     private NotificationManagerCompat notificationManager;
-    private InterstitialAd mHappyButtonInterstitialAd;
 
     ArrayList<String> timerName = new ArrayList<>();
     ArrayList<Integer> count = new ArrayList<>();
     ArrayList<Integer> timeInSeconds = new ArrayList<>();
 
     @SuppressLint("StaticFieldLeak")
-    private static MainActivity instance;
+    private static SingleTimerActivity instance;
     public String currentTimerName;
     public int currentTimerNamePosition;
     public int ticksToPass;
     public int counter;
 
     //TODO: Change disableFirebaseLogging to false when releasing
-    private static Boolean disableFirebaseLogging = false;
+    private static Boolean disableFirebaseLogging = true;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         instance = this;
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_single_timer);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         notificationManager = NotificationManagerCompat.from(this);
 
@@ -151,11 +150,14 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         setTime(100000); //default 1 minute timer
 
         mButtonStart.setOnClickListener( v -> {
-            Bundle bundle = new Bundle();
-            bundle.putString("Event", "Start Timer");
-            bundle.putString("Time", String.valueOf(mTimeLeftInMillis/1000));
-            bundle.putString("Name", getTimerName());
-            mFirebaseAnalytics.logEvent("Start_Timer", bundle);
+
+            if (!disableFirebaseLogging) {
+                Bundle bundle = new Bundle();
+                bundle.putString("Event", "Start Timer");
+                bundle.putString("Time", String.valueOf(mTimeLeftInMillis/1000));
+                bundle.putString("Name", getTimerName());
+                mFirebaseAnalytics.logEvent("Start_Timer", bundle);
+            }
 
             mButtonStart.hide();
             mButtonPause.show();
@@ -306,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         showNotification = true;
     }
 
-    public static MainActivity getInstance() {
+    public static SingleTimerActivity getInstance() {
         return instance;
     }
 
@@ -357,8 +359,9 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
 
-        menu.add(0, R.id.privacy_policy, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
-        menu.add(0, R.id.statistics_activity, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
+        menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_video_library_24), "Multi-Timer Mode"));
+        menu.add(0, R.id.privacy_policy, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
+        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
 //        menu.add(0, Menu.NONE, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
 
         return true;
@@ -414,18 +417,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
                 startActivity(myWebLink);
                 break;
 
-            case R.id.ad_button:
-                if (mHappyButtonInterstitialAd.isLoaded()) {
-
-                    //pause the timer when the ad is opened
-                    if (mTimerRunning) {
-                        pauseTimer();
-                    }
-
-                    mHappyButtonInterstitialAd.show();
-                } else {
-                    Log.d("TAG", "The interstitial wasn't loaded yet.");
-                }
+            case R.id.multi_Timer_Mode:
+                startActivity(new Intent(SingleTimerActivity.this, MultiTimerActivity.class));
                 break;
 
             default:
@@ -436,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
 
     public void timeUp() {
         //TODO: Wake up screen if off
-        Intent openMainActivity = new Intent(this, MainActivity.class);
+        Intent openMainActivity = new Intent(this, SingleTimerActivity.class);
         openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         logFirebaseAnalyticsEvents("Time Up");
         startActivityIfNeeded(openMainActivity, 0);
@@ -521,8 +514,8 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
     }
 
     private void openDialog() {
-        ExampleDialog exampleDialog = new ExampleDialog();
-        exampleDialog.show(getSupportFragmentManager(), "Set Timer Here");
+        setTimerDialog setTimerDialog = new setTimerDialog();
+        setTimerDialog.show(getSupportFragmentManager(), "Set Timer Here");
     }
 
     public void applyText(String time){
@@ -537,14 +530,14 @@ public class MainActivity extends AppCompatActivity implements ExampleDialog.Exm
         long finalsecond = (hour * 3600) + (minute * 60) + second;
 
         if (time.length() == 0) {
-            Toast.makeText(MainActivity.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SingleTimerActivity.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
             return;
         }
 
         //long millisInput = Long.parseLong(time) * 1000;
         long millisInput = finalsecond * 1000;
         if (millisInput == 0) {
-            Toast.makeText(MainActivity.this, "Please enter a positive number", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SingleTimerActivity.this, "Please enter a positive number", Toast.LENGTH_SHORT).show();
             return;
         }
 

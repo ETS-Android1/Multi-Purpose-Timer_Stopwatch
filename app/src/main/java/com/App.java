@@ -21,6 +21,7 @@ public class App extends Application {
             mainChannel.setDescription("This is the main Channel");
 
             NotificationManager manager = getSystemService(NotificationManager.class);
+            assert manager != null;
             manager.createNotificationChannel(mainChannel);
         }
     }

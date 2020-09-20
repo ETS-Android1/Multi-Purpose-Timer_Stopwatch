@@ -5,11 +5,10 @@
     >
 
     <item
-        android:id="@+id/ad_button"
-        android:icon="@drawable/ic_tag_faces_white_24dp"
-        app:showAsAction="ifRoom"
+        android:id="@+id/multi_Timer_Mode"
+        app:showAsAction="never"
         android:visible="false"
-        android:title="@string/smiley_face" />
+        android:title="@string/multi_timer_mode" />
 
     <item
         android:id="@+id/check_heartbeat"

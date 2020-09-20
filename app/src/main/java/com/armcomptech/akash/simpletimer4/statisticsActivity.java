@@ -33,9 +33,9 @@ public class statisticsActivity extends AppCompatActivity{
 
         loadData();
 
-        recyclerView = findViewById(R.id.timersRecyclerView);
+        recyclerView = findViewById(R.id.timersStatisticRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new Adapter(this, timerName, count, timeInSeconds));
+        recyclerView.setAdapter(new StatisticsAdapter(this, timerName, count, timeInSeconds));
     }
 
     private void loadData() {

@@ -12,13 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class StatisticsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private ArrayList<String> timerName;
     private ArrayList<Integer> count;
     private ArrayList<Integer> timeInSeconds;
 
-    Adapter(Context context, ArrayList<String> timerName, ArrayList<Integer> count, ArrayList<Integer> timeInSeconds) {
+    StatisticsAdapter(Context context, ArrayList<String> timerName, ArrayList<Integer> count, ArrayList<Integer> timeInSeconds) {
         this.context = context;
         this.timerName = timerName;
         this.count = count;
@@ -29,7 +29,7 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View row = inflater.inflate(R.layout.statistics_recycler_vew, viewGroup, false);
+        View row = inflater.inflate(R.layout.statistics_recycler_view, viewGroup, false);
         return new Item(row);
     }
 

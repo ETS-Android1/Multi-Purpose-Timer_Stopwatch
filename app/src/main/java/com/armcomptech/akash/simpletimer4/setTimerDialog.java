@@ -15,9 +15,9 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import java.util.Objects;
 
-public class ExampleDialog extends AppCompatDialogFragment {
+public class setTimerDialog extends AppCompatDialogFragment {
     private EditText editTextTimer;
-    private ExmapleDialogListner listner;
+    private ExmapleDialogListner listener;
 
 
     @NonNull
@@ -37,7 +37,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
                     String time = editTextTimer.getText().toString();
 
                     if (!(time.matches(""))) {
-                        listner.applyText(time);
+                        listener.applyText(time);
                     }
                 });
 
@@ -60,7 +60,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
         super.onAttach(context);
 
         try {
-            listner = (ExmapleDialogListner) context;
+            listener = (ExmapleDialogListner) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + "must implement ExampleDialogListner");
         }

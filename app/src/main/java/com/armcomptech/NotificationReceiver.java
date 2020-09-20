@@ -6,13 +6,13 @@ import android.content.Intent;
 
 import androidx.core.app.NotificationManagerCompat;
 
-import com.armcomptech.akash.simpletimer4.MainActivity;
+import com.armcomptech.akash.simpletimer4.SingleTimerActivity;
 
 public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 //        String action = intent.getStringExtra("Pause");
-        MainActivity.getInstance().pauseTimer();
+        SingleTimerActivity.getInstance().pauseTimer();
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.cancel(1);

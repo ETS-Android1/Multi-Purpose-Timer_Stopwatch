@@ -15,4 +15,5 @@
     <string name="setting">Setting</string>
     <string name="custom_timer">Custom Timer</string>
     <string name="Notification">Notification</string>
+    <string name="multi_timer_mode">Multi Timer Mode</string>
 </resources>
