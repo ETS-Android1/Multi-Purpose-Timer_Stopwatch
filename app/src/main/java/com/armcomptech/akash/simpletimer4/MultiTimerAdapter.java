@@ -6,6 +6,7 @@ import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -103,7 +104,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         counter = 0;
         ticksToPass = 1000 / 100;
 
-        timers.get(position).
+//        timers.get(position).
 
         if (timers.get(position).mCountDownTimer != null) {
             timers.get(position).mCountDownTimer.cancel();
@@ -114,7 +115,11 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 timers.get(position).mTimeLeftInMillis = millisUntilFinished;
 
                 ((Item)holder).timerTime.setText(timers.get(position).getTimeLeftFormatted());
-//                updateTimersText();
+
+                if (holders.size() != timers.size()) {
+                    notifyDataSetChanged();
+                }
+
                 counter++;
                 if (ticksToPass == counter) {
 //                    holder.timerTime.setText(timers.get(position).getTimeLeftFormatted());
@@ -134,17 +139,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }.start();
     }
 
-    private void updateTimersText() {
-        for(RecyclerView.ViewHolder myHolder: holders) {
-            int getThisPosition = holders.indexOf(myHolder);
-            ((Item)myHolder).timerTime.setText(timers.get(getThisPosition).getTimeLeftFormatted());
-
-            if (timers.get(getThisPosition).mTimeLeftInMillis == 0) {
-                ((Item) myHolder).timerName.setHintTextColor(Color.RED);
-            }
-        }
-    }
-
     @Override
     public int getItemCount() {
         if (timers == null) {
@@ -159,6 +153,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         FloatingActionButton startButton;
         FloatingActionButton pauseButton;
         FloatingActionButton resetButton;
+        Switch repeatSwitch;
         Item(@NonNull View itemView) {
             super(itemView);
             timerName = itemView.findViewById(R.id.timerNameInMultiTimer);
@@ -166,6 +161,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             startButton = itemView.findViewById(R.id.startButtonInMultiTimer);
             pauseButton = itemView.findViewById(R.id.stopButtonInMultiTimer);
             resetButton = itemView.findViewById(R.id.resetButtonInMultiTimer);
+            repeatSwitch = itemView.findViewById(R.id.repeat_Switch);
         }
     }
 }

@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MultiTimerActivity"
     android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/multiTimerRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-</LinearLayout>
+            android:layout_height="651dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="80dp" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/addTimerFloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="@dimen/fab_margin"
+            android:text="Add Timer"
+            android:theme="@style/Theme.MaterialComponents.NoActionBar"
+            app:icon="@drawable/ic_baseline_add_24" />
+</RelativeLayout>
