@@ -48,9 +48,22 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         ((Item)holder).timerName.setText("Timer Name: " + timers.get(position).timerName);
         ((Item)holder).timerTime.setText(timers.get(position).getTimeLeftFormatted());
-        ((Item)holder).startButton.setVisibility(View.VISIBLE);
-        ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
-        ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
+        if (timers.get(position).timerPlaying) {
+            ((Item)holder).startButton.setVisibility(View.INVISIBLE);
+            ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
+            ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
+        }
+        if (timers.get(position).timerPaused) {
+            ((Item)holder).startButton.setVisibility(View.VISIBLE);
+            ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
+            ((Item)holder).resetButton.setVisibility(View.VISIBLE);
+        }
+        if (timers.get(position).timerIsDone) {
+            ((Item)holder).startButton.setVisibility(View.INVISIBLE);
+            ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
+            ((Item)holder).resetButton.setVisibility(View.VISIBLE);
+        }
+
         ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(position).mStartTimeInMillis);
 
         ((Item)holder).startButton.setOnClickListener(v -> {

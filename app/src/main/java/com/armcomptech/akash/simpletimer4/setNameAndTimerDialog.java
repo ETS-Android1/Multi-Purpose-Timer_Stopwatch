@@ -12,6 +12,8 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
+import java.util.Objects;
+
 public class setNameAndTimerDialog extends AppCompatDialogFragment {
     private EditText editTextName;
     private EditText editTextTimer;
@@ -49,18 +51,11 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
         editTextName = view.findViewById(R.id.timerNameDialog);
 
         editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
             assert imm != null;
             imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
         }));
         editTextTimer.requestFocus();
-
-        editTextName.setOnFocusChangeListener((v, hasFocus) -> editTextName.post(() -> {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            assert imm != null;
-            imm.showSoftInput(editTextName, InputMethodManager.SHOW_IMPLICIT);
-        }));
-        editTextName.requestFocus();
 
         return builder.create();
     }
