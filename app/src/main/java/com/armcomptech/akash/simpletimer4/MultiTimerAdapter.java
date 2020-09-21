@@ -46,6 +46,10 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             holders.add(holder);
         }
 
+        int adapterPosition = holder.getAdapterPosition();
+        int layoutPosition = holder.getLayoutPosition();
+        int oldPosition = holder.getOldPosition();
+
         ((Item)holder).timerName.setText("Timer Name: " + timers.get(position).timerName);
         ((Item)holder).timerTime.setText(timers.get(position).getTimeLeftFormatted());
         if (timers.get(position).timerPlaying) {
@@ -126,7 +130,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         counter = 0;
         ticksToPass = 1000 / 100;
 
-//        timers.get(position).
+        notifyDataSetChanged();
 
         if (timers.get(position).mCountDownTimer != null) {
             timers.get(position).mCountDownTimer.cancel();
@@ -134,6 +138,9 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         timers.get(position).mCountDownTimer = new CountDownTimer(timers.get(position).mTimeLeftInMillis, 100) {
             @Override
             public void onTick(long millisUntilFinished) {
+                //TODO: oveservation: position stats the same but position in viewHolder changes to 0 for top and works like index
+                int x = holder.getAdapterPosition();
+                //TODo: x is responding indexwise thing but position is not and x is not same as position, so look into that
                 timers.get(position).mTimeLeftInMillis = millisUntilFinished;
                 ((Item)holder).timerTime.setText(timers.get(position).getTimeLeftFormatted());
 
@@ -141,10 +148,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis, true);
                 } else {
                     ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis);
-                }
-
-                if (holders.size() != timers.size()) {
-                    notifyDataSetChanged();
                 }
 
                 counter++;

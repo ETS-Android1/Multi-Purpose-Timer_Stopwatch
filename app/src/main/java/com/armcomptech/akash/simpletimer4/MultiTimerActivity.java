@@ -1,10 +1,8 @@
 package com.armcomptech.akash.simpletimer4;
 
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +19,8 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import java.util.ArrayList;
 import java.util.Objects;
 
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+
 public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener{
 
     RecyclerView recyclerView;
@@ -32,6 +32,11 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_timer);
+
+        timers.add(new Timer(60 * 1000 , "one minute"));
+        timers.add(new Timer(120 * 1000 , "two minute"));
+        timers.add(new Timer(180 * 1000 , "three minute"));
+        timers.add(new Timer(240 * 1000 , "four minute"));
 
         recyclerView = findViewById(R.id.multiTimerRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -50,18 +55,17 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                 //TODO: there is some bug that needs fixing crashing when somethign is removed
                 timers.remove(viewHolder.getAdapterPosition());
                 holders.remove(viewHolder.getAdapterPosition());
-                Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
+                Objects.requireNonNull(recyclerView.getAdapter()).notifyItemRemoved(viewHolder.getAdapterPosition());
             }
 
             @Override
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
 
-                View itemView = viewHolder.itemView;
-
-                Drawable d = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_baseline_video_library_24);
-                assert d != null;
-                d.setBounds(itemView.getLeft(), itemView.getTop(), (int) dX, itemView.getBottom());
-                d.draw(c);
+                new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                        .addBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.deleteRed))
+                        .addActionIcon(R.drawable.ic_baseline_delete_24)
+                        .create()
+                        .decorate();
 
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
@@ -71,7 +75,6 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         addTimerFab = findViewById(R.id.addTimerFloatingActionButton);
         addTimerFab.setOnClickListener(v -> {
             openTimerDialog();
-            Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             addTimerFab.setTooltipText("Add Timer");
@@ -107,6 +110,6 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         }
 
         timers.add(new Timer(finalsecond * 1000, name));
-        Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
+        Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(recyclerView.getAdapter().getItemCount() + 1);
     }
 }

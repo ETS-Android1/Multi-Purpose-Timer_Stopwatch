@@ -66,5 +66,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.google.android.gms:play-services-base:17.4.0"
 
-    implementation 'com.google.android.material:material:1.3.0-alpha02'
+    implementation 'it.xabaras.android:recyclerview-swipedecorator:1.2.3'
 }
