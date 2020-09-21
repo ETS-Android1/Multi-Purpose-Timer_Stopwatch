@@ -48,7 +48,7 @@ import java.util.Locale;
 
 import static com.App.MAIN_CHANNEL_ID;
 
-public class SingleTimerActivity extends AppCompatActivity implements setTimerDialog.ExmapleDialogListner{
+public class SingleTimerActivity extends AppCompatActivity implements setTimerDialog.setTimerDialogListener {
 
     private TextView mTextViewCountDown;
     private FloatingActionButton mButtonStart;
@@ -143,7 +143,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         mButtonSetTimer = findViewById(R.id.setTimer);
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
 
-        mButtonSetTimer.setOnClickListener(v -> openDialog());
+        mButtonSetTimer.setOnClickListener(v -> openTimerDialog());
 
         mButtonPause.hide();
 
@@ -513,12 +513,12 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         }
     }
 
-    private void openDialog() {
+    private void openTimerDialog() {
         setTimerDialog setTimerDialog = new setTimerDialog();
         setTimerDialog.show(getSupportFragmentManager(), "Set Timer Here");
     }
 
-    public void applyText(String time){
+    public void applyTimerTime(String time){
 
         long input = Long.parseLong(time);
         long hour = input / 10000;

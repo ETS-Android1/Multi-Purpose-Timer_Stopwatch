@@ -60,7 +60,9 @@
             android:backgroundTint="#FFFFFF"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:src="@drawable/ic_play" />
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@drawable/ic_play" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/stopButtonInMultiTimer"
@@ -71,7 +73,9 @@
             android:backgroundTint="#FFFFFF"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:src="@drawable/ic_pause" />
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@drawable/ic_pause" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/resetButtonInMultiTimer"
@@ -83,7 +87,9 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_replay" />
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@drawable/ic_replay" />
 
         <Switch
             android:text="Repeat"
@@ -97,7 +103,7 @@
     </RelativeLayout>
 
     <ProgressBar
-        android:id="@+id/progressBarTime"
+        android:id="@+id/progressBarTimeHorizontal"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

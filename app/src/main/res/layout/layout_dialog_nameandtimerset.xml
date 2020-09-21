@@ -3,14 +3,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:gravity="center">
 
     <EditText
-        android:id="@+id/timer"
+        android:id="@+id/timerNameDialog"
         android:layout_width="250dp"
         android:layout_height="60dp"
+        android:textAlignment="center"
+        android:hint="(Optional) Timer Name" />
+
+    <EditText
+        android:id="@+id/timerTimeDialog"
+        android:layout_width="250dp"
+        android:layout_height="60dp"
+        android:textAlignment="center"
         android:hint="12345 | 1 hour 23 min 45 sec"
-        android:inputType="number"
-        android:textAlignment="center" />
+        android:inputType="number" />
 
 </LinearLayout>

@@ -22,11 +22,24 @@ public class Timer {
     Timer() {
         this.timerPlaying = false;
         this.timerPaused = true;
+        this.timerIsDone = false;
         this.showNotification = false;
         this.mStartTimeInMillis = 5000; // 1 minute and 40 seconds 100000
         this.mTimeLeftInMillis = 5000;
         this.myHolder = null;
     }
+
+    public Timer(long startTimeInMillis, String name) {
+        this.timerPlaying = false;
+        this.timerPaused = true;
+        this.timerIsDone = false;
+        this.showNotification = false;
+        this.mStartTimeInMillis = startTimeInMillis;
+        this.mTimeLeftInMillis = startTimeInMillis;
+        this.timerName = name;
+        this.myHolder = null;
+    }
+
 
     public String getTimeLeftFormatted() {
         int hours = (int) (mTimeLeftInMillis / 1000) / 3600;

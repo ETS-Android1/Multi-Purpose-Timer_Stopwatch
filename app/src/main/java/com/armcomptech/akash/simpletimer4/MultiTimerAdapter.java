@@ -2,10 +2,12 @@ package com.armcomptech.akash.simpletimer4;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -49,6 +51,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ((Item)holder).startButton.setVisibility(View.VISIBLE);
         ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
         ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
+        ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(position).mStartTimeInMillis);
 
         ((Item)holder).startButton.setOnClickListener(v -> {
             startTimer((Item) holder, position);
@@ -75,7 +78,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
-            resetTimer(position);
+            resetTimer((Item) holder, position);
 
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
@@ -90,8 +93,14 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
     }
 
-    private void resetTimer(int position) {
+    private void resetTimer(@NonNull Item holder, int position) {
         timers.get(position).mTimeLeftInMillis = timers.get(position).mStartTimeInMillis;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis, true);
+        } else {
+            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis);
+        }
+        ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.WHITE);
     }
 
     private void pauseTimer(int position) {
@@ -113,8 +122,13 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             @Override
             public void onTick(long millisUntilFinished) {
                 timers.get(position).mTimeLeftInMillis = millisUntilFinished;
-
                 ((Item)holder).timerTime.setText(timers.get(position).getTimeLeftFormatted());
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis, true);
+                } else {
+                    ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis);
+                }
 
                 if (holders.size() != timers.size()) {
                     notifyDataSetChanged();
@@ -134,7 +148,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
                 ((Item)holder).resetButton.setVisibility(View.VISIBLE);
                 ((Item)holder).timerTime.setTextColor(Color.RED);
-//                blink();
+                ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.RED);
             }
         }.start();
     }
@@ -154,6 +168,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         FloatingActionButton pauseButton;
         FloatingActionButton resetButton;
         Switch repeatSwitch;
+        ProgressBar progressBarTimeHorizontal;
         Item(@NonNull View itemView) {
             super(itemView);
             timerName = itemView.findViewById(R.id.timerNameInMultiTimer);
@@ -162,6 +177,8 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             pauseButton = itemView.findViewById(R.id.stopButtonInMultiTimer);
             resetButton = itemView.findViewById(R.id.resetButtonInMultiTimer);
             repeatSwitch = itemView.findViewById(R.id.repeat_Switch);
+            progressBarTimeHorizontal = itemView.findViewById(R.id.progressBarTimeHorizontal);
+
         }
     }
 }

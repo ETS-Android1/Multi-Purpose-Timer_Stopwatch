@@ -1,6 +1,5 @@
 package com.armcomptech.akash.simpletimer4;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -13,9 +12,8 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
-import java.util.Objects;
-
-public class setTimerDialog extends AppCompatDialogFragment {
+public class setNameAndTimerDialog extends AppCompatDialogFragment {
+    private EditText editTextName;
     private EditText editTextTimer;
     private setTimerDialogListener listener;
 
@@ -25,8 +23,8 @@ public class setTimerDialog extends AppCompatDialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        LayoutInflater inflater = Objects.requireNonNull(getActivity()).getLayoutInflater();
-        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.layout_dialog_timerset, null);
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.layout_dialog_nameandtimerset, null);
 
         builder.setView(view)
                 .setTitle("Timer")
@@ -35,14 +33,20 @@ public class setTimerDialog extends AppCompatDialogFragment {
                 })
                 .setPositiveButton("Set Timer", (dialog, which) -> {
                     String time = editTextTimer.getText().toString();
+                    String name;
+                    if (!editTextName.getText().toString().matches("")) {
+                        name = editTextName.getText().toString();
+                    } else {
+                        name = "General";
+                    }
 
                     if (!(time.matches(""))) {
-                        listener.applyTimerTime(time);
+                        listener.applyTimerNameAndTime(time, name);
                     }
                 });
 
-        editTextTimer = view.findViewById(R.id.timer);
-
+        editTextTimer = view.findViewById(R.id.timerTimeDialog);
+        editTextName = view.findViewById(R.id.timerNameDialog);
 
         editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -51,6 +55,12 @@ public class setTimerDialog extends AppCompatDialogFragment {
         }));
         editTextTimer.requestFocus();
 
+        editTextName.setOnFocusChangeListener((v, hasFocus) -> editTextName.post(() -> {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            assert imm != null;
+            imm.showSoftInput(editTextName, InputMethodManager.SHOW_IMPLICIT);
+        }));
+        editTextName.requestFocus();
 
         return builder.create();
     }
@@ -66,6 +76,7 @@ public class setTimerDialog extends AppCompatDialogFragment {
     }
 
     public interface setTimerDialogListener {
-        void applyTimerTime(String time);
+        void applyTimerNameAndTime(String time, String name);
     }
 }
+
