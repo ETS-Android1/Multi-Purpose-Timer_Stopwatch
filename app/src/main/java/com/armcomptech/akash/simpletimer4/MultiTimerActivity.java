@@ -75,20 +75,19 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
         addTimerFab = findViewById(R.id.addTimerFloatingActionButton);
         addTimerFab.setOnClickListener(v -> {
-            openTimerDialog();
+            openNameAndTimerDialog();
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             addTimerFab.setTooltipText("Add Timer");
         }
     }
 
-    private void openTimerDialog() {
-        setNameAndTimerDialog setNameAndTimerDialog = new setNameAndTimerDialog();
+    public void openNameAndTimerDialog() {
+        setNameAndTimerDialog setNameAndTimerDialog = new setNameAndTimerDialog(false, true, null, timers);
         setNameAndTimerDialog.show(getSupportFragmentManager(), "Set Name and Timer Here");
     }
 
-    public void applyTimerNameAndTime(String time, String name){
-
+    public void createNewTimerNameAndTime(String time, String name, boolean creatingNewTimer, boolean updateExistingTimer, MultiTimerAdapter.Item holder, ArrayList<Timer> timers){
         long input = Long.parseLong(time);
         long hour = input / 10000;
         long minuteraw = (input - (hour * 10000)) ;
@@ -110,7 +109,21 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             return;
         }
 
-        timers.add(new Timer(finalsecond * 1000, name));
-        Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(recyclerView.getAdapter().getItemCount() + 1);
+        if (creatingNewTimer) {
+            timers.add(new Timer(finalsecond * 1000, name));
+            Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(recyclerView.getAdapter().getItemCount() + 1);
+        }
+        if (updateExistingTimer) {
+            timers.get(holder.getAdapterPosition()).mStartTimeInMillis = finalsecond * 1000;
+            timers.get(holder.getAdapterPosition()).mTimeLeftInMillis = finalsecond * 1000;
+            timers.get(holder.getAdapterPosition()).timerPlaying = false;
+            timers.get(holder.getAdapterPosition()).timerPaused = false;
+            timers.get(holder.getAdapterPosition()).timerIsDone = false;
+            if (timers.get(holder.getAdapterPosition()).mCountDownTimer != null) {
+                timers.get(holder.getAdapterPosition()).mCountDownTimer.cancel();
+                timers.get(holder.getAdapterPosition()).mCountDownTimer = null;
+            }
+            Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
+        }
     }
 }

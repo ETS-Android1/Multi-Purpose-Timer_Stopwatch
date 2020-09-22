@@ -136,7 +136,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         mButtonReset = findViewById(R.id.button_reset);
         mTimerNameEditText = findViewById(R.id.timerNameEditText);
         mMillis = findViewById(R.id.millis);
-        mRepeatSwitch = findViewById(R.id.repeat_Switch);
+        mRepeatSwitch = findViewById(R.id.repeat_SwitchInMultiTimer);
         mRepeatSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logFirebaseAnalyticsEvents("Repeat Switch: " + isChecked));
 
         mTimerNameTextView = findViewById(R.id.timerNameTextView);

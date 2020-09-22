@@ -7,18 +7,21 @@ import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements setNameAndTimerDialog.setTimerDialogListener{
 
     private Context context;
     private ArrayList<Timer> timers;
@@ -46,10 +49,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             holders.add(holder);
         }
 
-        int adapterPosition = holder.getAdapterPosition();
-        int layoutPosition = holder.getLayoutPosition();
-        int oldPosition = holder.getOldPosition();
-
         ((Item)holder).timerName.setText("Timer Name: " + timers.get(holder.getAdapterPosition()).timerName);
         ((Item)holder).timerTime.setText(timers.get(holder.getAdapterPosition()).getTimeLeftFormatted());
         if (timers.get(holder.getAdapterPosition()).timerPlaying) {
@@ -71,7 +70,8 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             ((Item) holder).timerTime.setTextColor(Color.BLACK);
             ((Item)holder).timerTime.setText(timers.get(holder.getAdapterPosition()).getTimeLeftFormatted());
-            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(holder.getAdapterPosition()).mTimeLeftInMillis);
+
+            resetTimer((Item) holder);
         }
 
         ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).mStartTimeInMillis);
@@ -85,15 +85,11 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             timers.get(holder.getAdapterPosition()).timerPaused = false;
             timers.get(holder.getAdapterPosition()).timerIsDone = false;
 
-            int beforeMyPosition = holder.getAdapterPosition();
             startTimer((Item) holder, holder.getAdapterPosition());
-            int afterMyPosition = holder.getAdapterPosition();
         });
 
         ((Item)holder).pauseButton.setOnClickListener(v -> {
-            int beforeMyPosition = holder.getAdapterPosition();
             pauseTimer(((Item)holder), holder.getAdapterPosition());
-            int afterMyPosition = holder.getAdapterPosition();
 
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
@@ -105,7 +101,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
-            int beforeMyPosition = holder.getAdapterPosition();
             resetTimer((Item) holder);
             int myPosition = holder.getAdapterPosition();
 
@@ -120,6 +115,9 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             timers.get(myPosition).timerPaused = false;
             timers.get(myPosition).timerIsDone = true;
         });
+
+        ((Item)holder).invisibleTimeButton.setBackgroundColor(Color.TRANSPARENT); //make button invisible
+        ((Item)holder).invisibleTimeButton.setOnClickListener(v -> openNameAndTimerDialog((Item)holder));
     }
 
     private void resetTimer(@NonNull Item holder) {
@@ -146,17 +144,13 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         counter = 0;
         ticksToPass = 1000 / 100;
 
-//        notifyDataSetChanged(); //this causes holder.getAdapterPosition() to be -1
-
         if (timers.get(position).mCountDownTimer != null) {
             timers.get(position).mCountDownTimer.cancel();
         }
         timers.get(position).mCountDownTimer = new CountDownTimer(timers.get(position).mTimeLeftInMillis, 100) {
             @Override
             public void onTick(long millisUntilFinished) {
-                //TODO: oveservation: position stats the same but position in viewHolder changes to 0 for top and works like index
                 int myPosition = holder.getAdapterPosition();
-                //TODo: x is responding indexwise thing but position is not and x is not same as position, so look into that
 
                 //to prevent new timers from continuing from other timer threads
                 if (myPosition != -1) {
@@ -193,6 +187,40 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }.start();
     }
 
+    public void openNameAndTimerDialog(@NonNull Item holder) {
+        setNameAndTimerDialog setNameAndTimerDialog = new setNameAndTimerDialog(true, false, holder, timers);
+        setNameAndTimerDialog.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
+    }
+
+    //this method does nothing but satisfy the compiler
+    public void createNewTimerNameAndTime(String time, String name, boolean creatingNewTimer, boolean updateExistingTimer, Item holder, ArrayList<Timer> timers){
+        long input = Long.parseLong(time);
+        long hour = input / 10000;
+        long minuteraw = (input - (hour * 10000)) ;
+        long minuteone = minuteraw / 1000;
+        long minutetwo = (minuteraw % 1000) / 100;
+        long minute = (minuteone * 10) + minutetwo;
+        long second = input - ((hour * 10000) + (minute * 100));
+        long finalsecond = (hour * 3600) + (minute * 60) + second;
+
+        if (time.length() == 0) {
+            Toast.makeText(this.context, "Field can't be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //long millisInput = Long.parseLong(time) * 1000;
+        long millisInput = finalsecond * 1000;
+        if (millisInput == 0) {
+            Toast.makeText(this.context, "Please enter a positive number", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (updateExistingTimer) {
+            timers.get(holder.getAdapterPosition()).mStartTimeInMillis = finalsecond;
+            resetTimer(holder);
+        }
+    }
+
     @Override
     public int getItemCount() {
         if (timers == null) {
@@ -209,6 +237,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         FloatingActionButton resetButton;
         Switch repeatSwitch;
         ProgressBar progressBarTimeHorizontal;
+        Button invisibleTimeButton;
         Item(@NonNull View itemView) {
             super(itemView);
             timerName = itemView.findViewById(R.id.timerNameInMultiTimer);
@@ -216,8 +245,9 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             startButton = itemView.findViewById(R.id.startButtonInMultiTimer);
             pauseButton = itemView.findViewById(R.id.stopButtonInMultiTimer);
             resetButton = itemView.findViewById(R.id.resetButtonInMultiTimer);
-            repeatSwitch = itemView.findViewById(R.id.repeat_Switch);
+            repeatSwitch = itemView.findViewById(R.id.repeat_SwitchInMultiTimer);
             progressBarTimeHorizontal = itemView.findViewById(R.id.progressBarTimeHorizontal);
+            invisibleTimeButton = itemView.findViewById(R.id.timerTimeInvisibleButtonInMultiTimer);
         }
     }
 }

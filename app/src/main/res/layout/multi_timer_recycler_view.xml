@@ -22,11 +22,11 @@
         android:layout_height="match_parent">
 
         <Button
-            android:id="@+id/timerTimeInvisibleButton"
+            android:id="@+id/timerTimeInvisibleButtonInMultiTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="invisible"
+            tools:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -93,7 +93,7 @@
 
         <Switch
             android:text="Repeat"
-            android:id="@+id/repeat_Switch"
+            android:id="@+id/repeat_SwitchInMultiTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
