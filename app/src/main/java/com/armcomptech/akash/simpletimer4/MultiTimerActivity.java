@@ -53,6 +53,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 //TODO: there is some bug that needs fixing crashing when somethign is removed
+                timers.get(viewHolder.getAdapterPosition()).clean();
                 timers.remove(viewHolder.getAdapterPosition());
                 holders.remove(viewHolder.getAdapterPosition());
                 Objects.requireNonNull(recyclerView.getAdapter()).notifyItemRemoved(viewHolder.getAdapterPosition());

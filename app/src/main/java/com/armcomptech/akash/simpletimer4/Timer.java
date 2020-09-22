@@ -21,7 +21,7 @@ public class Timer {
 
     Timer() {
         this.timerPlaying = false;
-        this.timerPaused = true;
+        this.timerPaused = false;
         this.timerIsDone = false;
         this.showNotification = false;
         this.mStartTimeInMillis = 5000; // 1 minute and 40 seconds 100000
@@ -31,7 +31,7 @@ public class Timer {
 
     public Timer(long startTimeInMillis, String name) {
         this.timerPlaying = false;
-        this.timerPaused = true;
+        this.timerPaused = false;
         this.timerIsDone = false;
         this.showNotification = false;
         this.mStartTimeInMillis = startTimeInMillis;
@@ -64,6 +64,20 @@ public class Timer {
 
     public RecyclerView.ViewHolder getHolder() {
         return this.myHolder;
+    }
+
+    public void clean() {
+        if (this.mCountDownTimer != null) {
+            this.mCountDownTimer.cancel();
+        }
+        this.mCountDownTimer = null;
+        this.timerPlaying = false;
+        this.timerPaused = false;
+        this.timerIsDone = false;
+        this.showNotification = false;
+        this.mStartTimeInMillis = 1000;
+        this.mTimeLeftInMillis = 1000;
+        this.timerName = null;
     }
 }
 

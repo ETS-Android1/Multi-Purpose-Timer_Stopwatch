@@ -50,87 +50,103 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         int layoutPosition = holder.getLayoutPosition();
         int oldPosition = holder.getOldPosition();
 
-        ((Item)holder).timerName.setText("Timer Name: " + timers.get(position).timerName);
-        ((Item)holder).timerTime.setText(timers.get(position).getTimeLeftFormatted());
-        if (timers.get(position).timerPlaying) {
+        ((Item)holder).timerName.setText("Timer Name: " + timers.get(holder.getAdapterPosition()).timerName);
+        ((Item)holder).timerTime.setText(timers.get(holder.getAdapterPosition()).getTimeLeftFormatted());
+        if (timers.get(holder.getAdapterPosition()).timerPlaying) {
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
-        }
-        if (timers.get(position).timerPaused) {
+        } else if (timers.get(holder.getAdapterPosition()).timerPaused) {
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
-        }
-        if (timers.get(position).timerIsDone) {
+        } else if (timers.get(holder.getAdapterPosition()).timerIsDone) {
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
+        } else {
+            ((Item)holder).startButton.setVisibility(View.VISIBLE);
+            ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
+            ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
+
+            ((Item) holder).timerTime.setTextColor(Color.BLACK);
+            ((Item)holder).timerTime.setText(timers.get(holder.getAdapterPosition()).getTimeLeftFormatted());
+            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(holder.getAdapterPosition()).mTimeLeftInMillis);
         }
 
-        ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(position).mStartTimeInMillis);
+        ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).mStartTimeInMillis);
 
         ((Item)holder).startButton.setOnClickListener(v -> {
-            startTimer((Item) holder, position);
-
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
 
-            timers.get(position).timerPlaying = true;
-            timers.get(position).timerPaused = false;
-            timers.get(position).timerIsDone = false;
+            timers.get(holder.getAdapterPosition()).timerPlaying = true;
+            timers.get(holder.getAdapterPosition()).timerPaused = false;
+            timers.get(holder.getAdapterPosition()).timerIsDone = false;
+
+            int beforeMyPosition = holder.getAdapterPosition();
+            startTimer((Item) holder, holder.getAdapterPosition());
+            int afterMyPosition = holder.getAdapterPosition();
         });
 
         ((Item)holder).pauseButton.setOnClickListener(v -> {
-            pauseTimer(position);
+            int beforeMyPosition = holder.getAdapterPosition();
+            pauseTimer(((Item)holder), holder.getAdapterPosition());
+            int afterMyPosition = holder.getAdapterPosition();
 
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
 
-            timers.get(position).timerPlaying = false;
-            timers.get(position).timerPaused = true;
-            timers.get(position).timerIsDone = false;
+            timers.get(holder.getAdapterPosition()).timerPlaying = false;
+            timers.get(holder.getAdapterPosition()).timerPaused = true;
+            timers.get(holder.getAdapterPosition()).timerIsDone = false;
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
-            resetTimer((Item) holder, position);
+            int beforeMyPosition = holder.getAdapterPosition();
+            resetTimer((Item) holder);
+            int myPosition = holder.getAdapterPosition();
 
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
 
             ((Item) holder).timerTime.setTextColor(Color.BLACK);
-            ((Item)holder).timerTime.setText(timers.get(position).getTimeLeftFormatted());
+            ((Item)holder).timerTime.setText(timers.get(myPosition).getTimeLeftFormatted());
 
-            timers.get(position).timerPlaying = false;
-            timers.get(position).timerPaused = false;
-            timers.get(position).timerIsDone = true;
+            timers.get(myPosition).timerPlaying = false;
+            timers.get(myPosition).timerPaused = false;
+            timers.get(myPosition).timerIsDone = true;
         });
     }
 
-    private void resetTimer(@NonNull Item holder, int position) {
-        timers.get(position).mTimeLeftInMillis = timers.get(position).mStartTimeInMillis;
+    private void resetTimer(@NonNull Item holder) {
+        int myPosition = holder.getAdapterPosition();
+
+        timers.get(myPosition).mTimeLeftInMillis = timers.get(myPosition).mStartTimeInMillis;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis, true);
+            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).mStartTimeInMillis, true);
         } else {
-            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis);
+            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).mStartTimeInMillis);
         }
         ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.WHITE);
+        timers.get(myPosition).mCountDownTimer = null;
     }
 
-    private void pauseTimer(int position) {
-        timers.get(position).mCountDownTimer.cancel();
-        timers.get(position).timerPlaying = false;
-        timers.get(position).timerPaused = true;
+    private void pauseTimer(@NonNull Item holder, int position) {
+        int myPosition = holder.getAdapterPosition();
+        timers.get(myPosition).mCountDownTimer.cancel();
+        timers.get(myPosition).timerPlaying = false;
+        timers.get(myPosition).timerPaused = true;
     }
 
     private void startTimer(@NonNull Item holder, int position) {
         counter = 0;
         ticksToPass = 1000 / 100;
 
-        notifyDataSetChanged();
+//        notifyDataSetChanged(); //this causes holder.getAdapterPosition() to be -1
 
         if (timers.get(position).mCountDownTimer != null) {
             timers.get(position).mCountDownTimer.cancel();
@@ -139,22 +155,30 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             @Override
             public void onTick(long millisUntilFinished) {
                 //TODO: oveservation: position stats the same but position in viewHolder changes to 0 for top and works like index
-                int x = holder.getAdapterPosition();
+                int myPosition = holder.getAdapterPosition();
                 //TODo: x is responding indexwise thing but position is not and x is not same as position, so look into that
-                timers.get(position).mTimeLeftInMillis = millisUntilFinished;
-                ((Item)holder).timerTime.setText(timers.get(position).getTimeLeftFormatted());
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis, true);
-                } else {
-                    ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(position).mTimeLeftInMillis);
-                }
+                //to prevent new timers from continuing from other timer threads
+                if (myPosition != -1) {
+                    if (!timers.get(myPosition).timerPlaying && !timers.get(myPosition).timerPaused && !timers.get(myPosition).timerIsDone) {
+                        resetTimer((Item)holder);
+                    } else {
+                        timers.get(myPosition).mTimeLeftInMillis = millisUntilFinished;
+                        ((Item)holder).timerTime.setText(timers.get(myPosition).getTimeLeftFormatted());
 
-                counter++;
-                if (ticksToPass == counter) {
-//                    holder.timerTime.setText(timers.get(position).getTimeLeftFormatted());
-//                    saveData(); //saving data every second to prevent lag
-                    counter = 0;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).mTimeLeftInMillis, true);
+                        } else {
+                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).mTimeLeftInMillis);
+                        }
+
+                        counter++;
+                        if (ticksToPass == counter) {
+//                            holder.timerTime.setText(timers.get(position).getTimeLeftFormatted());
+//                            saveData(); //saving data every second to prevent lag
+                            counter = 0;
+                        }
+                    }
                 }
             }
 
@@ -194,7 +218,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             resetButton = itemView.findViewById(R.id.resetButtonInMultiTimer);
             repeatSwitch = itemView.findViewById(R.id.repeat_Switch);
             progressBarTimeHorizontal = itemView.findViewById(R.id.progressBarTimeHorizontal);
-
         }
     }
 }

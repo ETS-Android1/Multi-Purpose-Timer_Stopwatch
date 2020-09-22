@@ -101,6 +101,8 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
 
         loadData(); //load saved data when opening the app
 
+        startActivity(new Intent(SingleTimerActivity.this, MultiTimerActivity.class));
+
         if (!disableFirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
             Bundle bundle = new Bundle();
