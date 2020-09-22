@@ -1,6 +1,7 @@
 package com.armcomptech.akash.simpletimer4;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -18,8 +19,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements setNameAndTimerDialog.setTimerDialogListener{
 
@@ -218,6 +224,79 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (updateExistingTimer) {
             timers.get(holder.getAdapterPosition()).mStartTimeInMillis = finalsecond;
             resetTimer(holder);
+        }
+    }
+
+    private void saveData(String timerName, int countersToAdd, int timeInSecondsToAdd) {
+        //putting array in json
+        SharedPreferences sharedPreferences = this.context.getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+
+        String timerNameJsonToGet = sharedPreferences.getString("timer name", null);
+        Type timerNameType = new TypeToken<ArrayList<String>>() {}.getType();
+        ArrayList<String> timerNameArray = gson.fromJson(timerNameJsonToGet, timerNameType);
+
+        //timesTimerRanCounter
+
+        //timesTimerRanCounter is new name and count was the past one so it has not data while other two things have data
+        String timesTimerRanCounterJsonToGet = sharedPreferences.getString("timesTimerRanCounter", null);
+        Type timesTimerRanCounterType = new TypeToken<ArrayList<Integer>>() {}.getType();
+        ArrayList<Integer> timesTimerRanCounterArray = gson.fromJson(timesTimerRanCounterJsonToGet, timesTimerRanCounterType);
+
+        String timeInSecondsJsonToGet = sharedPreferences.getString("timeInSeconds", null);
+        Type timeInSecondsType = new TypeToken<ArrayList<Integer>>() {}.getType();
+        ArrayList<Integer> timeInSecondsArray = gson.fromJson(timeInSecondsJsonToGet, timeInSecondsType);
+
+        boolean timerNameExist = false;
+
+        if (timerNameArray != null && timesTimerRanCounterArray != null && timeInSecondsArray != null) {
+            if (timesTimerRanCounterArray.size() > 0) {
+                for(int i = 0; i < timesTimerRanCounterArray.size(); i++) {
+                    if (timerNameArray.get(i).matches(timerName)) {
+                        timerNameExist = true;
+
+                        String timesTimerRanCounterJsonToPut = gson.toJson(timesTimerRanCounterArray.get(i) + countersToAdd);
+                        editor.putString("timesTimerRanCounter", timesTimerRanCounterJsonToPut);
+
+                        String timeInSecondsJsonToPut = gson.toJson(timeInSecondsArray.get(i) + timeInSecondsToAdd);
+                        editor.putString("timeInSeconds", timeInSecondsJsonToPut);
+
+                        editor.apply();
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        if (!timerNameExist) {
+            if (timerNameArray == null) {
+                timerNameArray = new ArrayList<>();
+            } else {
+                timerNameArray.add(timerName);
+            }
+            String timerNameJsonToPut = gson.toJson(timerNameArray);
+            editor.putString("timer name", timerNameJsonToPut);
+
+            if (timesTimerRanCounterArray == null) {
+                timesTimerRanCounterArray = new ArrayList<>();
+            } else {
+                timesTimerRanCounterArray.add(countersToAdd);
+            }
+
+            String timesTimerRanCounterJsonToPut = gson.toJson(timesTimerRanCounterArray);
+            editor.putString("timesTimerRanCounter", timesTimerRanCounterJsonToPut);
+
+            if (timeInSecondsArray == null) {
+                timeInSecondsArray = new ArrayList<>();
+            } else {
+                timeInSecondsArray.add(timeInSecondsToAdd);
+            }
+            String timeInSecondsJsonToPut = gson.toJson(timeInSecondsArray);
+            editor.putString("timeInSeconds", timeInSecondsJsonToPut);
+
+            editor.apply();
         }
     }
 
