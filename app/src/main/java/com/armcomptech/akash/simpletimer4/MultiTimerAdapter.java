@@ -86,9 +86,9 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
 
-            if (timers.get(holder.getAdapterPosition()).timerPlaying == false &&
-                    timers.get(holder.getAdapterPosition()).timerPaused == false &&
-                    timers.get(holder.getAdapterPosition()).timerIsDone == false) {
+            if (!timers.get(holder.getAdapterPosition()).timerPlaying &&
+                    !timers.get(holder.getAdapterPosition()).timerPaused &&
+                    !timers.get(holder.getAdapterPosition()).timerIsDone) {
                 saveData(timers.get(holder.getAdapterPosition()).timerName, 1, 0);
             }
 
