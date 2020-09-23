@@ -99,6 +99,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         notificationManager = NotificationManagerCompat.from(this);
 
+        saveData(); //temporary //used to start fresh
         loadData(); //load saved data when opening the app
 
         startActivity(new Intent(SingleTimerActivity.this, MultiTimerActivity.class));
@@ -343,13 +344,13 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         Gson gson = new Gson();
 
         String timerNameJson = gson.toJson(timerName);
-        editor.putString("timer name", timerNameJson);
+        editor.putString("timerName", timerNameJson);
 
         String countJson = gson.toJson(count);
-        editor.putString("count", countJson);
+        editor.putString("timesTimerRanCounter", countJson);
 
         String timeInSecondsJson = gson.toJson(timeInSeconds);
-        editor.putString("timeInSeconds", timeInSecondsJson);
+        editor.putString("timeInSecond", timeInSecondsJson);
 
         editor.apply();
     }
@@ -772,16 +773,16 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
 
-        String timerNameJson = sharedPreferences.getString("timer name", null);
-        Type timerNameType = new TypeToken<ArrayList<String>>() {}.getType();
+        String timerNameJson = sharedPreferences.getString("timerName", null);
+        Type timerNameType = new TypeToken<ArrayList<String>>(){}.getType();
         timerName = gson.fromJson(timerNameJson, timerNameType);
 
-        String countJson = sharedPreferences.getString("count", null);
-        Type countType = new TypeToken<ArrayList<Integer>>() {}.getType();
+        String countJson = sharedPreferences.getString("timesTimerRanCounter", null);
+        Type countType = new TypeToken<ArrayList<Integer>>(){}.getType();
         count = gson.fromJson(countJson, countType);
 
-        String timeInSecondsJson = sharedPreferences.getString("timeInSeconds", null);
-        Type timeInSecondsType = new TypeToken<ArrayList<Integer>>() {}.getType();
+        String timeInSecondsJson = sharedPreferences.getString("timeInSecond", null);
+        Type timeInSecondsType = new TypeToken<ArrayList<Integer>>(){}.getType();
         timeInSeconds = gson.fromJson(timeInSecondsJson, timeInSecondsType);
     }
 

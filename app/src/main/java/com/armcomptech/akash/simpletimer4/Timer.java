@@ -16,6 +16,10 @@ public class Timer {
 
     long mStartTimeInMillis;
     long mTimeLeftInMillis;
+    long mTimeToStoreInMillis;
+    long mTimeElapsedInMillis;
+
+    int counter;
     CountDownTimer mCountDownTimer;
     RecyclerView.ViewHolder myHolder;
 
@@ -26,7 +30,10 @@ public class Timer {
         this.showNotification = false;
         this.mStartTimeInMillis = 5000; // 1 minute and 40 seconds 100000
         this.mTimeLeftInMillis = 5000;
+        this.mTimeToStoreInMillis = 0;
+        this.mTimeElapsedInMillis = 0;
         this.myHolder = null;
+        this.counter = 0;
     }
 
     public Timer(long startTimeInMillis, String name) {
@@ -36,8 +43,11 @@ public class Timer {
         this.showNotification = false;
         this.mStartTimeInMillis = startTimeInMillis;
         this.mTimeLeftInMillis = startTimeInMillis;
+        this.mTimeToStoreInMillis = 0;
+        this.mTimeElapsedInMillis = 0;
         this.timerName = name;
         this.myHolder = null;
+        this.counter = 0;
     }
 
 
@@ -45,6 +55,7 @@ public class Timer {
         int hours = (int) (mTimeLeftInMillis / 1000) / 3600;
         int minutes = (int) ((mTimeLeftInMillis / 1000) % 3600) / 60;
         int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
+        int millis = (int) mTimeLeftInMillis % 1000;
 
         String timeLeftFormatted;
 
@@ -56,7 +67,7 @@ public class Timer {
                     "%02d:%02d", minutes, seconds);
         } else {
             timeLeftFormatted = String.format(Locale.getDefault(),
-                    "%02d", seconds);
+                    "00:%02d", seconds);
         }
 
         return timeLeftFormatted;

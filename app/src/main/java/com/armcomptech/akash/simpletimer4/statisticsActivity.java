@@ -42,15 +42,15 @@ public class statisticsActivity extends AppCompatActivity{
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
 
-        String timerNameJson = sharedPreferences.getString("timer name", null);
+        String timerNameJson = sharedPreferences.getString("timerName", null);
         Type timerNameType = new TypeToken<ArrayList<String>>() {}.getType();
         timerName = gson.fromJson(timerNameJson, timerNameType);
 
-        String countJson = sharedPreferences.getString("count", null);
+        String countJson = sharedPreferences.getString("timesTimerRanCounter", null);
         Type countType = new TypeToken<ArrayList<Integer>>() {}.getType();
         count = gson.fromJson(countJson, countType);
 
-        String timeInSecondsJson = sharedPreferences.getString("timeInSeconds", null);
+        String timeInSecondsJson = sharedPreferences.getString("timeInSecond", null);
         Type timeInSecondsType = new TypeToken<ArrayList<Integer>>() {}.getType();
         timeInSeconds = gson.fromJson(timeInSecondsJson, timeInSecondsType);
     }

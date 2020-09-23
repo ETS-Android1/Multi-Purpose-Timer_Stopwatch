@@ -32,7 +32,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private Context context;
     private ArrayList<Timer> timers;
     private ArrayList<RecyclerView.ViewHolder> holders;
-    private int counter = 0;
     private int ticksToPass = 0;
 
     MultiTimerAdapter(Context context, ArrayList<Timer> timers, ArrayList<RecyclerView.ViewHolder> holders) {
@@ -87,6 +86,12 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
 
+            if (timers.get(holder.getAdapterPosition()).timerPlaying == false &&
+                    timers.get(holder.getAdapterPosition()).timerPaused == false &&
+                    timers.get(holder.getAdapterPosition()).timerIsDone == false) {
+                saveData(timers.get(holder.getAdapterPosition()).timerName, 1, 0);
+            }
+
             timers.get(holder.getAdapterPosition()).timerPlaying = true;
             timers.get(holder.getAdapterPosition()).timerPaused = false;
             timers.get(holder.getAdapterPosition()).timerIsDone = false;
@@ -137,6 +142,9 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
         ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.WHITE);
         timers.get(myPosition).mCountDownTimer = null;
+        timers.get(myPosition).mTimeElapsedInMillis = 0;
+        timers.get(myPosition).mTimeToStoreInMillis = 0;
+        timers.get(myPosition).counter = 0;
     }
 
     private void pauseTimer(@NonNull Item holder, int position) {
@@ -147,13 +155,13 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void startTimer(@NonNull Item holder, int position) {
-        counter = 0;
-        ticksToPass = 1000 / 100;
+        int countDownInterval = 100;
+        ticksToPass = 1000 / countDownInterval;
 
         if (timers.get(position).mCountDownTimer != null) {
             timers.get(position).mCountDownTimer.cancel();
         }
-        timers.get(position).mCountDownTimer = new CountDownTimer(timers.get(position).mTimeLeftInMillis, 100) {
+        timers.get(position).mCountDownTimer = new CountDownTimer(timers.get(position).mTimeLeftInMillis, countDownInterval) {
             @Override
             public void onTick(long millisUntilFinished) {
                 int myPosition = holder.getAdapterPosition();
@@ -172,11 +180,19 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                             ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).mTimeLeftInMillis);
                         }
 
-                        counter++;
-                        if (ticksToPass == counter) {
-//                            holder.timerTime.setText(timers.get(position).getTimeLeftFormatted());
-//                            saveData(); //saving data every second to prevent lag
-                            counter = 0;
+                        Timer tempTimer = timers.get(myPosition);
+                        tempTimer.counter++;
+                        if (ticksToPass == tempTimer.counter) {
+                            //this algoritem still doesn't work prooperly but on right track, counter ofr each timer
+
+                            long currentElapsedTime = tempTimer.mStartTimeInMillis - tempTimer.mTimeLeftInMillis;
+                            long oldElapsedTime = tempTimer.mTimeElapsedInMillis;
+                            tempTimer.mTimeElapsedInMillis = currentElapsedTime;
+                            long tempTime = (currentElapsedTime - oldElapsedTime) + tempTimer.mTimeToStoreInMillis;
+                            saveData(timers.get(myPosition).timerName, 0, (int)(tempTime/1000)); //saving data every second to prevent lag
+
+                            tempTimer.mTimeToStoreInMillis = tempTime%1000;
+                            tempTimer.counter = 0;
                         }
                     }
                 }
@@ -233,7 +249,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
 
-        String timerNameJsonToGet = sharedPreferences.getString("timer name", null);
+        String timerNameJsonToGet = sharedPreferences.getString("timerName", null);
         Type timerNameType = new TypeToken<ArrayList<String>>() {}.getType();
         ArrayList<String> timerNameArray = gson.fromJson(timerNameJsonToGet, timerNameType);
 
@@ -244,7 +260,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         Type timesTimerRanCounterType = new TypeToken<ArrayList<Integer>>() {}.getType();
         ArrayList<Integer> timesTimerRanCounterArray = gson.fromJson(timesTimerRanCounterJsonToGet, timesTimerRanCounterType);
 
-        String timeInSecondsJsonToGet = sharedPreferences.getString("timeInSeconds", null);
+        String timeInSecondsJsonToGet = sharedPreferences.getString("timeInSecond", null);
         Type timeInSecondsType = new TypeToken<ArrayList<Integer>>() {}.getType();
         ArrayList<Integer> timeInSecondsArray = gson.fromJson(timeInSecondsJsonToGet, timeInSecondsType);
 
@@ -256,11 +272,14 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     if (timerNameArray.get(i).matches(timerName)) {
                         timerNameExist = true;
 
-                        String timesTimerRanCounterJsonToPut = gson.toJson(timesTimerRanCounterArray.get(i) + countersToAdd);
+                        //stuff gets added
+                        timesTimerRanCounterArray.set(i, timesTimerRanCounterArray.get(i) + countersToAdd);
+                        String timesTimerRanCounterJsonToPut = gson.toJson(timesTimerRanCounterArray);
                         editor.putString("timesTimerRanCounter", timesTimerRanCounterJsonToPut);
 
-                        String timeInSecondsJsonToPut = gson.toJson(timeInSecondsArray.get(i) + timeInSecondsToAdd);
-                        editor.putString("timeInSeconds", timeInSecondsJsonToPut);
+                        timeInSecondsArray.set(i, timeInSecondsArray.get(i) + timeInSecondsToAdd);
+                        String timeInSecondsJsonToPut = gson.toJson(timeInSecondsArray);
+                        editor.putString("timeInSecond", timeInSecondsJsonToPut);
 
                         editor.apply();
                         break;
@@ -277,7 +296,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 timerNameArray.add(timerName);
             }
             String timerNameJsonToPut = gson.toJson(timerNameArray);
-            editor.putString("timer name", timerNameJsonToPut);
+            editor.putString("timerName", timerNameJsonToPut);
 
             if (timesTimerRanCounterArray == null) {
                 timesTimerRanCounterArray = new ArrayList<>();
@@ -294,7 +313,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 timeInSecondsArray.add(timeInSecondsToAdd);
             }
             String timeInSecondsJsonToPut = gson.toJson(timeInSecondsArray);
-            editor.putString("timeInSeconds", timeInSecondsJsonToPut);
+            editor.putString("timeInSecond", timeInSecondsJsonToPut);
 
             editor.apply();
         }
