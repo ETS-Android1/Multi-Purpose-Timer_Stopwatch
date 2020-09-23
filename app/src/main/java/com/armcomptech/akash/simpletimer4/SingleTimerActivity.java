@@ -87,7 +87,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     public int counter;
 
     //TODO: Change disableFirebaseLogging to false when releasing
-    private static Boolean disableFirebaseLogging = true;
+    private static Boolean disableFirebaseLogging = false;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
@@ -99,10 +99,10 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         notificationManager = NotificationManagerCompat.from(this);
 
-        saveData(); //temporary //used to start fresh
+//        saveData(); //temporary //used to start fresh
         loadData(); //load saved data when opening the app
 
-        startActivity(new Intent(SingleTimerActivity.this, MultiTimerActivity.class));
+//        startActivity(new Intent(SingleTimerActivity.this, MultiTimerActivity.class)); //temporary
 
         if (!disableFirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
