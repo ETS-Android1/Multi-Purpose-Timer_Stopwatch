@@ -15,6 +15,95 @@ public class Timer {
     boolean showNotification;
 
     long mStartTimeInMillis;
+
+    public String getTimerName() {
+        return timerName;
+    }
+
+    public void setTimerName(String timerName) {
+        this.timerName = timerName;
+    }
+
+    public Boolean getTimerPlaying() {
+        return timerPlaying;
+    }
+
+    public void setTimerPlaying(Boolean timerPlaying) {
+        this.timerPlaying = timerPlaying;
+    }
+
+    public Boolean getTimerPaused() {
+        return timerPaused;
+    }
+
+    public void setTimerPaused(Boolean timerPaused) {
+        this.timerPaused = timerPaused;
+    }
+
+    public Boolean getTimerIsDone() {
+        return timerIsDone;
+    }
+
+    public void setTimerIsDone(Boolean timerIsDone) {
+        this.timerIsDone = timerIsDone;
+    }
+
+    public boolean isShowNotification() {
+        return showNotification;
+    }
+
+    public void setShowNotification(boolean showNotification) {
+        this.showNotification = showNotification;
+    }
+
+    public long getmStartTimeInMillis() {
+        return mStartTimeInMillis;
+    }
+
+    public void setmStartTimeInMillis(long mStartTimeInMillis) {
+        this.mStartTimeInMillis = mStartTimeInMillis;
+    }
+
+    public long getmTimeLeftInMillis() {
+        return mTimeLeftInMillis;
+    }
+
+    public void setmTimeLeftInMillis(long mTimeLeftInMillis) {
+        this.mTimeLeftInMillis = mTimeLeftInMillis;
+    }
+
+    public long getmTimeToStoreInMillis() {
+        return mTimeToStoreInMillis;
+    }
+
+    public void setmTimeToStoreInMillis(long mTimeToStoreInMillis) {
+        this.mTimeToStoreInMillis = mTimeToStoreInMillis;
+    }
+
+    public long getmTimeElapsedInMillis() {
+        return mTimeElapsedInMillis;
+    }
+
+    public void setmTimeElapsedInMillis(long mTimeElapsedInMillis) {
+        this.mTimeElapsedInMillis = mTimeElapsedInMillis;
+    }
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public void setCounter(int counter) {
+        this.counter = counter;
+    }
+
+    public CountDownTimer getmCountDownTimer() {
+        return mCountDownTimer;
+    }
+
+    public void setmCountDownTimer(CountDownTimer mCountDownTimer) {
+        this.mCountDownTimer = mCountDownTimer;
+    }
+
     long mTimeLeftInMillis;
     long mTimeToStoreInMillis;
     long mTimeElapsedInMillis;

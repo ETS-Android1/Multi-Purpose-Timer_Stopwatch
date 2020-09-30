@@ -1,4 +1,4 @@
-package com.armcomptech.akash.simpletimer4;
+package com.armcomptech.akash.simpletimer4.singleTimer;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -34,6 +34,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.armcomptech.akash.simpletimer4.R;
+import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
+import com.armcomptech.akash.simpletimer4.statistics.statisticsActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;

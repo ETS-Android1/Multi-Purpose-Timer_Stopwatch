@@ -17,10 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".MultiTimerActivity"></activity>
-        <activity android:name=".statisticsActivity" />
+        <activity android:name=".multiTimer.MultiTimerActivity"></activity>
+        <activity android:name=".statistics.statisticsActivity" />
         <activity
-            android:name=".SingleTimerActivity"
+            android:name=".singleTimer.SingleTimerActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
         </activity>
 
         <service
-            android:name=".SingleTimerActivity"
+            android:name=".singleTimer.SingleTimerActivity"
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="true" />

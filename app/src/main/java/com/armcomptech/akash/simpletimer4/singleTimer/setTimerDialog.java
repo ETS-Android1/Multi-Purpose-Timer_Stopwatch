@@ -1,4 +1,4 @@
-package com.armcomptech.akash.simpletimer4;
+package com.armcomptech.akash.simpletimer4.singleTimer;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -12,6 +12,8 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
+
+import com.armcomptech.akash.simpletimer4.R;
 
 import java.util.Objects;
 

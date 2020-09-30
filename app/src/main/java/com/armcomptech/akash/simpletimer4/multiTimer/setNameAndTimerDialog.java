@@ -1,4 +1,4 @@
-package com.armcomptech.akash.simpletimer4;
+package com.armcomptech.akash.simpletimer4.multiTimer;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,6 +11,9 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
+
+import com.armcomptech.akash.simpletimer4.R;
+import com.armcomptech.akash.simpletimer4.Timer;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -71,7 +74,7 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
         editTextTimer.requestFocus();
 
         if (this.updateExistingTimer) {
-            editTextName.setText(timers.get(holder.getAdapterPosition()).timerName);
+            editTextName.setText(timers.get(holder.getAdapterPosition()).getTimerName());
 
             builder.setMessage("Once timer is updated, it will reset");
             builder.setPositiveButton("Update Timer", (dialog, which) -> {

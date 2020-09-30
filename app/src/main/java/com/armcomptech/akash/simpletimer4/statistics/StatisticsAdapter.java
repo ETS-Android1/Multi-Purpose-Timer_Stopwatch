@@ -1,4 +1,4 @@
-package com.armcomptech.akash.simpletimer4;
+package com.armcomptech.akash.simpletimer4.statistics;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.armcomptech.akash.simpletimer4.R;
 
 import java.util.ArrayList;
 

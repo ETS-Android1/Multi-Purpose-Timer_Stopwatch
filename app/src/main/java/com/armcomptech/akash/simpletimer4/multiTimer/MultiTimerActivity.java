@@ -1,4 +1,4 @@
-package com.armcomptech.akash.simpletimer4;
+package com.armcomptech.akash.simpletimer4.multiTimer;
 
 import android.graphics.Canvas;
 import android.os.Build;
@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.armcomptech.akash.simpletimer4.R;
+import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ import java.util.Objects;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener{
+public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener {
 
     RecyclerView recyclerView;
     ExtendedFloatingActionButton addTimerFab;
@@ -114,14 +116,14 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(recyclerView.getAdapter().getItemCount() + 1);
         }
         if (updateExistingTimer) {
-            timers.get(holder.getAdapterPosition()).mStartTimeInMillis = finalsecond * 1000;
-            timers.get(holder.getAdapterPosition()).mTimeLeftInMillis = finalsecond * 1000;
-            timers.get(holder.getAdapterPosition()).timerPlaying = false;
-            timers.get(holder.getAdapterPosition()).timerPaused = false;
-            timers.get(holder.getAdapterPosition()).timerIsDone = false;
-            if (timers.get(holder.getAdapterPosition()).mCountDownTimer != null) {
-                timers.get(holder.getAdapterPosition()).mCountDownTimer.cancel();
-                timers.get(holder.getAdapterPosition()).mCountDownTimer = null;
+            timers.get(holder.getAdapterPosition()).setmStartTimeInMillis(finalsecond * 1000);
+            timers.get(holder.getAdapterPosition()).setmTimeLeftInMillis(finalsecond * 1000);
+            timers.get(holder.getAdapterPosition()).setTimerPlaying(false);
+            timers.get(holder.getAdapterPosition()).setTimerPaused(false);
+            timers.get(holder.getAdapterPosition()).setTimerIsDone(false);
+            if (timers.get(holder.getAdapterPosition()).getmCountDownTimer() != null) {
+                timers.get(holder.getAdapterPosition()).getmCountDownTimer().cancel();
+                timers.get(holder.getAdapterPosition()).setmCountDownTimer(null);
             }
             Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
         }

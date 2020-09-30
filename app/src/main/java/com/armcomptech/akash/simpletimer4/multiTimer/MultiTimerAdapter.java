@@ -1,4 +1,4 @@
-package com.armcomptech.akash.simpletimer4;
+package com.armcomptech.akash.simpletimer4.multiTimer;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.armcomptech.akash.simpletimer4.R;
+import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -54,17 +56,17 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             holders.add(holder);
         }
 
-        ((Item)holder).timerName.setText("Timer Name: " + timers.get(holder.getAdapterPosition()).timerName);
+        ((Item)holder).timerName.setText("Timer Name: " + timers.get(holder.getAdapterPosition()).getTimerName());
         ((Item)holder).timerTime.setText(timers.get(holder.getAdapterPosition()).getTimeLeftFormatted());
-        if (timers.get(holder.getAdapterPosition()).timerPlaying) {
+        if (timers.get(holder.getAdapterPosition()).getTimerPlaying()) {
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
-        } else if (timers.get(holder.getAdapterPosition()).timerPaused) {
+        } else if (timers.get(holder.getAdapterPosition()).getTimerPaused()) {
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
-        } else if (timers.get(holder.getAdapterPosition()).timerIsDone) {
+        } else if (timers.get(holder.getAdapterPosition()).getTimerIsDone()) {
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
@@ -79,22 +81,16 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             resetTimer((Item) holder);
         }
 
-        ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).mStartTimeInMillis);
+        ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).getmStartTimeInMillis());
 
         ((Item)holder).startButton.setOnClickListener(v -> {
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
 
-            if (!timers.get(holder.getAdapterPosition()).timerPlaying &&
-                    !timers.get(holder.getAdapterPosition()).timerPaused &&
-                    !timers.get(holder.getAdapterPosition()).timerIsDone) {
-                saveData(timers.get(holder.getAdapterPosition()).timerName, 1, 0);
-            }
-
-            timers.get(holder.getAdapterPosition()).timerPlaying = true;
-            timers.get(holder.getAdapterPosition()).timerPaused = false;
-            timers.get(holder.getAdapterPosition()).timerIsDone = false;
+            timers.get(holder.getAdapterPosition()).setTimerPlaying(true);
+            timers.get(holder.getAdapterPosition()).setTimerPaused(false);
+            timers.get(holder.getAdapterPosition()).setTimerIsDone(false);
 
             startTimer((Item) holder, holder.getAdapterPosition());
         });
@@ -106,9 +102,9 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
 
-            timers.get(holder.getAdapterPosition()).timerPlaying = false;
-            timers.get(holder.getAdapterPosition()).timerPaused = true;
-            timers.get(holder.getAdapterPosition()).timerIsDone = false;
+            timers.get(holder.getAdapterPosition()).setTimerPlaying(false);
+            timers.get(holder.getAdapterPosition()).setTimerPaused(true);
+            timers.get(holder.getAdapterPosition()).setTimerIsDone(false);
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
@@ -122,9 +118,9 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item) holder).timerTime.setTextColor(Color.BLACK);
             ((Item)holder).timerTime.setText(timers.get(myPosition).getTimeLeftFormatted());
 
-            timers.get(myPosition).timerPlaying = false;
-            timers.get(myPosition).timerPaused = false;
-            timers.get(myPosition).timerIsDone = true;
+            timers.get(myPosition).setTimerPlaying(false);
+            timers.get(myPosition).setTimerPaused(false);
+            timers.get(myPosition).setTimerIsDone(true);
         });
 
         ((Item)holder).invisibleTimeButton.setBackgroundColor(Color.TRANSPARENT); //make button invisible
@@ -134,65 +130,72 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void resetTimer(@NonNull Item holder) {
         int myPosition = holder.getAdapterPosition();
 
-        timers.get(myPosition).mTimeLeftInMillis = timers.get(myPosition).mStartTimeInMillis;
+        timers.get(myPosition).setmTimeLeftInMillis(timers.get(myPosition).getmStartTimeInMillis());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).mStartTimeInMillis, true);
+            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getmStartTimeInMillis(), true);
         } else {
-            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).mStartTimeInMillis);
+            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getmStartTimeInMillis());
         }
         ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.WHITE);
-        timers.get(myPosition).mCountDownTimer = null;
-        timers.get(myPosition).mTimeElapsedInMillis = 0;
-        timers.get(myPosition).mTimeToStoreInMillis = 0;
-        timers.get(myPosition).counter = 0;
+        ((Item)holder).timerTime.setTextColor(Color.BLACK);
+        timers.get(myPosition).setmCountDownTimer(null);
+        timers.get(myPosition).setmTimeElapsedInMillis(0);
+        timers.get(myPosition).setmTimeToStoreInMillis(0);
+        timers.get(myPosition).setCounter(0);
     }
 
     private void pauseTimer(@NonNull Item holder, int position) {
         int myPosition = holder.getAdapterPosition();
-        timers.get(myPosition).mCountDownTimer.cancel();
-        timers.get(myPosition).timerPlaying = false;
-        timers.get(myPosition).timerPaused = true;
+        timers.get(myPosition).getmCountDownTimer().cancel();
+        timers.get(myPosition).setTimerPlaying(false);
+        timers.get(myPosition).setTimerPaused(true);
     }
 
     private void startTimer(@NonNull Item holder, int position) {
+        if (!timers.get(holder.getAdapterPosition()).getTimerPlaying() &&
+                !timers.get(holder.getAdapterPosition()).getTimerPaused() &&
+                !timers.get(holder.getAdapterPosition()).getTimerIsDone()) {
+            saveData(timers.get(holder.getAdapterPosition()).getTimerName(), 1, 0);
+        }
+
         int countDownInterval = 100;
         ticksToPass = 1000 / countDownInterval;
 
-        if (timers.get(position).mCountDownTimer != null) {
-            timers.get(position).mCountDownTimer.cancel();
+        if (timers.get(position).getmCountDownTimer() != null) {
+            timers.get(position).getmCountDownTimer().cancel();
         }
-        timers.get(position).mCountDownTimer = new CountDownTimer(timers.get(position).mTimeLeftInMillis, countDownInterval) {
+        timers.get(position).setmCountDownTimer(new CountDownTimer(timers.get(position).getmTimeLeftInMillis(), countDownInterval) {
             @Override
             public void onTick(long millisUntilFinished) {
                 int myPosition = holder.getAdapterPosition();
 
                 //to prevent new timers from continuing from other timer threads
                 if (myPosition != -1) {
-                    if (!timers.get(myPosition).timerPlaying && !timers.get(myPosition).timerPaused && !timers.get(myPosition).timerIsDone) {
+                    if (!timers.get(myPosition).getTimerPlaying() && !timers.get(myPosition).getTimerPaused() && !timers.get(myPosition).getTimerIsDone()) {
                         resetTimer((Item)holder);
                     } else {
-                        timers.get(myPosition).mTimeLeftInMillis = millisUntilFinished;
+                        timers.get(myPosition).setmTimeLeftInMillis(millisUntilFinished);
                         ((Item)holder).timerTime.setText(timers.get(myPosition).getTimeLeftFormatted());
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).mTimeLeftInMillis, true);
+                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getmTimeLeftInMillis(), true);
                         } else {
-                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).mTimeLeftInMillis);
+                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getmTimeLeftInMillis());
                         }
 
                         Timer tempTimer = timers.get(myPosition);
-                        tempTimer.counter++;
-                        if (ticksToPass == tempTimer.counter) {
+                        tempTimer.setCounter(tempTimer.getCounter() + 1);
+                        if (ticksToPass == tempTimer.getCounter()) {
                             //this algoritem still doesn't work prooperly but on right track, counter ofr each timer
 
-                            long currentElapsedTime = tempTimer.mStartTimeInMillis - tempTimer.mTimeLeftInMillis;
-                            long oldElapsedTime = tempTimer.mTimeElapsedInMillis;
-                            tempTimer.mTimeElapsedInMillis = currentElapsedTime;
-                            long tempTime = (currentElapsedTime - oldElapsedTime) + tempTimer.mTimeToStoreInMillis;
-                            saveData(timers.get(myPosition).timerName, 0, (int)(tempTime/1000)); //saving data every second to prevent lag
+                            long currentElapsedTime = tempTimer.getmStartTimeInMillis() - tempTimer.getmTimeLeftInMillis();
+                            long oldElapsedTime = tempTimer.getmTimeElapsedInMillis();
+                            tempTimer.setmTimeElapsedInMillis(currentElapsedTime);
+                            long tempTime = (currentElapsedTime - oldElapsedTime) + tempTimer.getmTimeToStoreInMillis();
+                            saveData(timers.get(myPosition).getTimerName(), 0, (int)(tempTime/1000)); //saving data every second to prevent lag
 
-                            tempTimer.mTimeToStoreInMillis = tempTime%1000;
-                            tempTimer.counter = 0;
+                            tempTimer.setmTimeToStoreInMillis(tempTime%1000);
+                            tempTimer.setCounter(0);
                         }
                     }
                 }
@@ -200,13 +203,18 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             @Override
             public void onFinish() {
-                ((Item)holder).startButton.setVisibility(View.INVISIBLE);
-                ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
-                ((Item)holder).resetButton.setVisibility(View.VISIBLE);
-                ((Item)holder).timerTime.setTextColor(Color.RED);
-                ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.RED);
+                if (((Item)holder).repeatSwitch.isChecked()) {
+                    resetTimer(((Item)holder));
+                    startTimer(((Item)holder), holder.getAdapterPosition());
+                } else {
+                    ((Item)holder).startButton.setVisibility(View.INVISIBLE);
+                    ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
+                    ((Item)holder).resetButton.setVisibility(View.VISIBLE);
+                    ((Item)holder).timerTime.setTextColor(Color.RED);
+                    ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.RED);
+                }
             }
-        }.start();
+        }.start());
     }
 
     public void openNameAndTimerDialog(@NonNull Item holder) {
@@ -238,7 +246,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         if (updateExistingTimer) {
-            timers.get(holder.getAdapterPosition()).mStartTimeInMillis = finalsecond;
+            timers.get(holder.getAdapterPosition()).setmStartTimeInMillis(finalsecond);
             resetTimer(holder);
         }
     }

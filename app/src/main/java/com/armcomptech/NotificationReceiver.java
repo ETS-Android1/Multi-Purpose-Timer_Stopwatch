@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import androidx.core.app.NotificationManagerCompat;
 
-import com.armcomptech.akash.simpletimer4.SingleTimerActivity;
+import com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity;
 
 public class NotificationReceiver extends BroadcastReceiver {
     @Override
