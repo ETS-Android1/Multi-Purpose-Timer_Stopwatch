@@ -60,8 +60,6 @@
             android:backgroundTint="#FFFFFF"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:clickable="true"
-            android:focusable="true"
             app:srcCompat="@drawable/ic_play" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -73,8 +71,6 @@
             android:backgroundTint="#FFFFFF"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:clickable="true"
-            android:focusable="true"
             app:srcCompat="@drawable/ic_pause" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -83,12 +79,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="50dp"
-            android:backgroundTint="#FFFFFF"
+            android:backgroundTint="@android:color/white"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_centerVertical="true"
-            android:clickable="true"
-            android:focusable="true"
             app:srcCompat="@drawable/ic_replay" />
 
         <Switch

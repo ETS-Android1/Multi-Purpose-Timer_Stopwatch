@@ -62,14 +62,17 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
+            startTimer(((Item)holder), holder.getAdapterPosition());
         } else if (timers.get(holder.getAdapterPosition()).getTimerPaused()) {
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
+            resetTimer(((Item)holder));
         } else if (timers.get(holder.getAdapterPosition()).getTimerIsDone()) {
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
+            resetTimer(((Item)holder));
         } else {
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);

@@ -4,6 +4,7 @@
     package="com.armcomptech.akash.simpletimer4">
 
     <supports-screens
+        android:smallScreens="true"
         android:largeScreens="true"
         android:normalScreens="true"
         android:xlargeScreens="true" />
@@ -17,14 +18,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".multiTimer.MultiTimerActivity"></activity>
-        <activity android:name=".statistics.statisticsActivity" />
+
         <activity
-            android:name=".singleTimer.SingleTimerActivity"
-            android:screenOrientation="portrait">
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
+
+        <activity android:name=".multiTimer.MultiTimerActivity" />
+
+        <activity android:name=".statistics.StatisticsActivity" />
+
+        <activity android:name=".singleTimer.SingleTimerActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

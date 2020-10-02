@@ -35,10 +35,17 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_timer);
 
-        timers.add(new Timer(60 * 1000 , "one minute"));
-        timers.add(new Timer(120 * 1000 , "two minute"));
-        timers.add(new Timer(180 * 1000 , "three minute"));
-        timers.add(new Timer(240 * 1000 , "four minute"));
+        setTitle("Multi Timer");
+
+        if (savedInstanceState == null) {
+            timers.add(new Timer(60 * 1000 , "one minute"));
+            timers.add(new Timer(120 * 1000 , "two minute"));
+            timers.add(new Timer(180 * 1000 , "three minute"));
+            timers.add(new Timer(240 * 1000 , "four minute"));
+        } else {
+            timers = (ArrayList<Timer>) savedInstanceState.get("timers");
+        }
+
 
         recyclerView = findViewById(R.id.multiTimerRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -128,4 +135,12 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
         }
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable("timers", timers);
+    }
+
 }

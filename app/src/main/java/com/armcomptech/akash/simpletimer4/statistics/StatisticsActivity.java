@@ -16,7 +16,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class statisticsActivity extends AppCompatActivity{
+public class StatisticsActivity extends AppCompatActivity{
     RecyclerView recyclerView;
 
     ArrayList<String> timerName = new ArrayList<>();

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -30,18 +31,22 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.preference.PreferenceManager;
 
 import com.armcomptech.akash.simpletimer4.R;
+import com.armcomptech.akash.simpletimer4.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
-import com.armcomptech.akash.simpletimer4.statistics.statisticsActivity;
+import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -88,24 +93,40 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     public int currentTimerNamePosition;
     public int ticksToPass;
     public int counter;
+    String activityToOpen;
 
     //TODO: Change disableFirebaseLogging to false when releasing
-    private static Boolean disableFirebaseLogging = false;
+    private static Boolean disableFirebaseLogging = true;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         instance = this;
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_timer);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         notificationManager = NotificationManagerCompat.from(this);
+        setTitle("Single Timer");
 
-//        saveData(); //temporary //used to start fresh
         loadData(); //load saved data when opening the app
 
-//        startActivity(new Intent(SingleTimerActivity.this, MultiTimerActivity.class)); //temporary
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        activityToOpen = sharedPreferences.getString("firstOpenActivity", "Single Timer");
+
+        if (activityToOpen.equals("Single Timer")) {
+            //do nothing
+        } else if (activityToOpen.equals("Multi Timer")) {
+            startActivity(new Intent(this, MultiTimerActivity.class));
+        } else if (activityToOpen.equals("Statistics")) {
+            startActivity(new Intent(this, StatisticsActivity.class));
+        } else {
+            startActivity(new Intent(this, SettingsActivity.class));
+        }
+
+        if (disableFirebaseLogging) {
+            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false);
+        }
 
         if (!disableFirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -284,6 +305,11 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         notificationManager.cancel(1);
@@ -368,7 +394,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_video_library_24), "Multi-Timer Mode"));
         menu.add(0, R.id.privacy_policy, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
         menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
-//        menu.add(0, Menu.NONE, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
+        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
 
         return true;
     }
@@ -413,7 +439,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
 
             case R.id.statistics_activity:
                 logFirebaseAnalyticsEvents("Opened Statistics");
-                startActivity(new Intent(this, statisticsActivity.class));
+                startActivity(new Intent(this, StatisticsActivity.class));
                 break;
 
             case R.id.privacy_policy:
@@ -424,7 +450,11 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                 break;
 
             case R.id.multi_Timer_Mode:
-                startActivity(new Intent(SingleTimerActivity.this, MultiTimerActivity.class));
+                startActivity(new Intent(this, MultiTimerActivity.class));
+                break;
+
+            case R.id.setting_activity:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
 
             default:
