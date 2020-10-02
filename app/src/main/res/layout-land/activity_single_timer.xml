@@ -23,6 +23,7 @@
             android:inputType="text"
             android:text=""
             android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/repeat_SwitchInMultiTimer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -71,21 +72,23 @@
             android:id="@+id/button_reset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="56dp"
-            android:layout_marginBottom="64dp"
+            android:layout_marginBottom="65dp"
             app:backgroundTint="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.812"
+            app:layout_constraintStart_toStartOf="parent"
             app:srcCompat="@drawable/ic_replay" />
 
         <Switch
             android:id="@+id/repeat_SwitchInMultiTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="56dp"
             android:layout_marginBottom="92dp"
             android:textColor="#000000"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.181"
             app:layout_constraintStart_toStartOf="parent"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
