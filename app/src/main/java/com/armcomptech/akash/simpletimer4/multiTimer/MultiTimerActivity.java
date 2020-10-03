@@ -13,9 +13,11 @@ import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -36,6 +38,7 @@ import java.util.Objects;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity.logFirebaseAnalyticsEvents;
 
 public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener {
@@ -49,13 +52,14 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_timer);
-        setTitle("Multi Timer");
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setTitle("   Multi Timer");
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.drawable.ic_video_library_white);
+
 
         timers.add(new Timer(60 * 1000 , "one minute"));
-        timers.add(new Timer(120 * 1000 , "two minute"));
-        timers.add(new Timer(180 * 1000 , "three minute"));
-        timers.add(new Timer(240 * 1000 , "four minute"));
-
 
         recyclerView = findViewById(R.id.multiTimerRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -160,7 +164,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
         menu.findItem(R.id.check_heartbeat).setVisible(false);
         menu.findItem(R.id.check_sound).setVisible(false);
-        menu.add(0, R.id.single_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer), "Single Timer Mode"));
+        menu.add(0, R.id.single_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer_black), "Single Timer Mode"));
         menu.add(0, R.id.privacy_policy, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
         menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
         menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
@@ -203,6 +207,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
             case R.id.single_Timer_Mode:
                 Intent intent = new Intent(this, SingleTimerActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("overrideActivityToOpen", true);
                 startActivity(intent);
                 break;

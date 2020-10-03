@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -56,6 +57,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static com.App.MAIN_CHANNEL_ID;
 
 public class SingleTimerActivity extends AppCompatActivity implements setTimerDialog.setTimerDialogListener {
@@ -108,7 +110,10 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         setContentView(R.layout.activity_single_timer);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         notificationManager = NotificationManagerCompat.from(this);
-        setTitle("Single Timer");
+        setTitle("   Single Timer");
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.drawable.ic_timer_white);
 
         loadData(); //load saved data when opening the app
 
@@ -121,7 +126,9 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             if (activityToOpen.equals("Single Timer")) {
                 //do nothing
             } else if (activityToOpen.equals("Multi Timer")) {
-                startActivity(new Intent(this, MultiTimerActivity.class));
+                Intent intent = new Intent(this, MultiTimerActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             } else if (activityToOpen.equals("Statistics")) {
                 startActivity(new Intent(this, StatisticsActivity.class));
             } else {
@@ -411,7 +418,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
 
-        menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_video_library_24), "Multi Timer Mode"));
+        menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_video_library_black), "Multi Timer Mode"));
         menu.add(0, R.id.privacy_policy, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
         menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
         menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
@@ -470,8 +477,9 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                 break;
 
             case R.id.multi_Timer_Mode:
-                finish();
-                startActivity(new Intent(this, MultiTimerActivity.class));
+                Intent intent = new Intent(this, MultiTimerActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 break;
 
             case R.id.setting_activity:
@@ -843,7 +851,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     //testing
     public void showNotification(String timeLeft) {
         Notification notification = new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_timer)
+                .setSmallIcon(R.drawable.ic_timer_black)
                 .setContentTitle(timeLeft)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
