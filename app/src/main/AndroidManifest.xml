@@ -23,7 +23,8 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
 
-        <activity android:name=".multiTimer.MultiTimerActivity" />
+        <activity android:name=".multiTimer.MultiTimerActivity"
+            android:configChanges="screenLayout|orientation|screenSize" />
 
         <activity android:name=".statistics.StatisticsActivity" />
 

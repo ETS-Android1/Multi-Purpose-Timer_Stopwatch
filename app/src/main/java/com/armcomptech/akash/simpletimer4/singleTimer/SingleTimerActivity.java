@@ -112,18 +112,23 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
 
         loadData(); //load saved data when opening the app
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        activityToOpen = sharedPreferences.getString("firstOpenActivity", "Single Timer");
+        boolean overrideActivityToOpen = getIntent().getBooleanExtra("overrideActivityToOpen", false);
 
-        if (activityToOpen.equals("Single Timer")) {
-            //do nothing
-        } else if (activityToOpen.equals("Multi Timer")) {
-            startActivity(new Intent(this, MultiTimerActivity.class));
-        } else if (activityToOpen.equals("Statistics")) {
-            startActivity(new Intent(this, StatisticsActivity.class));
-        } else {
-            startActivity(new Intent(this, SettingsActivity.class));
+        if (!overrideActivityToOpen) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            activityToOpen = sharedPreferences.getString("firstOpenActivity", "Single Timer");
+
+            if (activityToOpen.equals("Single Timer")) {
+                //do nothing
+            } else if (activityToOpen.equals("Multi Timer")) {
+                startActivity(new Intent(this, MultiTimerActivity.class));
+            } else if (activityToOpen.equals("Statistics")) {
+                startActivity(new Intent(this, StatisticsActivity.class));
+            } else {
+                startActivity(new Intent(this, SettingsActivity.class));
+            }
         }
+
 
         if (disableFirebaseLogging) {
             FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
@@ -155,8 +160,6 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
         if (!disableFirebaseLogging) {
             mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
-        } else {
-            mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("E5CC1736905A67B0077760DE2AFF519D").build());//test device
         }
 
         mProgressBar = findViewById(R.id.progressBar);
@@ -408,7 +411,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
 
-        menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_video_library_24), "Multi-Timer Mode"));
+        menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_video_library_24), "Multi Timer Mode"));
         menu.add(0, R.id.privacy_policy, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
         menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
         menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
@@ -467,6 +470,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                 break;
 
             case R.id.multi_Timer_Mode:
+                finish();
                 startActivity(new Intent(this, MultiTimerActivity.class));
                 break;
 

@@ -1,8 +1,18 @@
 package com.armcomptech.akash.simpletimer4.multiTimer;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,13 +25,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.armcomptech.akash.simpletimer4.R;
+import com.armcomptech.akash.simpletimer4.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
+import com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity;
+import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+
+import static com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity.logFirebaseAnalyticsEvents;
 
 public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener {
 
@@ -34,17 +49,12 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_timer);
-
         setTitle("Multi Timer");
 
-        if (savedInstanceState == null) {
-            timers.add(new Timer(60 * 1000 , "one minute"));
-            timers.add(new Timer(120 * 1000 , "two minute"));
-            timers.add(new Timer(180 * 1000 , "three minute"));
-            timers.add(new Timer(240 * 1000 , "four minute"));
-        } else {
-            timers = (ArrayList<Timer>) savedInstanceState.get("timers");
-        }
+        timers.add(new Timer(60 * 1000 , "one minute"));
+        timers.add(new Timer(120 * 1000 , "two minute"));
+        timers.add(new Timer(180 * 1000 , "three minute"));
+        timers.add(new Timer(240 * 1000 , "four minute"));
 
 
         recyclerView = findViewById(R.id.multiTimerRecyclerView);
@@ -137,9 +147,73 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+    protected void onPause() {
+        super.onPause();
+    }
 
-        outState.putSerializable("timers", timers);
+    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.option_menu, menu);
+
+        menu.findItem(R.id.check_heartbeat).setVisible(false);
+        menu.findItem(R.id.check_sound).setVisible(false);
+        menu.add(0, R.id.single_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer), "Single Timer Mode"));
+        menu.add(0, R.id.privacy_policy, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
+        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
+        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
+
+        return true;
+    }
+
+    private CharSequence menuIconWithText(Drawable r, String title) {
+
+        r.setBounds(0, 0, r.getIntrinsicWidth(), r.getIntrinsicHeight());
+        SpannableString sb = new SpannableString("    " + title);
+        ImageSpan imageSpan = new ImageSpan(r, ImageSpan.ALIGN_BOTTOM);
+        sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        return sb;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (item.isChecked()) {
+            item.setChecked(false);
+        } else {
+            item.setChecked(true);
+        }
+
+        switch (id) {
+            case R.id.statistics_activity:
+                logFirebaseAnalyticsEvents("Opened Statistics");
+                startActivity(new Intent(this, StatisticsActivity.class));
+                break;
+
+            case R.id.privacy_policy:
+                logFirebaseAnalyticsEvents("Opened Privacy Policy");
+                Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
+                myWebLink.setData(Uri.parse("https://timerpolicy.blogspot.com/2019/06/privacy-policy-armcomptech-built.html"));
+                startActivity(myWebLink);
+                break;
+
+            case R.id.single_Timer_Mode:
+                Intent intent = new Intent(this, SingleTimerActivity.class);
+                intent.putExtra("overrideActivityToOpen", true);
+                startActivity(intent);
+                break;
+
+            case R.id.setting_activity:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

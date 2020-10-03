@@ -5,6 +5,12 @@
     >
 
     <item
+        android:id="@+id/single_Timer_Mode"
+        app:showAsAction="never"
+        android:visible="false"
+        android:title="Single Timer Mode" />
+
+    <item
         android:id="@+id/multi_Timer_Mode"
         app:showAsAction="never"
         android:visible="false"
