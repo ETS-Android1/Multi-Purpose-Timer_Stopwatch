@@ -58,6 +58,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
+import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static com.App.MAIN_CHANNEL_ID;
 
 public class SingleTimerActivity extends AppCompatActivity implements setTimerDialog.setTimerDialogListener {
@@ -127,7 +131,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                 //do nothing
             } else if (activityToOpen.equals("Multi Timer")) {
                 Intent intent = new Intent(this, MultiTimerActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(intent);
             } else if (activityToOpen.equals("Statistics")) {
                 startActivity(new Intent(this, StatisticsActivity.class));
@@ -478,7 +482,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
 
             case R.id.multi_Timer_Mode:
                 Intent intent = new Intent(this, MultiTimerActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 break;
 
@@ -495,7 +499,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     public void timeUp() {
         //TODO: Wake up screen if off
         Intent openMainActivity = new Intent(this, SingleTimerActivity.class);
-        openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        openMainActivity.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
         logFirebaseAnalyticsEvents("Time Up");
         startActivityIfNeeded(openMainActivity, 0);
 

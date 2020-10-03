@@ -2,6 +2,7 @@ package com.armcomptech.akash.simpletimer4;
 
 import android.os.Bundle;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -16,7 +17,10 @@ public class SettingsActivity extends AppCompatActivity {
                 .replace(R.id.settings, new SettingsFragment())
                 .commit();
 
-        setTitle("Settings");
+        setTitle("   Settings");
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.drawable.ic_settings_white);
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
