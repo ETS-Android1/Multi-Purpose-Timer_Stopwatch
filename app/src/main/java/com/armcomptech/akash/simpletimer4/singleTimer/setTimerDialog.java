@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -14,8 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.armcomptech.akash.simpletimer4.R;
-
-import java.util.Objects;
 
 public class setTimerDialog extends AppCompatDialogFragment {
     private EditText editTextTimer;
@@ -30,6 +29,7 @@ public class setTimerDialog extends AppCompatDialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.layout_dialog_timerset, null);
 
+        builder.setMessage("Once timer is updated, it will reset");
         builder.setView(view)
                 .setTitle("Timer")
                 .setNegativeButton("Cancel", (dialog, which) -> {
@@ -44,7 +44,7 @@ public class setTimerDialog extends AppCompatDialogFragment {
                 });
 
         editTextTimer = view.findViewById(R.id.timer);
-
+        editTextTimer.setFilters(new InputFilter[] { new InputFilter.LengthFilter(6)});
 
         editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);

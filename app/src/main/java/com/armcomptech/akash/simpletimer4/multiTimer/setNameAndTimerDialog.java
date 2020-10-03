@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -73,6 +74,7 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
 
         editTextTimer = view.findViewById(R.id.timerTimeDialog);
         autoCompleteTimerName = view.findViewById(R.id.timerNameDialog);
+        editTextTimer.setFilters(new InputFilter[] { new InputFilter.LengthFilter(6)});
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();

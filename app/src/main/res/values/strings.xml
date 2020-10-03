@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Heartbeat Timer</string>
+    <string name="app_name">Multi Purpose Timer</string>
 
     <string name="enter_timer_name_optional">Enter Timer Name (Optional)</string>
     <string name="repeat">Repeat</string>

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -104,7 +103,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     String activityToOpen;
 
     //TODO: Change disableFirebaseLogging to false when releasing
-    private static Boolean disableFirebaseLogging = true;
+    private static Boolean disableFirebaseLogging = false;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
@@ -221,41 +220,37 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             mButtonPause.show();
             mButtonReset.hide();
 
-            if (mTimerRunning) {
-                pauseTimer();
-            } else {
-                startTimer();
-                counter = 0;
+            startTimer();
+            counter = 0;
 
-                //only update during the start
-                // mProgressBar.getProgress() ==
-                if (mTimeLeftInMillis == mStartTimeInMillis) {
-                    currentTimerName = getTimerName();
+            //only update during the start
+            // mProgressBar.getProgress() ==
+            if (mTimeLeftInMillis == mStartTimeInMillis) {
+                currentTimerName = getTimerName();
 
-                    //get position of timer name and -1 if it doesn't exist
-                    currentTimerNamePosition = timerNamePosition(currentTimerName, timerName);
+                //get position of timer name and -1 if it doesn't exist
+                currentTimerNamePosition = timerNamePosition(currentTimerName, timerName);
 
-                    if (currentTimerNamePosition == -1) {
-                        timerName.add(currentTimerName);
-                        count.add(1);
-                        timeInSeconds.add(0);
-                        currentTimerNamePosition = timeInSeconds.size() - 1; //make a new position since adding new value which is at the end
-                    } else {
-                        //increment count
-                        count.set(currentTimerNamePosition, count.get(currentTimerNamePosition) + 1);
-                    }
-                    saveData(); //save data
-
-                    //just to be safe because sometimes second is one less in statistics
-                    if (mStartTimeInMillis >= 4000) { //when timer is set more than 4 seconds
-                        timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
-                    }
-
-                    //update interface to show timer name
-                    mTimerNameTextView.setVisibility(View.VISIBLE);
-                    mTimerNameTextView.setText(currentTimerName);
-                    mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
+                if (currentTimerNamePosition == -1) {
+                    timerName.add(currentTimerName);
+                    count.add(1);
+                    timeInSeconds.add(0);
+                    currentTimerNamePosition = timeInSeconds.size() - 1; //make a new position since adding new value which is at the end
+                } else {
+                    //increment count
+                    count.set(currentTimerNamePosition, count.get(currentTimerNamePosition) + 1);
                 }
+                saveData(); //save data
+
+                //just to be safe because sometimes second is one less in statistics
+                if (mStartTimeInMillis >= 4000) { //when timer is set more than 4 seconds
+                    timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
+                }
+
+                //update interface to show timer name
+                mTimerNameTextView.setVisibility(View.VISIBLE);
+                mTimerNameTextView.setText(currentTimerName);
+                mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -266,42 +261,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             mButtonStart.show();
             mButtonReset.show();
 
-            if (mTimerRunning) {
-                pauseTimer();
-            } else {
-                startTimer();
-                counter = 0;
-
-                //only update during the start
-                // mProgressBar.getProgress() ==
-                if (mTimeLeftInMillis == mStartTimeInMillis) {
-                    currentTimerName = getTimerName();
-
-                    //get position of timer name and -1 if it doesn't exist
-                    currentTimerNamePosition = timerNamePosition(currentTimerName, timerName);
-
-                    if (currentTimerNamePosition == -1) {
-                        timerName.add(currentTimerName);
-                        count.add(1);
-                        timeInSeconds.add(0);
-                        currentTimerNamePosition = timeInSeconds.size() - 1; //make a new position since adding new value which is at the end
-                    } else {
-                        //increment count
-                        count.set(currentTimerNamePosition, count.get(currentTimerNamePosition) + 1);
-                    }
-                    saveData(); //save data
-
-                    //just to be safe because sometimes second is one less in statistics
-                    if (mStartTimeInMillis >= 4000) { //when timer is set more than 4 seconds
-                        timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
-                    }
-
-                    //update interface to show timer name
-                    mTimerNameTextView.setVisibility(View.VISIBLE);
-                    mTimerNameTextView.setText(currentTimerName);
-                    mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
-                }
-            }
+            pauseTimer();
         });
 
         mButtonReset.setOnClickListener(v -> {
@@ -336,8 +296,74 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+//        if (mCountDownTimer != null) {
+//            mCountDownTimer.cancel();
+//        }
+
+        outState.putBoolean("mTimerRunning", mTimerRunning);
+        outState.putBoolean("BlinkTimerStopRequest", BlinkTimerStopRequest);
+        outState.putBoolean("heartbeatChecked", heartbeatChecked);
+        outState.putBoolean("soundChecked", soundChecked);
+        outState.putBoolean("showNotification", showNotification);
+
+        outState.putLong("mStartTimeInMillis", mStartTimeInMillis);
+        outState.putLong("mTimeLeftInMillis", mTimeLeftInMillis);
+
+        outState.putInt("alternate", alternate);
+        outState.putInt("currentTimerNamePosition", currentTimerNamePosition);
+        outState.putInt("ticksToPass", ticksToPass);
+        outState.putInt("counter", counter);
+
+        outState.putString("currentTimerName", currentTimerName);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        mTimerRunning = savedInstanceState.getBoolean("mTimerRunning");
+        BlinkTimerStopRequest = savedInstanceState.getBoolean("BlinkTimerStopRequest");
+        heartbeatChecked = savedInstanceState.getBoolean("heartbeatChecked");
+        soundChecked = savedInstanceState.getBoolean("soundChecked");
+        showNotification = savedInstanceState.getBoolean("showNotification");
+
+        mStartTimeInMillis = savedInstanceState.getLong("mStartTimeInMillis");
+        mTimeLeftInMillis = savedInstanceState.getLong("mTimeLeftInMillis");
+
+        alternate = savedInstanceState.getInt("alternate");
+        currentTimerNamePosition = savedInstanceState.getInt("currentTimerNamePosition");
+        ticksToPass = savedInstanceState.getInt("ticksToPass");
+        counter = savedInstanceState.getInt("counter");
+
+        currentTimerName = savedInstanceState.getString("currentTimerName");
+
+        if (mTimerRunning) {
+            mTimerNameAutoComplete.setText(currentTimerName);
+            mButtonStart.performClick();
+
+            //update interface to show timer name
+            mTimerNameTextView.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setText(currentTimerName);
+            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
+        } else if (mTimeLeftInMillis != mStartTimeInMillis) {
+            mButtonStart.performClick();
+            mButtonPause.performClick();
+
+            //update interface to show timer name
+            mTimerNameTextView.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setText(currentTimerName);
+            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
+            updateCountDownText();
+            updateWatchInterface();
+
+            mProgressBar.setMax((int)mStartTimeInMillis);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mProgressBar.setProgress((int)mTimeLeftInMillis,true);
+            }
+        }
     }
 
     @Override
@@ -610,6 +636,8 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             return;
         }
 
+        mButtonPause.performClick();
+        mButtonReset.performClick();
         setTime(millisInput);
     }
 
@@ -679,7 +707,9 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     public void pauseTimer() {
-        mCountDownTimer.cancel();
+        if (mCountDownTimer != null) {
+            mCountDownTimer.cancel();
+        }
         mTimerRunning = false;
         updateWatchInterface();
         stopPlayer();
@@ -749,12 +779,12 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
 
     private void updateWatchInterface() {
         if (mTimerRunning) {
-            mButtonSetTimer.setVisibility(View.INVISIBLE);
+//            mButtonSetTimer.setVisibility(View.INVISIBLE);
             mButtonReset.hide();
             mButtonStart.hide();
             mButtonPause.show();
         } else {
-            mButtonSetTimer.setVisibility(View.VISIBLE);
+//            mButtonSetTimer.setVisibility(View.VISIBLE);
             mButtonStart.show();
             mButtonPause.hide();
 
