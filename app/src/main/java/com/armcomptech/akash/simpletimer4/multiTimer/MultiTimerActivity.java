@@ -142,5 +142,4 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
         outState.putSerializable("timers", timers);
     }
-
 }

@@ -23,9 +23,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -66,7 +68,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     private Button mButtonSetTimer;
     private CountDownTimer mCountDownTimer;
     private TextView mMillis;
-    private EditText mTimerNameEditText;
+    private AutoCompleteTextView mTimerNameAutoComplete;
     private TextView mTimerNameTextView;
     private Switch mRepeatSwitch;
 
@@ -126,6 +128,9 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         if (disableFirebaseLogging) {
             FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
             FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false);
+        } else {
+            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(true);
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
         }
 
         if (!disableFirebaseLogging) {
@@ -159,7 +164,19 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         mButtonStart = findViewById(R.id.button_start);
         mButtonPause = findViewById(R.id.button_pause);
         mButtonReset = findViewById(R.id.button_reset);
-        mTimerNameEditText = findViewById(R.id.timerNameEditText);
+        mTimerNameAutoComplete = findViewById(R.id.timerNameAutoComplete);
+        mTimerNameAutoComplete.setAdapter(new ArrayAdapter<>(
+                this, R.layout.timername_autocomplete_textview, timerName));
+        mTimerNameAutoComplete.setThreshold(0);
+        mTimerNameAutoComplete.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_GO
+                    || actionId == EditorInfo.IME_ACTION_DONE) {
+                closeKeyboard();
+                return true;
+            }
+            return false;
+        });
+
         mMillis = findViewById(R.id.millis);
         mRepeatSwitch = findViewById(R.id.repeat_SwitchInMultiTimer);
         mRepeatSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logFirebaseAnalyticsEvents("Repeat Switch: " + isChecked));
@@ -223,7 +240,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                     //update interface to show timer name
                     mTimerNameTextView.setVisibility(View.VISIBLE);
                     mTimerNameTextView.setText(currentTimerName);
-                    mTimerNameEditText.setVisibility(View.INVISIBLE);
+                    mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -268,7 +285,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                     //update interface to show timer name
                     mTimerNameTextView.setVisibility(View.VISIBLE);
                     mTimerNameTextView.setText(currentTimerName);
-                    mTimerNameEditText.setVisibility(View.INVISIBLE);
+                    mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -281,7 +298,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             resetTimer();
 
             mTimerNameTextView.setVisibility(View.INVISIBLE);
-            mTimerNameEditText.setVisibility(View.VISIBLE);
+            mTimerNameAutoComplete.setVisibility(View.VISIBLE);
 
             if (mResetButtonInterstitialAd.isLoaded()) {
                 mResetButtonInterstitialAd.show();
@@ -345,7 +362,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     private String getTimerName() {
-        String timerName = mTimerNameEditText.getText().toString();
+        String timerName = mTimerNameAutoComplete.getText().toString();
         if (timerName.matches("")) {
             timerName = "General";
         }

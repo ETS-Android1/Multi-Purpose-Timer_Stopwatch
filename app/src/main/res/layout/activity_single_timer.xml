@@ -13,12 +13,11 @@
         android:layout_height="0dp"
         android:layout_weight="30">
 
-        <EditText
-            android:id="@+id/timerNameEditText"
+        <AutoCompleteTextView
+            android:id="@+id/timerNameAutoComplete"
             android:layout_width="250dp"
             android:layout_height="50dp"
             android:layout_margin="10dp"
-            android:autofillHints="@string/enter_timer_name_optional"
             android:hint="@string/enter_timer_name_optional"
             android:inputType="text"
             android:text=""

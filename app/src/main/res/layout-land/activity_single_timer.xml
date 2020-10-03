@@ -13,8 +13,8 @@
         android:layout_height="match_parent"
         android:layout_weight="50">
 
-        <EditText
-            android:id="@+id/timerNameEditText"
+        <AutoCompleteTextView
+            android:id="@+id/timerNameAutoComplete"
             android:layout_width="250dp"
             android:layout_height="50dp"
             android:layout_marginTop="80dp"
@@ -39,10 +39,10 @@
             android:textAlignment="center"
             android:textSize="25sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="@+id/timerNameEditText"
-            app:layout_constraintEnd_toEndOf="@+id/timerNameEditText"
-            app:layout_constraintStart_toStartOf="@+id/timerNameEditText"
-            app:layout_constraintTop_toTopOf="@+id/timerNameEditText"
+            app:layout_constraintBottom_toBottomOf="@+id/timerNameAutoComplete"
+            app:layout_constraintEnd_toEndOf="@+id/timerNameAutoComplete"
+            app:layout_constraintStart_toStartOf="@+id/timerNameAutoComplete"
+            app:layout_constraintTop_toTopOf="@+id/timerNameAutoComplete"
             tools:visibility="gone" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

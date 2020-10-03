@@ -6,14 +6,15 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/timerNameDialog"
         android:layout_width="250dp"
-        android:layout_height="60dp"
-        android:textAlignment="center"
-        android:hint="(Optional) Timer Name"/>
-    
-<!--    autofillhints-->
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:hint="@string/enter_timer_name_optional"
+        android:inputType="text"
+        android:text=""
+        android:visibility="visible" />
 
     <EditText
         android:id="@+id/timerTimeDialog"

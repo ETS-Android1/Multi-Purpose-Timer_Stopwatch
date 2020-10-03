@@ -27,7 +27,7 @@ public class setTimerDialog extends AppCompatDialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        LayoutInflater inflater = Objects.requireNonNull(getActivity()).getLayoutInflater();
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.layout_dialog_timerset, null);
 
         builder.setView(view)

@@ -3,10 +3,14 @@ package com.armcomptech.akash.simpletimer4.multiTimer;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -14,12 +18,16 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Timer;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Objects;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class setNameAndTimerDialog extends AppCompatDialogFragment {
-    private EditText editTextName;
+    private AutoCompleteTextView autoCompleteTimerName;
     private EditText editTextTimer;
     private setTimerDialogListener listener;
     private boolean updateExistingTimer = false;
@@ -52,8 +60,8 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
                 .setPositiveButton("Set Timer", (dialog, which) -> {
                     String time = editTextTimer.getText().toString();
                     String name;
-                    if (!editTextName.getText().toString().matches("")) {
-                        name = editTextName.getText().toString();
+                    if (!autoCompleteTimerName.getText().toString().matches("")) {
+                        name = autoCompleteTimerName.getText().toString();
                     } else {
                         name = "General";
                     }
@@ -64,24 +72,48 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
                 });
 
         editTextTimer = view.findViewById(R.id.timerTimeDialog);
-        editTextName = view.findViewById(R.id.timerNameDialog);
+        autoCompleteTimerName = view.findViewById(R.id.timerNameDialog);
 
-        editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
-            InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
-            assert imm != null;
-            imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
-        }));
-        editTextTimer.requestFocus();
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String timerNameJson = sharedPreferences.getString("timerName", null);
+        Type timerNameType = new TypeToken<ArrayList<String>>(){}.getType();
+        ArrayList<String> timerName = gson.fromJson(timerNameJson, timerNameType);
+
+        if (timerName != null) {
+            autoCompleteTimerName.setAdapter(new ArrayAdapter<String>(
+                    requireContext(), R.layout.timername_autocomplete_textview, timerName));
+            autoCompleteTimerName.setThreshold(0);
+        }
+
+        autoCompleteTimerName.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_GO
+                    || actionId == EditorInfo.IME_ACTION_DONE) {
+                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                assert imm != null;
+                imm.hideSoftInputFromWindow(autoCompleteTimerName.getWindowToken(), 0);
+                return true;
+            }
+            return false;
+        });
 
         if (this.updateExistingTimer) {
-            editTextName.setText(timers.get(holder.getAdapterPosition()).getTimerName());
+            autoCompleteTimerName.setEnabled(false);
+            autoCompleteTimerName.setText(timers.get(holder.getAdapterPosition()).getTimerName());
+
+            editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
+                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                assert imm != null;
+                imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
+            }));
+            editTextTimer.requestFocus();
 
             builder.setMessage("Once timer is updated, it will reset");
             builder.setPositiveButton("Update Timer", (dialog, which) -> {
                 String time = editTextTimer.getText().toString();
                 String name;
-                if (!editTextName.getText().toString().matches("")) {
-                    name = editTextName.getText().toString();
+                if (!autoCompleteTimerName.getText().toString().matches("")) {
+                    name = autoCompleteTimerName.getText().toString();
                 } else {
                     name = "General";
                 }
@@ -91,11 +123,18 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
                 }
             });
         } else if (this.creatingNewTimer) {
+            autoCompleteTimerName.setOnFocusChangeListener((v, hasFocus) -> autoCompleteTimerName.post(() -> {
+                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                assert imm != null;
+                imm.showSoftInput(autoCompleteTimerName, InputMethodManager.SHOW_IMPLICIT);
+            }));
+            autoCompleteTimerName.requestFocus();
+
             builder.setPositiveButton("Set Timer", (dialog, which) -> {
                 String time = editTextTimer.getText().toString();
                 String name;
-                if (!editTextName.getText().toString().matches("")) {
-                    name = editTextName.getText().toString();
+                if (!autoCompleteTimerName.getText().toString().matches("")) {
+                    name = autoCompleteTimerName.getText().toString();
                 } else {
                     name = "General";
                 }
