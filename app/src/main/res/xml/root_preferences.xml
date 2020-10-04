@@ -13,4 +13,30 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Single Timer">
+
+        <ListPreference
+            app:defaultValue="Scrolling Wheel"
+            app:entries="@array/timePicker_entries"
+            app:entryValues="@array/timePicker_values"
+            app:key="singleTimerTimePicker"
+            app:title="Time Input Option"
+            app:summary="Select how you would like to pick time while in single timer"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Multi Timer">
+
+        <ListPreference
+            app:defaultValue="Typing"
+            app:entries="@array/timePicker_entries"
+            app:entryValues="@array/timePicker_values"
+            app:key="multiTimerTimePicker"
+            app:title="Time Input Option"
+            app:summary="Select how you would like to pick time while in multi timer"
+            />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

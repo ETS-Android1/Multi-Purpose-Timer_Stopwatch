@@ -2,12 +2,21 @@
     <string-array name="activityToOpen_entries">
         <item>Single Timer</item>
         <item>Multi Timer</item>
-        <item>Statistics</item>
     </string-array>
 
     <string-array name="activityToOpen_values">
         <item>Single Timer</item>
         <item>Multi Timer</item>
-        <item>Statistics</item>
+    </string-array>
+
+
+    <string-array name="timePicker_entries">
+        <item>Typing</item>
+        <item>Scroll Wheel</item>
+    </string-array>
+
+    <string-array name="timePicker_values">
+        <item>Typing</item>
+        <item>Scroll Wheel</item>
     </string-array>
 </resources>

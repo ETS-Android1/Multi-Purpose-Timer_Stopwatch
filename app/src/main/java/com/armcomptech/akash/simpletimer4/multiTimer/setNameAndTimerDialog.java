@@ -16,6 +16,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.preference.PreferenceManager;
 
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Timer;
@@ -31,8 +32,10 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
     private AutoCompleteTextView autoCompleteTimerName;
     private EditText editTextTimer;
     private setTimerDialogListener listener;
-    private boolean updateExistingTimer = false;
-    private boolean creatingNewTimer = false;
+    private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
+
+    private boolean updateExistingTimer;
+    private boolean creatingNewTimer;
     private MultiTimerAdapter.Item holder;
     private ArrayList<Timer> timers;
 
@@ -43,10 +46,12 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
         this.timers = timers;
     }
 
-
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        SharedPreferences sharedPreferencesSettings = PreferenceManager.getDefaultSharedPreferences(this.requireContext());
+        String timePickerPreference = sharedPreferencesSettings.getString("multiTimerTimePicker", "Scrolling Wheel");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -54,26 +59,15 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
         View view = inflater.inflate(R.layout.layout_dialog_nameandtimerset, null);
 
         builder.setView(view)
-                .setTitle("Timer")
+                .setTitle("Once Timer Is Updated, It Will Reset")
                 .setNegativeButton("Cancel", (dialog, which) -> {
 
-                })
-                .setPositiveButton("Set Timer", (dialog, which) -> {
-                    String time = editTextTimer.getText().toString();
-                    String name;
-                    if (!autoCompleteTimerName.getText().toString().matches("")) {
-                        name = autoCompleteTimerName.getText().toString();
-                    } else {
-                        name = "General";
-                    }
-
-                    if (!(time.matches(""))) {
-                        listener.createNewTimerNameAndTime(time, name, this.creatingNewTimer, this.updateExistingTimer, this.holder, this.timers);
-                    }
                 });
 
         editTextTimer = view.findViewById(R.id.timerTimeDialog);
         autoCompleteTimerName = view.findViewById(R.id.timerNameDialog);
+        timePicker = view.findViewById(R.id.scrollHmsPicker);
+
         editTextTimer.setFilters(new InputFilter[] { new InputFilter.LengthFilter(6)});
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
@@ -83,7 +77,7 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
         ArrayList<String> timerName = gson.fromJson(timerNameJson, timerNameType);
 
         if (timerName != null) {
-            autoCompleteTimerName.setAdapter(new ArrayAdapter<String>(
+            autoCompleteTimerName.setAdapter(new ArrayAdapter<>(
                     requireContext(), R.layout.timername_autocomplete_textview, timerName));
             autoCompleteTimerName.setThreshold(0);
         }
@@ -102,17 +96,26 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
         if (this.updateExistingTimer) {
             autoCompleteTimerName.setEnabled(false);
             autoCompleteTimerName.setText(timers.get(holder.getAdapterPosition()).getTimerName());
+            autoCompleteTimerName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
-            editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
-                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                assert imm != null;
-                imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
-            }));
-            editTextTimer.requestFocus();
+            if (timePickerPreference.equals("Typing")) {
+                timePicker.setEnabled(false);
+                timePicker.setVisibility(View.GONE);
+                editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
+                    InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    assert imm != null;
+                    imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
+                }));
+                editTextTimer.requestFocus();
+            } else {
+                editTextTimer.setEnabled(false);
+                editTextTimer.setVisibility(View.GONE);
+                timePicker = view.findViewById(R.id.scrollHmsPicker);
+            }
 
-            builder.setMessage("Once timer is updated, it will reset");
+//            builder.setMessage("Once timer is updated, it will reset");
             builder.setPositiveButton("Update Timer", (dialog, which) -> {
-                String time = editTextTimer.getText().toString();
+
                 String name;
                 if (!autoCompleteTimerName.getText().toString().matches("")) {
                     name = autoCompleteTimerName.getText().toString();
@@ -120,8 +123,14 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
                     name = "General";
                 }
 
-                if (!(time.matches(""))) {
-                    listener.createNewTimerNameAndTime(time, name, this.creatingNewTimer, this.updateExistingTimer, this.holder, this.timers);
+                String time;
+                if (timePickerPreference.equals("Typing")) {
+                    time = editTextTimer.getText().toString();
+                    if (!(time.matches(""))) {
+                        listener.createNewTimerNameAndTime(time, 0, 0, 0, name, this.creatingNewTimer, this.updateExistingTimer, this.holder, this.timers);
+                    }
+                } else {
+                    listener.createNewTimerNameAndTime("null", timePicker.getHours(), timePicker.getMinutes(), timePicker.getSeconds(), name, this.creatingNewTimer, this.updateExistingTimer, this.holder, this.timers);
                 }
             });
         } else if (this.creatingNewTimer) {
@@ -132,8 +141,16 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
             }));
             autoCompleteTimerName.requestFocus();
 
+            if (timePickerPreference.equals("Typing")) {
+                timePicker.setEnabled(false);
+                timePicker.setVisibility(View.GONE);
+            } else {
+                editTextTimer.setEnabled(false);
+                editTextTimer.setVisibility(View.GONE);
+                timePicker = view.findViewById(R.id.scrollHmsPicker);
+            }
+
             builder.setPositiveButton("Set Timer", (dialog, which) -> {
-                String time = editTextTimer.getText().toString();
                 String name;
                 if (!autoCompleteTimerName.getText().toString().matches("")) {
                     name = autoCompleteTimerName.getText().toString();
@@ -141,8 +158,14 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
                     name = "General";
                 }
 
-                if (!(time.matches(""))) {
-                    listener.createNewTimerNameAndTime(time, name, this.creatingNewTimer, this.updateExistingTimer, this.holder, this.timers);
+                String time;
+                if (timePickerPreference.equals("Typing")) {
+                    time = editTextTimer.getText().toString();
+                    if (!(time.matches(""))) {
+                        listener.createNewTimerNameAndTime(time, 0, 0, 0, name, this.creatingNewTimer, this.updateExistingTimer, this.holder, this.timers);
+                    }
+                } else {
+                    listener.createNewTimerNameAndTime("null", timePicker.getHours(), timePicker.getMinutes(), timePicker.getSeconds(), name, this.creatingNewTimer, this.updateExistingTimer, this.holder, this.timers);
                 }
             });
         }
@@ -161,7 +184,7 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
     }
 
     public interface setTimerDialogListener {
-        void createNewTimerNameAndTime(String time, String name, boolean creatingNewTimer, boolean updateExistingTimer, MultiTimerAdapter.Item holder, ArrayList<Timer> timers);
+        void createNewTimerNameAndTime(String time, int hours, int minutes, int seconds, String name, boolean creatingNewTimer, boolean updateExistingTimer, MultiTimerAdapter.Item holder, ArrayList<Timer> timers);
     }
 }
 

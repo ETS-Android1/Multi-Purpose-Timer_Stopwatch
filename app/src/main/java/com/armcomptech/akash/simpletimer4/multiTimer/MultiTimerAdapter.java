@@ -233,30 +233,42 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     //this method does nothing but satisfy the compiler
-    public void createNewTimerNameAndTime(String time, String name, boolean creatingNewTimer, boolean updateExistingTimer, Item holder, ArrayList<Timer> timers){
-        long input = Long.parseLong(time);
-        long hour = input / 10000;
-        long minuteraw = (input - (hour * 10000)) ;
-        long minuteone = minuteraw / 1000;
-        long minutetwo = (minuteraw % 1000) / 100;
-        long minute = (minuteone * 10) + minutetwo;
-        long second = input - ((hour * 10000) + (minute * 100));
-        long finalsecond = (hour * 3600) + (minute * 60) + second;
+    public void createNewTimerNameAndTime(String time, int hours, int minutes, int seconds, String name, boolean creatingNewTimer, boolean updateExistingTimer, Item holder, ArrayList<Timer> timers){
+        long millisInput;
+        long finalSecond;
 
-        if (time.length() == 0) {
-            Toast.makeText(this.context, "Field can't be empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (!time.equals("null")) {
+            long input = Long.parseLong(time);
+            long hour = input / 10000;
+            long minuteRaw = (input - (hour * 10000)) ;
+            long minuteOne = minuteRaw / 1000;
+            long minuteTwo = (minuteRaw % 1000) / 100;
+            long minute = (minuteOne * 10) + minuteTwo;
+            long second = input - ((hour * 10000) + (minute * 100));
+            finalSecond = (hour * 3600) + (minute * 60) + second;
 
-        //long millisInput = Long.parseLong(time) * 1000;
-        long millisInput = finalsecond * 1000;
-        if (millisInput == 0) {
-            Toast.makeText(this.context, "Please enter a positive number", Toast.LENGTH_SHORT).show();
-            return;
+            if (time.length() == 0) {
+                Toast.makeText(this.context, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            millisInput = finalSecond * 1000;
+            if (millisInput == 0) {
+                Toast.makeText(this.context, "Please enter a positive number", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else {
+            if (hours == 0 && minutes == 0 && seconds == 0){
+                Toast.makeText(this.context, "Time can't be zero", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                millisInput = (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
+                finalSecond = millisInput/1000;
+            }
         }
 
         if (updateExistingTimer) {
-            timers.get(holder.getAdapterPosition()).setmStartTimeInMillis(finalsecond);
+            timers.get(holder.getAdapterPosition()).setmStartTimeInMillis(finalSecond);
             resetTimer(holder);
             SingleTimerActivity.logFirebaseAnalyticsEvents("Update Existing Timer in Multi-Timer");
         }

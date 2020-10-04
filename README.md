@@ -11,3 +11,6 @@ Screenshots of the Application:
 <img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235229.jpg" width="300">
 <img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235241.jpg" width="300">
 <img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20200618-235250.jpg" width="300">
+
+Libraries Used in this project:
+https://github.com/DeweyReed/ScrollHmsPicker?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=6805

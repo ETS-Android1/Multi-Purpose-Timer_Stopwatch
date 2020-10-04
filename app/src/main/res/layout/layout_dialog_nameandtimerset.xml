@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:gravity="center">
 
@@ -13,8 +13,8 @@
         android:layout_margin="10dp"
         android:hint="@string/enter_timer_name_optional"
         android:inputType="text"
-        android:text=""
-        android:visibility="visible" />
+        android:textAlignment="center"
+        android:text=""/>
 
     <EditText
         android:id="@+id/timerTimeDialog"
@@ -23,5 +23,13 @@
         android:textAlignment="center"
         android:hint="12345 | 1 hour 23 min 45 sec"
         android:inputType="number" />
+
+    <io.github.deweyreed.scrollhmspicker.ScrollHmsPicker
+        android:id="@+id/scrollHmsPicker"
+        app:shp_normal_color="@android:color/black"
+        app:shp_selected_color="@color/colorPrimaryDark"
+        android:hapticFeedbackEnabled="true"
+        android:layout_width="250dp"
+        android:layout_height="250dp"/>
 
 </LinearLayout>

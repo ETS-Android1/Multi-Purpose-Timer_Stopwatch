@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:gravity="center">
 
     <EditText
@@ -12,5 +13,13 @@
         android:hint="12345 | 1 hour 23 min 45 sec"
         android:inputType="number"
         android:textAlignment="center" />
+
+    <io.github.deweyreed.scrollhmspicker.ScrollHmsPicker
+        android:id="@+id/scrollHmsPicker"
+        app:shp_normal_color="@android:color/black"
+        app:shp_selected_color="@color/colorPrimaryDark"
+        android:hapticFeedbackEnabled="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

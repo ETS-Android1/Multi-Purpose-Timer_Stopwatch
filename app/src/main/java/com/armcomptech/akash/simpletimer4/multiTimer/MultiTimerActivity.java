@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -57,6 +56,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setTitle("   Multi Timer");
         ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_video_library_white);
 
@@ -85,7 +85,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             }
 
             @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
 
                 new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
                         .addBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.deleteRed))
@@ -99,9 +99,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         addTimerFab = findViewById(R.id.addTimerFloatingActionButton);
-        addTimerFab.setOnClickListener(v -> {
-            openNameAndTimerDialog();
-        });
+        addTimerFab.setOnClickListener(v -> openNameAndTimerDialog());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             addTimerFab.setTooltipText("Add Timer");
         }
@@ -112,35 +110,47 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         setNameAndTimerDialog.show(getSupportFragmentManager(), "Set Name and Timer Here");
     }
 
-    public void createNewTimerNameAndTime(String time, String name, boolean creatingNewTimer, boolean updateExistingTimer, MultiTimerAdapter.Item holder, ArrayList<Timer> timers){
-        long input = Long.parseLong(time);
-        long hour = input / 10000;
-        long minuteraw = (input - (hour * 10000)) ;
-        long minuteone = minuteraw / 1000;
-        long minutetwo = (minuteraw % 1000) / 100;
-        long minute = (minuteone * 10) + minutetwo;
-        long second = input - ((hour * 10000) + (minute * 100));
-        long finalsecond = (hour * 3600) + (minute * 60) + second;
+    public void createNewTimerNameAndTime(String time, int hours, int minutes, int seconds, String name, boolean creatingNewTimer, boolean updateExistingTimer, MultiTimerAdapter.Item holder, ArrayList<Timer> timers){
+        long millisInput;
+        long finalSecond;
 
-        if (time.length() == 0) {
-            Toast.makeText(this, "Field can't be empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (!time.equals("null")) {
+            long input = Long.parseLong(time);
+            long hour = input / 10000;
+            long minuteRaw = (input - (hour * 10000)) ;
+            long minuteOne = minuteRaw / 1000;
+            long minuteTwo = (minuteRaw % 1000) / 100;
+            long minute = (minuteOne * 10) + minuteTwo;
+            long second = input - ((hour * 10000) + (minute * 100));
+            finalSecond = (hour * 3600) + (minute * 60) + second;
 
-        //long millisInput = Long.parseLong(time) * 1000;
-        long millisInput = finalsecond * 1000;
-        if (millisInput == 0) {
-            Toast.makeText(this, "Please enter a positive number", Toast.LENGTH_SHORT).show();
-            return;
+            if (time.length() == 0) {
+                Toast.makeText(this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            millisInput = finalSecond * 1000;
+            if (millisInput == 0) {
+                Toast.makeText(this, "Please enter a positive number", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else {
+            if (hours == 0 && minutes == 0 && seconds == 0){
+                Toast.makeText(this, "Time can't be zero", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                millisInput = (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
+                finalSecond = millisInput/1000;
+            }
         }
 
         if (creatingNewTimer) {
-            timers.add(new Timer(finalsecond * 1000, name));
+            timers.add(new Timer(finalSecond * 1000, name));
             Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(recyclerView.getAdapter().getItemCount() + 1);
         }
         if (updateExistingTimer) {
-            timers.get(holder.getAdapterPosition()).setmStartTimeInMillis(finalsecond * 1000);
-            timers.get(holder.getAdapterPosition()).setmTimeLeftInMillis(finalsecond * 1000);
+            timers.get(holder.getAdapterPosition()).setmStartTimeInMillis(finalSecond * 1000);
+            timers.get(holder.getAdapterPosition()).setmTimeLeftInMillis(finalSecond * 1000);
             timers.get(holder.getAdapterPosition()).setTimerPlaying(false);
             timers.get(holder.getAdapterPosition()).setTimerPaused(false);
             timers.get(holder.getAdapterPosition()).setTimerIsDone(false);
@@ -167,7 +177,6 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         menu.findItem(R.id.check_heartbeat).setVisible(false);
         menu.findItem(R.id.check_sound).setVisible(false);
         menu.add(0, R.id.single_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer_black), "Single Timer Mode"));
-        menu.add(0, R.id.privacy_policy, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
         menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
         menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
 
@@ -198,13 +207,6 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             case R.id.statistics_activity:
                 logFirebaseAnalyticsEvents("Opened Statistics");
                 startActivity(new Intent(this, StatisticsActivity.class));
-                break;
-
-            case R.id.privacy_policy:
-                logFirebaseAnalyticsEvents("Opened Privacy Policy");
-                Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
-                myWebLink.setData(Uri.parse("https://timerpolicy.blogspot.com/2019/06/privacy-policy-armcomptech-built.html"));
-                startActivity(myWebLink);
                 break;
 
             case R.id.single_Timer_Mode:
