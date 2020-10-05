@@ -293,12 +293,14 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             mTimerNameTextView.setVisibility(View.INVISIBLE);
             mTimerNameAutoComplete.setVisibility(View.VISIBLE);
 
-            if (mResetButtonInterstitialAd.isLoaded() && !isRemovedAds()) {
-                mResetButtonInterstitialAd.show();
-                logFirebaseAnalyticsEvents("Showed Ad");
-            } else {
-                Log.d("TAG", "The interstitial wasn't loaded yet.");
-                logFirebaseAnalyticsEvents("Ad not loaded");
+            if (!isRemovedAds()) {
+                if (mResetButtonInterstitialAd.isLoaded()) {
+                    mResetButtonInterstitialAd.show();
+                    logFirebaseAnalyticsEvents("Showed Ad");
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
+                    logFirebaseAnalyticsEvents("Ad not loaded");
+                }
             }
         });
         heartbeatChecked = true;

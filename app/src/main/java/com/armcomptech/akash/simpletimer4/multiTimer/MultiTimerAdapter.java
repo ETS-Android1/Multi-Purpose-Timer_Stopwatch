@@ -135,9 +135,10 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
-
-            if (!SingleTimerActivity.disableFirebaseLogging && !isRemovedAds()) {
-                mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            if (!isRemovedAds()) {
+                if (!SingleTimerActivity.disableFirebaseLogging) {
+                    mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+                }
             }
 
             resetTimer((Item) holder);
