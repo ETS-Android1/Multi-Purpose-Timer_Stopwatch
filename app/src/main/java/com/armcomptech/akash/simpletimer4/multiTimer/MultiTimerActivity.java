@@ -2,6 +2,7 @@ package com.armcomptech.akash.simpletimer4.multiTimer;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -25,6 +26,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
@@ -42,8 +45,9 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity.logFirebaseAnalyticsEvents;
 
-public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener {
+public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener, BillingProcessor.IBillingHandler {
 
+    BillingProcessor bp;
     RecyclerView recyclerView;
     ExtendedFloatingActionButton addTimerFab;
     private ArrayList<Timer> timers = new ArrayList<>();
@@ -60,6 +64,8 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_video_library_white);
 
+        bp = new BillingProcessor(this, getString(R.string.licence_key), this);
+        bp.initialize();
 
         timers.add(new Timer(60 * 1000 , "one minute"));
 
@@ -77,7 +83,6 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                //TODO: there is some bug that needs fixing crashing when somethign is removed
                 timers.get(viewHolder.getAdapterPosition()).clean();
                 timers.remove(viewHolder.getAdapterPosition());
                 holders.remove(viewHolder.getAdapterPosition());
@@ -162,11 +167,6 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
     @SuppressLint("UseCompatLoadingForDrawables")
     @SuppressWarnings("deprecation")
     @Override
@@ -179,6 +179,9 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         menu.add(0, R.id.single_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer_black), "Single Timer Mode"));
         menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
         menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
+        if (!isRemovedAds()) {
+            menu.add(0, R.id.remove_Ads, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_remove_circle_outline_black), "Remove Ads"));
+        }
 
         return true;
     }
@@ -220,9 +223,42 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
 
+            case R.id.remove_Ads:
+                bp.purchase(this, "remove_ads");
+
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isRemovedAds() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("removed_Ads", false);
+    }
+
+    @Override
+    public void onProductPurchased(String productId, TransactionDetails details) {
+        if (productId.equals("remove_ads")) {
+            SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("removed_Ads", true);
+            editor.apply();
+        }
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+        bp.loadOwnedPurchasesFromGoogle();
+    }
+
+    @Override
+    public void onBillingError(int errorCode, Throwable error) {
+        Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBillingInitialized() {
+
     }
 }

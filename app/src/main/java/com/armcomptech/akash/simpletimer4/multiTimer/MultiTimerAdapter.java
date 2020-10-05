@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Timer;
 import com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -36,11 +39,27 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private ArrayList<Timer> timers;
     private ArrayList<RecyclerView.ViewHolder> holders;
     private int ticksToPass = 0;
+    InterstitialAd mResetButtonInterstitialAd;
 
     MultiTimerAdapter(Context context, ArrayList<Timer> timers, ArrayList<RecyclerView.ViewHolder> holders) {
         this.context = context;
         this.timers = timers;
         this.holders = holders;
+
+        if (!SingleTimerActivity.disableFirebaseLogging) {
+            SingleTimerActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
+
+            if (!isRemovedAds()) {
+                //ad stuff
+                //noinspection deprecation
+                MobileAds.initialize(this.context, this.context.getString(R.string.admob_app_id));
+
+                //reset button ad
+                mResetButtonInterstitialAd = new InterstitialAd(this.context);
+                mResetButtonInterstitialAd.setAdUnitId(this.context.getString(R.string.resetButton_interstital_ad_id));
+                mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        }
     }
 
     @NonNull
@@ -57,7 +76,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             holders.add(holder);
         }
 
-        ((Item)holder).timerName.setText("Timer Name: " + timers.get(holder.getAdapterPosition()).getTimerName());
+        ((Item)holder).timerName.setText(String.format("Timer Name: %s", timers.get(holder.getAdapterPosition()).getTimerName()));
         ((Item)holder).timerTime.setText(timers.get(holder.getAdapterPosition()).getTimeLeftFormatted());
         if (timers.get(holder.getAdapterPosition()).getTimerPlaying()) {
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
@@ -104,7 +123,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ((Item)holder).pauseButton.setOnClickListener(v -> {
             SingleTimerActivity.logFirebaseAnalyticsEvents("Pause Timer in Multi-Timer");
 
-            pauseTimer(((Item)holder), holder.getAdapterPosition());
+            pauseTimer(((Item)holder));
 
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
@@ -116,7 +135,10 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
-            SingleTimerActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
+
+            if (!SingleTimerActivity.disableFirebaseLogging && !isRemovedAds()) {
+                mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
 
             resetTimer((Item) holder);
             int myPosition = holder.getAdapterPosition();
@@ -137,6 +159,11 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ((Item)holder).invisibleTimeButton.setOnClickListener(v -> openNameAndTimerDialog((Item)holder));
     }
 
+    public boolean isRemovedAds() {
+        SharedPreferences sharedPreferences = this.context.getSharedPreferences("shared preferences", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("removed_Ads", false);
+    }
+
     private void resetTimer(@NonNull Item holder) {
         int myPosition = holder.getAdapterPosition();
 
@@ -154,7 +181,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         timers.get(myPosition).setCounter(0);
     }
 
-    private void pauseTimer(@NonNull Item holder, int position) {
+    private void pauseTimer(@NonNull Item holder) {
         int myPosition = holder.getAdapterPosition();
         timers.get(myPosition).getmCountDownTimer().cancel();
         timers.get(myPosition).setTimerPlaying(false);

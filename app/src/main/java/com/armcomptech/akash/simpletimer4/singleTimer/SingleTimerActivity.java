@@ -40,6 +40,8 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.preference.PreferenceManager;
 
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
@@ -64,8 +66,9 @@ import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static com.App.MAIN_CHANNEL_ID;
 
-public class SingleTimerActivity extends AppCompatActivity implements setTimerDialog.setTimerDialogListener {
+public class SingleTimerActivity extends AppCompatActivity implements setTimerDialog.setTimerDialogListener, BillingProcessor.IBillingHandler {
 
+    BillingProcessor bp;
     private TextView mTextViewCountDown;
     private FloatingActionButton mButtonStart;
     private FloatingActionButton mButtonPause;
@@ -91,6 +94,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
 
     MediaPlayer player;
     private NotificationManagerCompat notificationManager;
+    InterstitialAd mResetButtonInterstitialAd;
 
     ArrayList<String> timerName = new ArrayList<>();
     ArrayList<Integer> count = new ArrayList<>();
@@ -105,7 +109,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     String activityToOpen;
 
     //TODO: Change disableFirebaseLogging to false when releasing
-    private static Boolean disableFirebaseLogging = true;
+    public static Boolean disableFirebaseLogging = true;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
@@ -120,6 +124,9 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         assert actionBar != null;
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_timer_white);
+
+        bp = new BillingProcessor(this, getString(R.string.licence_key), this);
+        bp.initialize();
 
         loadData(); //load saved data when opening the app
 
@@ -169,16 +176,20 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             timeInSeconds = new ArrayList<>();
         }
 
-        //ad stuff
-        //noinspection deprecation
-        MobileAds.initialize(this,getString(R.string.admob_app_id));
+        if (!isRemovedAds()) {
+            //ad stuff
+            //noinspection deprecation
+            MobileAds.initialize(this,getString(R.string.admob_app_id));
 
-        //reset button ad
-        InterstitialAd mResetButtonInterstitialAd = new InterstitialAd(this);
-        mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
-        if (!disableFirebaseLogging) {
-            mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            //reset button ad
+            mResetButtonInterstitialAd = new InterstitialAd(this);
+            mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
+
+            if (!disableFirebaseLogging) {
+                mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
         }
+
 
         mProgressBar = findViewById(R.id.progressBar);
         mTextViewCountDown = findViewById(R.id.text_view_countdown);
@@ -282,7 +293,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             mTimerNameTextView.setVisibility(View.INVISIBLE);
             mTimerNameAutoComplete.setVisibility(View.VISIBLE);
 
-            if (mResetButtonInterstitialAd.isLoaded()) {
+            if (mResetButtonInterstitialAd.isLoaded() && !isRemovedAds()) {
                 mResetButtonInterstitialAd.show();
                 logFirebaseAnalyticsEvents("Showed Ad");
             } else {
@@ -303,13 +314,14 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         }
     }
 
+    public boolean isRemovedAds() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("removed_Ads", false);
+    }
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
-//        if (mCountDownTimer != null) {
-//            mCountDownTimer.cancel();
-//        }
 
         outState.putBoolean("mTimerRunning", mTimerRunning);
         outState.putBoolean("BlinkTimerStopRequest", BlinkTimerStopRequest);
@@ -453,6 +465,10 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
         menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
 
+        if (!isRemovedAds()) {
+            menu.add(0, R.id.remove_Ads, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_remove_circle_outline_black), "Remove Ads"));
+        }
+
         return true;
     }
 
@@ -508,6 +524,9 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             case R.id.setting_activity:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
+
+            case R.id.remove_Ads:
+                bp.purchase(this, "remove_ads");
 
             default:
                 break;
@@ -846,5 +865,30 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                 .build();
 
         notificationManager.notify(1, notification);
+    }
+
+    @Override
+    public void onProductPurchased(String productId, TransactionDetails details) {
+        if (productId.equals("remove_ads")) {
+            SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("removed_Ads", true);
+            editor.apply();
+        }
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+        bp.loadOwnedPurchasesFromGoogle();
+    }
+
+    @Override
+    public void onBillingError(int errorCode, Throwable error) {
+        Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBillingInitialized() {
+
     }
 }

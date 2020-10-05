@@ -57,4 +57,11 @@
         app:showAsAction="never"
         android:visible="false"/>
 
+    <item
+        android:id="@+id/remove_Ads"
+        android:title="Remove Ads"
+        android:icon="@drawable/ic_baseline_remove_circle_outline_black"
+        app:showAsAction="never"
+        android:visible="false"/>
+
 </menu>

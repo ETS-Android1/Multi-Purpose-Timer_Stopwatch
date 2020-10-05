@@ -4,6 +4,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 
 repositories {
     jcenter()
+    mavenCentral()
 }
 
 android {
@@ -17,8 +18,8 @@ android {
         applicationId "com.armcomptech.akash.simpletimer4"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 20
-        versionName "4.2.0"
+        versionCode 21
+        versionName "4.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -61,7 +62,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'com.google.ads.mediation:mopub:5.7.0.0'
     implementation 'androidx.annotation:annotation:1.1.0'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -69,4 +69,5 @@ dependencies {
 
     implementation 'it.xabaras.android:recyclerview-swipedecorator:1.2.3'
     implementation 'com.github.DeweyReed:ScrollHmsPicker:2.0.3'
+    implementation 'com.anjlab.android.iab.v3:library:1.0.44'
 }

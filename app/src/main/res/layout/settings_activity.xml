@@ -8,21 +8,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/privacy_policy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@drawable/button_background"
-        android:drawableStart="@drawable/ic_lock_black"
-        android:drawablePadding="10dp"
-        android:foregroundGravity="center"
-        android:gravity="center"
-        android:padding="10dp"
-        android:text="Privacy Policy"
-        android:bottomRightRadius="20dp"
-        android:bottomLeftRadius="20dp"
-        android:topLeftRadius="20dp"
-        android:topRightRadius="20dp"
-        android:textAlignment="center" />
 </LinearLayout>

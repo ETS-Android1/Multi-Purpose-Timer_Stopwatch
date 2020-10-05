@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.armcomptech.akash.simpletimer4">
 
+    <uses-permission android:name="com.android.vending.BILLING" />
+
     <supports-screens
         android:smallScreens="true"
         android:largeScreens="true"
