@@ -244,6 +244,8 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("removed_Ads", true);
             editor.apply();
+
+            Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
         }
     }
 

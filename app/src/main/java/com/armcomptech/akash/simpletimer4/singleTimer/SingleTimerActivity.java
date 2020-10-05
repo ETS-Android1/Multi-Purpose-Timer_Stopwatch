@@ -874,6 +874,8 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("removed_Ads", true);
             editor.apply();
+
+            Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
         }
     }
 
