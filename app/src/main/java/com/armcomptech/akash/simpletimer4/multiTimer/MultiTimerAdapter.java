@@ -107,7 +107,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).getmStartTimeInMillis());
 
         ((Item)holder).startButton.setOnClickListener(v -> {
-            SingleTimerActivity.logFirebaseAnalyticsEvents("Pause Timer in Multi-Timer");
+            SingleTimerActivity.logFirebaseAnalyticsEvents("Start Timer in Multi-Timer");
 
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
@@ -135,6 +135,8 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
+            SingleTimerActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
+
             if (!isRemovedAds()) {
                 if (!SingleTimerActivity.disableFirebaseLogging) {
                     mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());

@@ -240,13 +240,17 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     @Override
     public void onProductPurchased(String productId, TransactionDetails details) {
         if (productId.equals("remove_ads")) {
-            SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("removed_Ads", true);
-            editor.apply();
+            removeAds();
 
             Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void removeAds() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("removed_Ads", true);
+        editor.apply();
     }
 
     @Override
@@ -263,4 +267,6 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     public void onBillingInitialized() {
 
     }
+
+
 }

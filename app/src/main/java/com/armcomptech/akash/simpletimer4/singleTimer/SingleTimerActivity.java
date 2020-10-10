@@ -125,6 +125,8 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_timer_white);
 
+        removeAds(); // this removes all ads for new users
+
         bp = new BillingProcessor(this, getString(R.string.licence_key), this);
         bp.initialize();
 
@@ -872,13 +874,17 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     @Override
     public void onProductPurchased(String productId, TransactionDetails details) {
         if (productId.equals("remove_ads")) {
-            SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("removed_Ads", true);
-            editor.apply();
+            removeAds();
 
             Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void removeAds() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("removed_Ads", true);
+        editor.apply();
     }
 
     @Override
