@@ -1,11 +1,12 @@
 package com.armcomptech.akash.simpletimer4.singleTimer;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -13,37 +14,32 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
+import android.text.InputFilter;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.preference.PreferenceManager;
 
-import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.TransactionDetails;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.SettingsActivity;
+import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.gms.ads.AdRequest;
@@ -59,6 +55,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.content.Context.MODE_PRIVATE;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -66,9 +64,13 @@ import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static com.App.MAIN_CHANNEL_ID;
 
-public class SingleTimerActivity extends AppCompatActivity implements setTimerDialog.setTimerDialogListener, BillingProcessor.IBillingHandler {
+/**
+ * A placeholder fragment containing a simple view.
+ */
+public class singleTimerFragment extends Fragment {
 
-    BillingProcessor bp;
+    private static final String START_TIME = "start_time";
+
     private TextView mTextViewCountDown;
     private FloatingActionButton mButtonStart;
     private FloatingActionButton mButtonPause;
@@ -84,7 +86,6 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
 
     private boolean mTimerRunning;
     private boolean BlinkTimerStopRequest;
-    private boolean heartbeatChecked;
     private boolean soundChecked;
     private boolean showNotification;
 
@@ -101,41 +102,40 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     ArrayList<Integer> timeInSeconds = new ArrayList<>();
 
     @SuppressLint("StaticFieldLeak")
-    private static SingleTimerActivity instance;
+    private static TabbedActivity instance;
     public String currentTimerName;
     public int currentTimerNamePosition;
     public int ticksToPass;
     public int counter;
     String activityToOpen;
 
+    long startTime = 1000;
+    private EditText editTextTimer;
+    private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
+
     //TODO: Change disableFirebaseLogging to false when releasing
     public static Boolean disableFirebaseLogging = true;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
+    public static singleTimerFragment newInstance() {
+        return new singleTimerFragment();
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        instance = this;
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single_timer);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        notificationManager = NotificationManagerCompat.from(this);
-        setTitle("   Single Timer");
-        ActionBar actionBar = getSupportActionBar();
-        assert actionBar != null;
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setIcon(R.drawable.ic_timer_white);
 
-        removeAds(); // this removes all ads for new users
-
-        bp = new BillingProcessor(this, getString(R.string.licence_key), this);
-        bp.initialize();
+        instance = (TabbedActivity) requireContext();
+        instance.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        notificationManager = NotificationManagerCompat.from(requireContext());
+        instance.setTitle("   Single Timer");
 
         loadData(); //load saved data when opening the app
 
-        boolean overrideActivityToOpen = getIntent().getBooleanExtra("overrideActivityToOpen", false);
+        boolean overrideActivityToOpen = instance.getIntent().getBooleanExtra("overrideActivityToOpen", false);
 
         if (!overrideActivityToOpen) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
             activityToOpen = sharedPreferences.getString("firstOpenActivity", "Single Timer");
 
             switch (activityToOpen) {
@@ -143,30 +143,30 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                     //do nothing
                     break;
                 case "Multi Timer":
-                    Intent intent = new Intent(this, MultiTimerActivity.class);
+                    Intent intent = new Intent(requireContext(), MultiTimerActivity.class);
                     intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
                     break;
                 case "Statistics":
-                    startActivity(new Intent(this, StatisticsActivity.class));
+                    startActivity(new Intent(requireContext(), StatisticsActivity.class));
                     break;
                 default:
-                    startActivity(new Intent(this, SettingsActivity.class));
+                    startActivity(new Intent(requireContext(), SettingsActivity.class));
                     break;
             }
         }
 
 
         if (disableFirebaseLogging) {
-            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
+            FirebaseAnalytics.getInstance(requireContext()).setAnalyticsCollectionEnabled(false);
             FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false);
         } else {
-            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(true);
+            FirebaseAnalytics.getInstance(requireContext()).setAnalyticsCollectionEnabled(true);
             FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
         }
 
         if (!disableFirebaseLogging) {
-            mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "App Opened");
             mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle);
@@ -181,26 +181,32 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         if (!isRemovedAds()) {
             //ad stuff
             //noinspection deprecation
-            MobileAds.initialize(this,getString(R.string.admob_app_id));
+            MobileAds.initialize(getContext(),getString(R.string.admob_app_id));
 
             //reset button ad
-            mResetButtonInterstitialAd = new InterstitialAd(this);
+            mResetButtonInterstitialAd = new InterstitialAd(requireContext());
             mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
 
             if (!disableFirebaseLogging) {
                 mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
         }
+    }
 
+    @Override
+    public View onCreateView(
+            @NonNull LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.activity_single_timer, container, false);
 
-        mProgressBar = findViewById(R.id.progressBar);
-        mTextViewCountDown = findViewById(R.id.text_view_countdown);
-        mButtonStart = findViewById(R.id.button_start);
-        mButtonPause = findViewById(R.id.button_pause);
-        mButtonReset = findViewById(R.id.button_reset);
-        mTimerNameAutoComplete = findViewById(R.id.timerNameAutoComplete);
-        mTimerNameAutoComplete.setAdapter(new ArrayAdapter<>(
-                this, R.layout.timername_autocomplete_textview, timerName));
+        mProgressBar = root.findViewById(R.id.progressBar);
+        mTextViewCountDown = root.findViewById(R.id.text_view_countdown);
+        mButtonStart = root.findViewById(R.id.button_start);
+        mButtonPause = root.findViewById(R.id.button_pause);
+        mButtonReset = root.findViewById(R.id.button_reset);
+        mTimerNameAutoComplete = root.findViewById(R.id.timerNameAutoComplete);
+//        mTimerNameAutoComplete.setAdapter(new ArrayAdapter<>(
+//                this, R.layout.timername_autocomplete_textview, timerName));
         mTimerNameAutoComplete.setThreshold(0);
         mTimerNameAutoComplete.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_GO
@@ -211,21 +217,21 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             return false;
         });
 
-        mMillis = findViewById(R.id.millis);
-        mRepeatSwitch = findViewById(R.id.repeat_SwitchInMultiTimer);
+        mMillis = root.findViewById(R.id.millis);
+        mRepeatSwitch = root.findViewById(R.id.repeat_SwitchInMultiTimer);
         mRepeatSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> logFirebaseAnalyticsEvents("Repeat Switch: " + isChecked));
 
-        mTimerNameTextView = findViewById(R.id.timerNameTextView);
+        mTimerNameTextView = root.findViewById(R.id.timerNameTextView);
         mTimerNameTextView.setVisibility(View.INVISIBLE );
 
-        mButtonSetTimer = findViewById(R.id.setTimer);
+        mButtonSetTimer = root.findViewById(R.id.setTimer);
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
 
         mButtonSetTimer.setOnClickListener(v -> openTimerDialog());
 
         mButtonPause.hide();
 
-        setTime(100000); //default 1 minute timer
+        setTime(requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE).getLong(START_TIME, 1000)); //default 1 minute timer
 
         mButtonStart.setOnClickListener( v -> {
 
@@ -305,9 +311,9 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                 }
             }
         });
-        heartbeatChecked = true;
-        soundChecked = true;
         showNotification = true;
+
+        return root;
     }
 
     public static void logFirebaseAnalyticsEvents(String eventName) {
@@ -319,17 +325,16 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     public boolean isRemovedAds() {
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         return sharedPreferences.getBoolean("removed_Ads", false);
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean("mTimerRunning", mTimerRunning);
         outState.putBoolean("BlinkTimerStopRequest", BlinkTimerStopRequest);
-        outState.putBoolean("heartbeatChecked", heartbeatChecked);
         outState.putBoolean("soundChecked", soundChecked);
         outState.putBoolean("showNotification", showNotification);
 
@@ -345,46 +350,46 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+    public void onViewStateRestored(@NonNull Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
 
-        mTimerRunning = savedInstanceState.getBoolean("mTimerRunning");
-        BlinkTimerStopRequest = savedInstanceState.getBoolean("BlinkTimerStopRequest");
-        heartbeatChecked = savedInstanceState.getBoolean("heartbeatChecked");
-        soundChecked = savedInstanceState.getBoolean("soundChecked");
-        showNotification = savedInstanceState.getBoolean("showNotification");
-
-        mStartTimeInMillis = savedInstanceState.getLong("mStartTimeInMillis");
-        mTimeLeftInMillis = savedInstanceState.getLong("mTimeLeftInMillis");
-
-        alternate = savedInstanceState.getInt("alternate");
-        currentTimerNamePosition = savedInstanceState.getInt("currentTimerNamePosition");
-        ticksToPass = savedInstanceState.getInt("ticksToPass");
-        counter = savedInstanceState.getInt("counter");
-
-
-        currentTimerName = savedInstanceState.getString("currentTimerName");
-
-        if (mTimerRunning) {
-            mTimerNameAutoComplete.setText(currentTimerName);
-            mButtonStart.performClick();
-
-            //update interface to show timer name
-            mTimerNameTextView.setVisibility(View.VISIBLE);
-            mTimerNameTextView.setText(currentTimerName);
-            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
-        } else if (mTimeLeftInMillis != mStartTimeInMillis) {
-            //update interface to show timer name
-            mTimerNameTextView.setVisibility(View.VISIBLE);
-            mTimerNameTextView.setText(currentTimerName);
-            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
-            updateCountDownText();
-            updateWatchInterface();
-        }
+//        mTimerRunning = savedInstanceState.getBoolean("mTimerRunning");
+//        BlinkTimerStopRequest = savedInstanceState.getBoolean("BlinkTimerStopRequest");
+//        heartbeatChecked = savedInstanceState.getBoolean("heartbeatChecked");
+//        soundChecked = savedInstanceState.getBoolean("soundChecked");
+//        showNotification = savedInstanceState.getBoolean("showNotification");
+//
+//        mStartTimeInMillis = savedInstanceState.getLong("mStartTimeInMillis");
+//        mTimeLeftInMillis = savedInstanceState.getLong("mTimeLeftInMillis");
+//
+//        alternate = savedInstanceState.getInt("alternate");
+//        currentTimerNamePosition = savedInstanceState.getInt("currentTimerNamePosition");
+//        ticksToPass = savedInstanceState.getInt("ticksToPass");
+//        counter = savedInstanceState.getInt("counter");
+//
+//
+//        currentTimerName = savedInstanceState.getString("currentTimerName");
+//
+//        if (mTimerRunning) {
+//            mTimerNameAutoComplete.setText(currentTimerName);
+//            mButtonStart.performClick();
+//
+//            //update interface to show timer name
+//            mTimerNameTextView.setVisibility(View.VISIBLE);
+//            mTimerNameTextView.setText(currentTimerName);
+//            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
+//        } else if (mTimeLeftInMillis != mStartTimeInMillis) {
+//            //update interface to show timer name
+//            mTimerNameTextView.setVisibility(View.VISIBLE);
+//            mTimerNameTextView.setText(currentTimerName);
+//            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
+//            updateCountDownText();
+//            updateWatchInterface();
+//        }
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         notificationManager.cancel(1);
         stopPlayer();
@@ -392,7 +397,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         notificationManager.cancel(1);
         stopPlayer();
@@ -400,21 +405,21 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         notificationManager.cancel(1);
         showNotification = false;
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         notificationManager.cancel(1);
         stopPlayer();
         showNotification = true;
     }
 
-    public static SingleTimerActivity getInstance() {
+    public static TabbedActivity getInstance() {
         return instance;
     }
 
@@ -442,7 +447,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     private void saveData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
 
@@ -458,98 +463,20 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
         editor.apply();
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
-    @SuppressWarnings("deprecation")
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.option_menu, menu);
-
-        menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_video_library_black), "Multi Timer Mode"));
-        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
-        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
-
-        if (!isRemovedAds()) {
-            menu.add(0, R.id.remove_Ads, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_remove_circle_outline_black), "Remove Ads"));
-        }
-
-        return true;
-    }
-
-    private CharSequence menuIconWithText(Drawable r, String title) {
-
-        r.setBounds(0, 0, r.getIntrinsicWidth(), r.getIntrinsicHeight());
-        SpannableString sb = new SpannableString("    " + title);
-        ImageSpan imageSpan = new ImageSpan(r, ImageSpan.ALIGN_BOTTOM);
-        sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        return sb;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (item.isChecked()) {
-            item.setChecked(false);
-        } else {
-            item.setChecked(true);
-        }
-
-        switch (id) {
-            case R.id.check_heartbeat:
-                heartbeatChecked = !heartbeatChecked;
-                logFirebaseAnalyticsEvents("Heartbeat Checked: " + heartbeatChecked);
-
-                //refresh the heartbeat sound
-                if (mTimerRunning) {
-                    mButtonPause.performClick();
-                    mButtonStart.performClick();
-                }
-                break;
-
-            case R.id.check_sound:
-                soundChecked = !soundChecked;
-                logFirebaseAnalyticsEvents("Sound Checked: " + heartbeatChecked);
-
-                break;
-
-            case R.id.statistics_activity:
-                logFirebaseAnalyticsEvents("Opened Statistics");
-                startActivity(new Intent(this, StatisticsActivity.class));
-                break;
-
-            case R.id.multi_Timer_Mode:
-                Intent intent = new Intent(this, MultiTimerActivity.class);
-                intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                break;
-
-            case R.id.setting_activity:
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
-
-            case R.id.remove_Ads:
-                bp.purchase(this, "remove_ads");
-
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     public void timeUp() {
         //TODO: Wake up screen if off
-        Intent openMainActivity = new Intent(this, SingleTimerActivity.class);
+        Intent openMainActivity = new Intent(getContext(), TabbedActivity.class);
         openMainActivity.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
         logFirebaseAnalyticsEvents("Time Up");
-        startActivityIfNeeded(openMainActivity, 0);
+//        startActivityIfNeeded(openMainActivity, 0);
+
+        soundChecked = soundChecked = instance.getSharedPreferences("shared preferences", MODE_PRIVATE).getBoolean("SOUND_CHECKED", true);
 
         if (soundChecked && this.getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
             if (player != null) {
                 stopPlayer();
             } else {
-                player = MediaPlayer.create(this, R.raw.endsong);
+                player = MediaPlayer.create(getContext(), R.raw.endsong);
                 player.setOnCompletionListener(mp -> {
                     player.seekTo(0);
                     player.start();
@@ -567,7 +494,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                     try {
                         Thread.sleep(400);
 
-                        runOnUiThread(() -> {
+                        instance.runOnUiThread(() -> {
                             if (alternate % 2 == 0) {
                                 alternate++;
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -591,9 +518,9 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     public void heartbeat() {
-        if (heartbeatChecked) {
+        if (/*heartbeatChecked*/false) {
 
-            player = MediaPlayer.create(this, R.raw.heartbeat);
+            player = MediaPlayer.create(getContext(), R.raw.heartbeat);
             player.setOnCompletionListener(mp -> {
                 player.seekTo(0);
                 //player.start();
@@ -625,8 +552,51 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     private void openTimerDialog() {
-        setTimerDialog setTimerDialog = new setTimerDialog();
-        setTimerDialog.show(getSupportFragmentManager(), "Set Timer Here");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.requireContext());
+        String timePickerPreference = sharedPreferences.getString("singleTimerTimePicker", "Typing");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.layout_dialog_timerset, null);
+
+        builder.setView(view)
+                .setTitle("Once Timer Is Updated, It Will Reset")
+                .setNegativeButton("Cancel", (dialog, which) -> {
+
+                })
+                .setPositiveButton("Set Timer", (dialog, which) -> {
+
+                    if (timePickerPreference.equals("Typing")) {
+                        String time = editTextTimer.getText().toString();
+                        if (!(time.matches(""))) {
+                            applyTimerTime(time, 0, 0, 0);
+                        }
+                    } else {
+                        applyTimerTime("null", timePicker.getHours(), timePicker.getMinutes(), timePicker.getSeconds());
+                    }
+                });
+
+        editTextTimer = view.findViewById(R.id.timer);
+        timePicker = view.findViewById(R.id.scrollHmsPicker);
+        if (timePickerPreference.equals("Typing")) {
+            timePicker.setEnabled(false);
+            timePicker.setVisibility(View.GONE);
+            editTextTimer.setFilters(new InputFilter[] { new InputFilter.LengthFilter(6)});
+
+            editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
+                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                assert imm != null;
+                imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
+            }));
+            editTextTimer.requestFocus();
+        } else {
+            editTextTimer.setEnabled(false);
+            editTextTimer.setVisibility(View.GONE);
+            timePicker = view.findViewById(R.id.scrollHmsPicker);
+        }
+
+        builder.create().show();
     }
 
     public void applyTimerTime(String time, int hours, int minutes, int seconds){
@@ -644,18 +614,18 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
             long finalSecond = (hour * 3600) + (minute * 60) + second;
 
             if (time.length() == 0) {
-                Toast.makeText(SingleTimerActivity.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Field can't be empty", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             millisInput = finalSecond * 1000;
             if (millisInput == 0) {
-                Toast.makeText(SingleTimerActivity.this, "Please enter a positive number", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Please enter a positive number", Toast.LENGTH_SHORT).show();
                 return;
             }
         } else {
             if (hours == 0 && minutes == 0 && seconds == 0){
-                Toast.makeText(SingleTimerActivity.this, "Time can't be zero", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Time can't be zero", Toast.LENGTH_SHORT).show();
                 return;
             } else {
                 millisInput = (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
@@ -708,7 +678,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                     if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
                         try {
                             Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                            Ringtone r = RingtoneManager.getRingtone(instance.getApplicationContext(), notification);
                             r.play();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -830,16 +800,16 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
     }
 
     private void closeKeyboard() {
-        View view = this.getCurrentFocus();
+        View view = instance.getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) instance.getSystemService(INPUT_METHOD_SERVICE);
             assert imm != null;
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
     private void loadData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
 
         String timerNameJson = sharedPreferences.getString("timerName", null);
@@ -857,7 +827,7 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
 
     //testing
     public void showNotification(String timeLeft) {
-        Notification notification = new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(getContext(), MAIN_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_timer_black)
                 .setContentTitle(timeLeft)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -869,36 +839,5 @@ public class SingleTimerActivity extends AppCompatActivity implements setTimerDi
                 .build();
 
         notificationManager.notify(1, notification);
-    }
-
-    @Override
-    public void onProductPurchased(String productId, TransactionDetails details) {
-        if (productId.equals("remove_ads")) {
-            removeAds();
-
-            Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void removeAds() {
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("removed_Ads", true);
-        editor.apply();
-    }
-
-    @Override
-    public void onPurchaseHistoryRestored() {
-        bp.loadOwnedPurchasesFromGoogle();
-    }
-
-    @Override
-    public void onBillingError(int errorCode, Throwable error) {
-        Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onBillingInitialized() {
-
     }
 }
