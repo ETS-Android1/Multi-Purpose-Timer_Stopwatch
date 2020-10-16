@@ -16,7 +16,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
 
-import static com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity.logFirebaseAnalyticsEvents;
+import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -50,7 +50,6 @@ public class SettingsActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
 
-        menu.findItem(R.id.check_heartbeat).setVisible(false);
         menu.findItem(R.id.check_sound).setVisible(false);
         menu.add(0, R.id.privacy_policy, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
 

@@ -31,7 +31,7 @@ import com.anjlab.android.iab.v3.TransactionDetails;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
-import com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity;
+import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
@@ -43,7 +43,7 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity.logFirebaseAnalyticsEvents;
+import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
 public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener, BillingProcessor.IBillingHandler {
 
@@ -174,9 +174,8 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
 
-        menu.findItem(R.id.check_heartbeat).setVisible(false);
         menu.findItem(R.id.check_sound).setVisible(false);
-        menu.add(0, R.id.single_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer_black), "Single Timer Mode"));
+        menu.add(0, R.id.timer_and_stopwatch, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer_black), "Timer and Stopwatch"));
         menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
         menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
         if (!isRemovedAds()) {
@@ -212,8 +211,8 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                 startActivity(new Intent(this, StatisticsActivity.class));
                 break;
 
-            case R.id.single_Timer_Mode:
-                Intent intent = new Intent(this, SingleTimerActivity.class);
+            case R.id.timer_and_stopwatch:
+                Intent intent = new Intent(this, TabbedActivity.class);
                 intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("overrideActivityToOpen", true);
                 startActivity(intent);

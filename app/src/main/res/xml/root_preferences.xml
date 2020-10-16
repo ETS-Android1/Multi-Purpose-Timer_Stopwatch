@@ -3,7 +3,7 @@
     <PreferenceCategory app:title="When application is opened">
 
         <ListPreference
-            app:defaultValue="Single Timer"
+            app:defaultValue="Timer and Stopwatch"
             app:entries="@array/activityToOpen_entries"
             app:entryValues="@array/activityToOpen_values"
             app:key="firstOpenActivity"

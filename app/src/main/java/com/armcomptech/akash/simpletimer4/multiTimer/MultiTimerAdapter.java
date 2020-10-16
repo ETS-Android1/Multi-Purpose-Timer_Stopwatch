@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Timer;
-import com.armcomptech.akash.simpletimer4.singleTimer.SingleTimerActivity;
+import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -46,8 +46,8 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.timers = timers;
         this.holders = holders;
 
-        if (!SingleTimerActivity.disableFirebaseLogging) {
-            SingleTimerActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
+        if (!TabbedActivity.disableFirebaseLogging) {
+            TabbedActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
 
             if (!isRemovedAds()) {
                 //ad stuff
@@ -107,7 +107,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).getmStartTimeInMillis());
 
         ((Item)holder).startButton.setOnClickListener(v -> {
-            SingleTimerActivity.logFirebaseAnalyticsEvents("Start Timer in Multi-Timer");
+            TabbedActivity.logFirebaseAnalyticsEvents("Start Timer in Multi-Timer");
 
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
@@ -121,7 +121,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).pauseButton.setOnClickListener(v -> {
-            SingleTimerActivity.logFirebaseAnalyticsEvents("Pause Timer in Multi-Timer");
+            TabbedActivity.logFirebaseAnalyticsEvents("Pause Timer in Multi-Timer");
 
             pauseTimer(((Item)holder));
 
@@ -135,10 +135,10 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
-            SingleTimerActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
+            TabbedActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
 
             if (!isRemovedAds()) {
-                if (!SingleTimerActivity.disableFirebaseLogging) {
+                if (!TabbedActivity.disableFirebaseLogging) {
                     mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
                 }
             }
@@ -300,11 +300,11 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (updateExistingTimer) {
             timers.get(holder.getAdapterPosition()).setmStartTimeInMillis(finalSecond);
             resetTimer(holder);
-            SingleTimerActivity.logFirebaseAnalyticsEvents("Update Existing Timer in Multi-Timer");
+            TabbedActivity.logFirebaseAnalyticsEvents("Update Existing Timer in Multi-Timer");
         }
 
         if (creatingNewTimer) {
-            SingleTimerActivity.logFirebaseAnalyticsEvents("Creating new timer in Multi-Timer");
+            TabbedActivity.logFirebaseAnalyticsEvents("Creating new timer in Multi-Timer");
         }
     }
 

@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.armcomptech.akash.simpletimer4">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
     <supports-screens
-        android:smallScreens="true"
         android:largeScreens="true"
         android:normalScreens="true"
+        android:smallScreens="true"
         android:xlargeScreens="true" />
 
     <application
@@ -20,30 +21,31 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".TabbedView.TabbedActivity"
+            android:label="@string/title_activity_tabbed"
+            android:configChanges="screenSize|screenLayout|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
 
-        <activity android:name=".multiTimer.MultiTimerActivity"
+        <activity
+            android:name=".multiTimer.MultiTimerActivity"
             android:configChanges="screenLayout|orientation|screenSize" />
-
         <activity android:name=".statistics.StatisticsActivity" />
 
-        <activity android:name=".singleTimer.SingleTimerActivity"
-            android:configChanges="screenSize|screenLayout|keyboardHidden" >
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <service
-            android:name=".singleTimer.SingleTimerActivity"
-            android:enabled="true"
-            android:exported="false"
-            android:stopWithTask="true" />
+<!--        <service-->
+<!--            android:name=".singleTimer.SingleTimerActivity"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="false"-->
+<!--            android:stopWithTask="true" />-->
 
         <receiver android:name="com.armcomptech.NotificationReceiver" />
 

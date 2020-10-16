@@ -5,26 +5,16 @@
     >
 
     <item
-        android:id="@+id/single_Timer_Mode"
+        android:id="@+id/timer_and_stopwatch"
         app:showAsAction="never"
         android:visible="false"
-        android:title="Single Timer Mode" />
+        android:title="Timer and Stopwatch" />
 
     <item
         android:id="@+id/multi_Timer_Mode"
         app:showAsAction="never"
         android:visible="false"
         android:title="@string/multi_timer_mode" />
-
-    <item
-        android:id="@+id/check_heartbeat"
-        android:checkable="true"
-        android:enabled="true"
-        android:title="@string/heartbeat"
-        android:tooltipText="@string/app_name"
-        android:checked="true"
-        app:showAsAction="never"
-        tools:targetApi="o" />
 
     <item
         android:id="@+id/check_sound"

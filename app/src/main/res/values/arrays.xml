@@ -1,11 +1,11 @@
 <resources>
     <string-array name="activityToOpen_entries">
-        <item>Single Timer</item>
+        <item>Timer and Stopwatch</item>
         <item>Multi Timer</item>
     </string-array>
 
     <string-array name="activityToOpen_values">
-        <item>Single Timer</item>
+        <item>Timer and Stopwatch</item>
         <item>Multi Timer</item>
     </string-array>
 
