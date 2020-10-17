@@ -53,6 +53,7 @@ public class stopwatchFragment extends Fragment {
     int milliseconds = 0;
     long pauseOffset = 0;
     ArrayList<String> lapTimeInfo = new ArrayList<>();
+    ArrayList<Long> lapTimeStamp = new ArrayList<>();
     ArrayAdapter<String> lapListAdapter;
 
     @SuppressLint("StaticFieldLeak")
@@ -168,7 +169,8 @@ public class stopwatchFragment extends Fragment {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     if (stopWatchRunning) {
-                        mMillis.setText(String.format(Locale.getDefault(), "%02d", 1000 - millisUntilFinished));
+//                        mMillis.setText(String.format(Locale.getDefault(), "%02d", 1000 - millisUntilFinished));
+                        mMillis.setText(String.valueOf((SystemClock.elapsedRealtime() - chronometer.getBase()) % 1000));
                     }
                 }
 
@@ -190,6 +192,7 @@ public class stopwatchFragment extends Fragment {
         chronometer.setBase(SystemClock.elapsedRealtime());
         pauseOffset = 0;
         lapTimeInfo.clear();
+        lapTimeStamp.clear();
         lapListViewConstraintLayout.setVisibility(View.GONE);
     }
 
@@ -205,7 +208,13 @@ public class stopwatchFragment extends Fragment {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Lap " + lap + " : ");
         stringBuilder.append(getTimeFormatted(SystemClock.elapsedRealtime() - chronometer.getBase()));
-        getTimeFormatted(SystemClock.elapsedRealtime() - chronometer.getBase()); // use this to get format of the string
+        stringBuilder.append("    ");
+        if (lapTimeStamp.isEmpty()) {
+            stringBuilder.append(getTimeFormatted(SystemClock.elapsedRealtime() - chronometer.getBase()));
+        } else {
+            stringBuilder.append(getTimeFormatted(SystemClock.elapsedRealtime() - chronometer.getBase() - lapTimeStamp.get(lapTimeStamp.size() - 1)));
+        }
+        lapTimeStamp.add(SystemClock.elapsedRealtime() - chronometer.getBase());
         lapTimeInfo.add(stringBuilder.toString());
         lapListAdapter.notifyDataSetChanged();
         lapListView.smoothScrollToPosition(lapTimeInfo.size());

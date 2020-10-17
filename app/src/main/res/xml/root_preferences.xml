@@ -16,7 +16,7 @@
     <PreferenceCategory app:title="Single Timer">
 
         <ListPreference
-            app:defaultValue="Scrolling Wheel"
+            app:defaultValue="Scroll Wheel"
             app:entries="@array/timePicker_entries"
             app:entryValues="@array/timePicker_values"
             app:key="singleTimerTimePicker"

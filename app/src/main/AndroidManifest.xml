@@ -23,8 +23,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".TabbedView.TabbedActivity"
-            android:label="@string/title_activity_tabbed"
-            android:configChanges="screenSize|screenLayout|keyboardHidden">
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,11 +33,13 @@
 
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:configChanges="screenLayout|orientation|screenSize"/>
 
         <activity
             android:name=".multiTimer.MultiTimerActivity"
             android:configChanges="screenLayout|orientation|screenSize" />
+
         <activity android:name=".statistics.StatisticsActivity" />
 
 <!--        <service-->
