@@ -133,6 +133,8 @@ public class stopwatchFragment extends Fragment {
             }
             mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.VISIBLE);
+
+            logFirebaseAnalyticsEvents("Started Stopwatch");
         });
 
         mButtonPause.setOnClickListener(v -> {
@@ -141,6 +143,8 @@ public class stopwatchFragment extends Fragment {
             mButtonPause.setVisibility(View.INVISIBLE);
             mButtonReset.setVisibility(View.VISIBLE);
             mButtonLap.setVisibility(View.INVISIBLE);
+
+            logFirebaseAnalyticsEvents("Paused Stopwatch");
         });
 
         mButtonReset.setOnClickListener(v -> {
@@ -153,6 +157,8 @@ public class stopwatchFragment extends Fragment {
             mTimerNameAutoComplete.setVisibility(View.VISIBLE);
             mMillis.setText("000");
             setWithoutLapView();
+
+            logFirebaseAnalyticsEvents("Reset Stopwatch");
         });
 
         mButtonLap.setOnClickListener(v -> {
