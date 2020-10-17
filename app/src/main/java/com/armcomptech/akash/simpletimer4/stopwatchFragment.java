@@ -151,6 +151,7 @@ public class stopwatchFragment extends Fragment {
             mButtonLap.setVisibility(View.INVISIBLE);
             mTimerNameTextView.setVisibility(View.INVISIBLE);
             mTimerNameAutoComplete.setVisibility(View.VISIBLE);
+            mMillis.setText("000");
             setWithoutLapView();
         });
 
