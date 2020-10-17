@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.armcomptech.akash.simpletimer4.singleTimer.singleTimerFragment;
+import com.armcomptech.akash.simpletimer4.stopwatchFragment;
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
@@ -25,6 +26,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        if (position == 0) {
+            return singleTimerFragment.newInstance();
+        } else if (position == 1){
+            return stopwatchFragment.newInstance();
+        }
         return singleTimerFragment.newInstance();
     }
 

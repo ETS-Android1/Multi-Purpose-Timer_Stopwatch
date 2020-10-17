@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
@@ -38,16 +37,12 @@ import androidx.lifecycle.Lifecycle;
 import androidx.preference.PreferenceManager;
 
 import com.armcomptech.akash.simpletimer4.R;
-import com.armcomptech.akash.simpletimer4.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
-import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
-import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -57,10 +52,6 @@ import java.util.Locale;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static com.App.MAIN_CHANNEL_ID;
 
@@ -107,9 +98,7 @@ public class singleTimerFragment extends Fragment {
     public int currentTimerNamePosition;
     public int ticksToPass;
     public int counter;
-    String activityToOpen;
 
-    long startTime = 1000;
     private EditText editTextTimer;
     private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
 
@@ -125,45 +114,9 @@ public class singleTimerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        loadData();
         instance = (TabbedActivity) requireContext();
-        instance.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         notificationManager = NotificationManagerCompat.from(requireContext());
-        instance.setTitle("   Single Timer");
-
-        loadData(); //load saved data when opening the app
-
-        boolean overrideActivityToOpen = instance.getIntent().getBooleanExtra("overrideActivityToOpen", false);
-
-        if (!overrideActivityToOpen) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
-            activityToOpen = sharedPreferences.getString("firstOpenActivity", "Single Timer");
-
-            switch (activityToOpen) {
-                case "Single Timer":
-                    //do nothing
-                    break;
-                case "Multi Timer":
-                    Intent intent = new Intent(requireContext(), MultiTimerActivity.class);
-                    intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_NO_ANIMATION);
-                    startActivity(intent);
-                    break;
-                case "Statistics":
-                    startActivity(new Intent(requireContext(), StatisticsActivity.class));
-                    break;
-                default:
-                    startActivity(new Intent(requireContext(), SettingsActivity.class));
-                    break;
-            }
-        }
-
-
-        if (disableFirebaseLogging) {
-            FirebaseAnalytics.getInstance(requireContext()).setAnalyticsCollectionEnabled(false);
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false);
-        } else {
-            FirebaseAnalytics.getInstance(requireContext()).setAnalyticsCollectionEnabled(true);
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
-        }
 
         if (!disableFirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());

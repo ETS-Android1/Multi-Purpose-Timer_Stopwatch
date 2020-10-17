@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
@@ -26,10 +27,12 @@ import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 
 public class TabbedActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler{
 
@@ -39,6 +42,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
 
     private static final String START_TIME = "start_time";
     BillingProcessor bp;
+    String activityToOpen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +57,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         setContentView(R.layout.activity_tabbled);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 //        notificationManager = NotificationManagerCompat.from(this);
-        setTitle("   Single Timer");
+        setTitle("   Timer and Stopwatch");
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowHomeEnabled(true);
@@ -71,10 +75,38 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong(START_TIME, 50000);
-        editor.apply();
+        boolean overrideActivityToOpen = getIntent().getBooleanExtra("overrideActivityToOpen", false);
+
+        if (!overrideActivityToOpen) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            activityToOpen = sharedPreferences.getString("firstOpenActivity", "Single Timer");
+
+            switch (activityToOpen) {
+                case "Single Timer":
+                    //do nothing
+                    break;
+                case "Multi Timer":
+                    Intent intent = new Intent(this , MultiTimerActivity.class);
+                    intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                    break;
+                case "Statistics":
+                    startActivity(new Intent(this, StatisticsActivity.class));
+                    break;
+                default:
+                    startActivity(new Intent(this, SettingsActivity.class));
+                    break;
+            }
+        }
+
+
+        if (disableFirebaseLogging) {
+            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false);
+        } else {
+            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(true);
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
+        }
     }
 
     @Override
