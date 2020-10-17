@@ -1,6 +1,7 @@
 package com.armcomptech.akash.simpletimer4;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
@@ -22,11 +23,15 @@ import androidx.fragment.app.Fragment;
 
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.content.Context.MODE_PRIVATE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
@@ -54,6 +59,7 @@ public class stopwatchFragment extends Fragment {
     long pauseOffset = 0;
     ArrayList<String> lapTimeInfo = new ArrayList<>();
     ArrayList<Long> lapTimeStamp = new ArrayList<>();
+    ArrayList<String> timerName = new ArrayList<>();
     ArrayAdapter<String> lapListAdapter;
 
     @SuppressLint("StaticFieldLeak")
@@ -68,6 +74,7 @@ public class stopwatchFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         instance = (TabbedActivity) requireContext();
+        loadData();
     }
 
     @Override
@@ -94,9 +101,9 @@ public class stopwatchFragment extends Fragment {
         mButtonReset.setVisibility(View.INVISIBLE);
         mButtonLap = root.findViewById(R.id.stopWatchLapFloatingActionButton);
         mButtonLap.setVisibility(View.INVISIBLE);
-        mTimerNameAutoComplete = root.findViewById(R.id.stopWatchTimerNameAutoComplete);
-//        mTimerNameAutoComplete.setAdapter(new ArrayAdapter<>(
-//                this, R.layout.timername_autocomplete_textview, timerName));
+        mTimerNameAutoComplete = root.findViewById(R.id.stopWatchAutoComplete);
+        mTimerNameAutoComplete.setAdapter(new ArrayAdapter<>(
+                getActivity(), R.layout.timername_autocomplete_textview, timerName));
         mTimerNameAutoComplete.setThreshold(0);
         mTimerNameAutoComplete.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_GO
@@ -108,7 +115,7 @@ public class stopwatchFragment extends Fragment {
         });
 
         mMillis = root.findViewById(R.id.stopWatchMillis);
-        mTimerNameTextView = root.findViewById(R.id.stopWatchTimerNameTextView);
+        mTimerNameTextView = root.findViewById(R.id.stopWatchTextView);
         mTimerNameTextView.setVisibility(View.INVISIBLE);
         setWithoutLapView();
 
@@ -275,5 +282,14 @@ public class stopwatchFragment extends Fragment {
             assert imm != null;
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    private void loadData() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+
+        String timerNameJson = sharedPreferences.getString("timerName", null);
+        Type timerNameType = new TypeToken<ArrayList<String>>(){}.getType();
+        timerName = gson.fromJson(timerNameJson, timerNameType);
     }
 }

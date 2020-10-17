@@ -13,11 +13,11 @@
         android:layout_weight="50">
 
         <AutoCompleteTextView
-            android:id="@+id/stopWatchTimerNameAutoComplete"
+            android:id="@+id/stopWatchAutoComplete"
             android:layout_width="250dp"
             android:layout_height="50dp"
             android:layout_margin="10dp"
-            android:hint="@string/enter_timer_name_optional"
+            android:hint="@string/enter_stopwatch_name_optional"
             android:inputType="text"
             android:text=""
             android:textAlignment="center"
@@ -29,11 +29,11 @@
             tools:visibility="invisible" />
 
         <TextView
-            android:id="@+id/stopWatchTimerNameTextView"
+            android:id="@+id/stopWatchTextView"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:gravity="center"
-            android:hint="@string/timer_name"
+            android:hint="Stopwatch Name"
             android:text="General"
             android:textAlignment="center"
             android:textSize="25sp"

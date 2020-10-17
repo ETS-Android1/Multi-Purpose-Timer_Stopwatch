@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -158,8 +159,8 @@ public class singleTimerFragment extends Fragment {
         mButtonPause = root.findViewById(R.id.button_pause);
         mButtonReset = root.findViewById(R.id.button_reset);
         mTimerNameAutoComplete = root.findViewById(R.id.timerNameAutoComplete);
-//        mTimerNameAutoComplete.setAdapter(new ArrayAdapter<>(
-//                this, R.layout.timername_autocomplete_textview, timerName));
+        mTimerNameAutoComplete.setAdapter(new ArrayAdapter<>(
+                getContext(), R.layout.timername_autocomplete_textview, timerName));
         mTimerNameAutoComplete.setThreshold(0);
         mTimerNameAutoComplete.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_GO
@@ -184,7 +185,7 @@ public class singleTimerFragment extends Fragment {
 
         mButtonPause.hide();
 
-        setTime(requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE).getLong(START_TIME, 1000)); //default 1 minute timer
+        setTime(requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE).getLong(START_TIME, 60000)); //default 1 minute timer
 
         mButtonStart.setOnClickListener( v -> {
 
