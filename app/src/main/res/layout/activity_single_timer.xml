@@ -30,6 +30,7 @@
             android:visibility="visible"
             tools:visibility="invisible" />
 
+
         <TextView
             android:id="@+id/timerNameTextView"
             android:layout_width="300dp"
