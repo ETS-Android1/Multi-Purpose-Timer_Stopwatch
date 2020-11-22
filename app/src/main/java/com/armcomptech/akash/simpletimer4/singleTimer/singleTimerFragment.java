@@ -3,9 +3,12 @@ package com.armcomptech.akash.simpletimer4.singleTimer;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Notification;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -39,6 +42,7 @@ import androidx.preference.PreferenceManager;
 
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
+import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -102,6 +106,13 @@ public class singleTimerFragment extends Fragment {
 
     private EditText editTextTimer;
     private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mTimeLeftInMillis = intent.getLongExtra("mTimeLeftInMillis", mTimeLeftInMillis);
+            mTextViewCountDown.setText(getTimeLeftFormatted());
+        }
+    };
 
     //TODO: Change disableFirebaseLogging to false when releasing
     public static Boolean disableFirebaseLogging = true;
@@ -361,6 +372,7 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        instance.registerReceiver(broadcastReceiver, new IntentFilter(Timer.receiver));
         notificationManager.cancel(1);
         showNotification = false;
     }
@@ -368,6 +380,7 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        instance.unregisterReceiver(broadcastReceiver);
         notificationManager.cancel(1);
         stopPlayer();
         showNotification = true;
@@ -401,6 +414,9 @@ public class singleTimerFragment extends Fragment {
     }
 
     private void saveData() {
+//        if (getContext().getSharedPreferences("shared preferences", MODE_PRIVATE) == null) {
+//            return;
+//        }
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -686,23 +702,40 @@ public class singleTimerFragment extends Fragment {
         int hours = (int) (mTimeLeftInMillis / 1000) / 3600;
         int minutes = (int) ((mTimeLeftInMillis / 1000) % 3600) / 60;
         int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
+        int screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
 
         String timeLeftFormatted;
 
         if (hours > 0) {
             timeLeftFormatted = String.format(Locale.getDefault(),
                     "%d:%02d:%02d", hours, minutes, seconds);
-            mTextViewCountDown.setTextSize(60);
-            mMillis.setTextSize(25);
-            if (hours > 9) {
-                mTextViewCountDown.setTextSize(54);
-                mMillis.setTextSize(30);
+
+            if (screenSize == Configuration.SCREENLAYOUT_SIZE_SMALL) {
+                mTextViewCountDown.setTextSize(50);
+                mMillis.setTextSize(17);
+                if (hours > 9) {
+                    mTextViewCountDown.setTextSize(45);
+                    mMillis.setTextSize(20);
+                }
+            } else {
+                mTextViewCountDown.setTextSize(60);
+                mMillis.setTextSize(25);
+                if (hours > 9) {
+                    mTextViewCountDown.setTextSize(54);
+                    mMillis.setTextSize(30);
+                }
             }
         } else {
             timeLeftFormatted = String.format(Locale.getDefault(),
                     "%02d:%02d", minutes, seconds);
-            mTextViewCountDown.setTextSize(70);
-            mMillis.setTextSize(30);
+
+            if (screenSize == Configuration.SCREENLAYOUT_SIZE_SMALL) {
+                mTextViewCountDown.setTextSize(55);
+                mMillis.setTextSize(25);
+            } else {
+                mTextViewCountDown.setTextSize(70);
+                mMillis.setTextSize(30);
+            }
         }
 
         return timeLeftFormatted;

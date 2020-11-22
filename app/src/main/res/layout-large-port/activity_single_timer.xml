@@ -15,10 +15,8 @@
 
         <AutoCompleteTextView
             android:id="@+id/timerNameAutoComplete"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:layout_margin="10dp"
-            android:textSize="45sp"
+            android:layout_width="450dp"
+            android:layout_height="70dp"
             android:hint="@string/enter_timer_name_optional"
             android:inputType="text"
             android:text=""
@@ -33,7 +31,7 @@
         <TextView
             android:id="@+id/timerNameTextView"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:hint="@string/timer_name"
             android:text="General"
             android:textAlignment="center"
@@ -50,7 +48,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="60">
+        android:layout_weight="70">
 
         <TextView
             android:id="@+id/text_view_countdown"
@@ -58,7 +56,7 @@
             android:layout_height="wrap_content"
             android:text="@string/_00_00_00"
             android:textColor="@android:color/black"
-            android:textSize="80sp"
+            android:textSize="85sp"
             app:layout_constraintBottom_toBottomOf="@+id/progressBar"
             app:layout_constraintEnd_toEndOf="@+id/progressBar"
             app:layout_constraintStart_toStartOf="@+id/progressBar"
@@ -70,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_000"
-            android:textSize="45sp"
+            android:textSize="50sp"
             app:layout_constraintEnd_toEndOf="@+id/text_view_countdown"
             app:layout_constraintHorizontal_bias="0.82"
             app:layout_constraintStart_toStartOf="@+id/text_view_countdown"
@@ -79,8 +77,8 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:progressBarStyleHorizontal"
-            android:layout_width="550sp"
-            android:layout_height="550sp"
+            android:layout_width="500sp"
+            android:layout_height="500sp"
             android:progress="80"
             android:progressDrawable="@drawable/circle"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -106,7 +104,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="30"
+        android:layout_weight="20"
         android:orientation="horizontal">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -119,7 +117,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000000"
-                android:layout_marginBottom="50dp"
+                android:layout_marginBottom="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -132,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/repeat"
                 android:textColor="#000000"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="@+id/repeat_SwitchInMultiTimer"
                 app:layout_constraintStart_toStartOf="@+id/repeat_SwitchInMultiTimer"
                 app:layout_constraintTop_toBottomOf="@+id/repeat_SwitchInMultiTimer"
@@ -151,7 +149,6 @@
                 android:layout_height="wrap_content"
                 app:backgroundTint="@color/colorPrimaryDark"
                 app:fabCustomSize="70dp"
-                android:layout_marginBottom="50dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -165,7 +162,6 @@
                 android:layout_height="wrap_content"
                 app:fabCustomSize="70dp"
                 app:backgroundTint="#FF4545"
-                android:layout_marginBottom="50dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -183,7 +179,6 @@
                 android:id="@+id/button_reset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="50dp"
                 app:fabCustomSize="70dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

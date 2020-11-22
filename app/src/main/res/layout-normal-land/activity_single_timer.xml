@@ -40,8 +40,8 @@
 
                 <TextView
                     android:id="@+id/timerNameTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:hint="@string/timer_name"
                     android:text="General"
@@ -52,7 +52,7 @@
                     app:layout_constraintEnd_toEndOf="@+id/timerNameAutoComplete"
                     app:layout_constraintStart_toStartOf="@+id/timerNameAutoComplete"
                     app:layout_constraintTop_toTopOf="@+id/timerNameAutoComplete"
-                    tools:visibility="gone" />
+                    tools:visibility="visible" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -77,7 +77,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="#000000"
-                            android:layout_marginBottom="50dp"
+                            android:layout_marginBottom="20dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -90,11 +90,11 @@
                             android:layout_height="wrap_content"
                             android:text="@string/repeat"
                             android:textColor="#000000"
-                            android:textSize="16sp"
+                            android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="@+id/repeat_SwitchInMultiTimer"
                             app:layout_constraintStart_toStartOf="@+id/repeat_SwitchInMultiTimer"
                             app:layout_constraintTop_toBottomOf="@+id/repeat_SwitchInMultiTimer"
-                            tools:visibility="gone"/>
+                            tools:visibility="visible"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -184,8 +184,8 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:progressBarStyleHorizontal"
-            android:layout_width="300sp"
-            android:layout_height="300sp"
+            android:layout_width="275dp"
+            android:layout_height="275dp"
             android:progress="80"
             android:progressDrawable="@drawable/circle"
             app:layout_constraintBottom_toBottomOf="parent"
