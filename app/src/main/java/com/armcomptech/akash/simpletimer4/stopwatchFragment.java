@@ -343,8 +343,12 @@ public class stopwatchFragment extends Fragment {
         super.onDestroy();
         showNotification = false;
         notificationManager.cancel(notification_id);
-        tempTimer.cancel();
-        tempTimerTask.cancel();
+        if (tempTimer != null) {
+            tempTimer.cancel();
+        }
+        if (tempTimerTask != null) {
+            tempTimerTask.cancel();
+        }
     }
 
     @Override

@@ -366,7 +366,9 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.mCountDownTimer.cancel();
+        if (this.mCountDownTimer != null) {
+            this.mCountDownTimer.cancel();
+        }
         notificationManager.cancel(notification_id);
         stopPlayer();
         showNotification = false;
