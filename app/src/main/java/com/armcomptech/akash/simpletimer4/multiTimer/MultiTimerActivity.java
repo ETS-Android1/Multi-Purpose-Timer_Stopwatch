@@ -278,15 +278,19 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        destroyAllTimer();
+        destroyAllTimerAndNotification();
+        NotificationManagerCompat.from(this).cancel(GROUP_NOTIFICATION_ID); //cancel group notification
     }
 
-    private void destroyAllTimer() {
+    private void destroyAllTimerAndNotification() {
+        int count = 0;
         for (Timer timer: timers) {
             timer.setShowNotification(false);
+            NotificationManagerCompat.from(this).cancel(count + 2); //cancel notification
             if (timer.getCountDownTimer() != null) {
                 timer.getCountDownTimer().cancel();
             }
+            count++;
         }
     }
 
