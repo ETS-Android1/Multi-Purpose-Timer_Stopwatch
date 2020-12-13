@@ -79,10 +79,10 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
 
         if (!overrideActivityToOpen) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            activityToOpen = sharedPreferences.getString("firstOpenActivity", "Single Timer");
+            activityToOpen = sharedPreferences.getString("firstOpenActivity", "Timer and Stopwatch");
 
             switch (activityToOpen) {
-                case "Single Timer":
+                case "Timer and Stopwatch":
                     //do nothing
                     break;
                 case "Multi Timer":

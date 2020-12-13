@@ -1,7 +1,11 @@
 package com.armcomptech.akash.simpletimer4;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
@@ -19,6 +23,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
@@ -29,10 +35,12 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.TimerTask;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static com.App.MAIN_CHANNEL_ID;
 import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
 public class stopwatchFragment extends Fragment {
@@ -49,6 +57,9 @@ public class stopwatchFragment extends Fragment {
     private ListView lapListView;
     ConstraintLayout lapListViewConstraintLayout;
     ConstraintLayout buttonConstraintLayout;
+
+    boolean showNotification;
+    private NotificationManagerCompat notificationManager;
 
     Chronometer chronometer;
     CountDownTimer countDownTimer;
@@ -74,6 +85,8 @@ public class stopwatchFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         instance = (TabbedActivity) requireContext();
+        notificationManager = NotificationManagerCompat.from(requireContext());
+
         loadData();
     }
 
@@ -174,6 +187,18 @@ public class stopwatchFragment extends Fragment {
         stopWatchRunning = true;
         chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffset);
         chronometer.start();
+
+        new java.util.Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
+                if (showNotification) {
+                    showNotification(String.valueOf(elapsedMillis), getTimerName());
+                } else {
+                    notificationManager.cancel(1);
+                }
+            }
+        }, 0, 1000);//put here time 1000 milliseconds=1 second
 
         chronometer.setOnChronometerTickListener(chronometer -> {
             if (countDownTimer != null) {
@@ -298,5 +323,64 @@ public class stopwatchFragment extends Fragment {
         String timerNameJson = sharedPreferences.getString("timerName", null);
         Type timerNameType = new TypeToken<ArrayList<String>>(){}.getType();
         timerName = gson.fromJson(timerNameJson, timerNameType);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        showNotification = false;
+        notificationManager.cancel(1);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        showNotification = true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        showNotification = false;
+        notificationManager.cancel(1);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        showNotification = true;
+    }
+
+    public void showNotification(String timeLeft, String currentTimerName) {
+
+        PackageManager client = getContext().getPackageManager();
+        final Intent notificationIntent = client.getLaunchIntentForPackage("com.armcomptech.akash.simpletimer4");
+
+        final PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        String content;
+        int timeLeftSecondsInt = (Integer.parseInt(timeLeft))/1000;
+        String timeLeftFormatted = String.format("%02d:%02d:%02d", timeLeftSecondsInt / 3600,
+                (timeLeftSecondsInt % 3600) / 60, (timeLeftSecondsInt % 60));
+        if (currentTimerName.equals("")) {
+            content = timeLeftFormatted;
+        } else {
+            content = currentTimerName + "  " + timeLeftFormatted;
+        }
+
+        Notification notification = new NotificationCompat.Builder(getContext(), MAIN_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_timer_black)
+                .setContentTitle(content)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setAutoCancel(true)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setSound(null)
+                .setFullScreenIntent(pendingIntent, false)
+                .build();
+
+        notificationManager.notify(1, notification);
     }
 }

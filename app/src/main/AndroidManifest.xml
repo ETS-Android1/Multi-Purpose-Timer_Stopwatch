@@ -22,8 +22,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:launchMode="singleTop"
             android:name=".TabbedView.TabbedActivity"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden">
+            android:configChanges="screenSize|screenLayout|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,14 +42,6 @@
             android:configChanges="screenLayout|orientation|screenSize" />
 
         <activity android:name=".statistics.StatisticsActivity" />
-
-<!--        <service-->
-<!--            android:name=".singleTimer.SingleTimerActivity"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="false"-->
-<!--            android:stopWithTask="true" />-->
-
-        <receiver android:name="com.armcomptech.NotificationReceiver" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

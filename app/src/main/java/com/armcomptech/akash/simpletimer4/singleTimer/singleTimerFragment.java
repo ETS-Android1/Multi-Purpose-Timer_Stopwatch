@@ -3,11 +3,13 @@ package com.armcomptech.akash.simpletimer4.singleTimer;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -42,7 +44,6 @@ import androidx.preference.PreferenceManager;
 
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
-import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -66,6 +67,7 @@ import static com.App.MAIN_CHANNEL_ID;
 public class singleTimerFragment extends Fragment {
 
     private static final String START_TIME = "start_time";
+    private static final String BROADCAST_INTENT_FILTER = "com.armcomptech.akash.simpletimer4.timerAction";
 
     private TextView mTextViewCountDown;
     private FloatingActionButton mButtonStart;
@@ -106,17 +108,13 @@ public class singleTimerFragment extends Fragment {
 
     private EditText editTextTimer;
     private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            mTimeLeftInMillis = intent.getLongExtra("mTimeLeftInMillis", mTimeLeftInMillis);
-            mTextViewCountDown.setText(getTimeLeftFormatted());
-        }
-    };
+
+    private BroadcastReceiver broadcastReceiver;
 
     //TODO: Change disableFirebaseLogging to false when releasing
     public static Boolean disableFirebaseLogging = true;
     private static FirebaseAnalytics mFirebaseAnalytics;
+    private boolean fragmentAttached;
 
     public static singleTimerFragment newInstance() {
         return new singleTimerFragment();
@@ -129,6 +127,17 @@ public class singleTimerFragment extends Fragment {
         loadData();
         instance = (TabbedActivity) requireContext();
         notificationManager = NotificationManagerCompat.from(requireContext());
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String timerAction = intent.getStringExtra("timer_action");
+                if (timerAction.equals("pause")) {
+                    pauseTimer();
+                }
+            }
+        };
+        instance.registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_INTENT_FILTER));
 
         if (!disableFirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
@@ -372,7 +381,6 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        instance.registerReceiver(broadcastReceiver, new IntentFilter(Timer.receiver));
         notificationManager.cancel(1);
         showNotification = false;
     }
@@ -380,10 +388,21 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        instance.unregisterReceiver(broadcastReceiver);
         notificationManager.cancel(1);
         stopPlayer();
         showNotification = true;
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.fragmentAttached = true;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.fragmentAttached = false;
     }
 
     public static TabbedActivity getInstance() {
@@ -747,7 +766,6 @@ public class singleTimerFragment extends Fragment {
         String millisFormatted;
         millisFormatted = String.format(Locale.getDefault(), "%02d", (mTimeLeftInMillis % 1000));
 
-
         mTextViewCountDown.setText(timeLeftFormatted);
         mMillis.setText(millisFormatted);
         mProgressBar.setMax((int)mStartTimeInMillis);
@@ -756,32 +774,34 @@ public class singleTimerFragment extends Fragment {
         }
 
         if (showNotification) {
-            showNotification(timeLeftFormatted);
+            showNotification(timeLeftFormatted, currentTimerName);
         } else {
             notificationManager.cancel(1);
         }
     }
 
     private void updateWatchInterface() {
-        if (mTimerRunning) {
+        if (fragmentAttached) {
+            if (mTimerRunning) {
 //            mButtonSetTimer.setVisibility(View.INVISIBLE);
-            mButtonReset.hide();
-            mButtonStart.hide();
-            mButtonPause.show();
-        } else {
-//            mButtonSetTimer.setVisibility(View.VISIBLE);
-            mButtonStart.show();
-            mButtonPause.hide();
-
-            if (mTimeLeftInMillis < 100) {
-                mButtonStart.hide();
-                mButtonPause.hide();
-            }
-
-            if (mTimeLeftInMillis < mStartTimeInMillis) {
-                mButtonReset.show();
-            } else {
                 mButtonReset.hide();
+                mButtonStart.hide();
+                mButtonPause.show();
+            } else {
+//            mButtonSetTimer.setVisibility(View.VISIBLE);
+                mButtonStart.show();
+                mButtonPause.hide();
+
+                if (mTimeLeftInMillis < 100) {
+                    mButtonStart.hide();
+                    mButtonPause.hide();
+                }
+
+                if (mTimeLeftInMillis < mStartTimeInMillis) {
+                    mButtonReset.show();
+                } else {
+                    mButtonReset.hide();
+                }
             }
         }
     }
@@ -812,17 +832,24 @@ public class singleTimerFragment extends Fragment {
         timeInSeconds = gson.fromJson(timeInSecondsJson, timeInSecondsType);
     }
 
-    //testing
-    public void showNotification(String timeLeft) {
+    public void showNotification(String timeLeft, String currentTimerName) {
+
+        PackageManager client = getContext().getPackageManager();
+        final Intent notificationIntent = client.getLaunchIntentForPackage("com.armcomptech.akash.simpletimer4");
+
+        final PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         Notification notification = new NotificationCompat.Builder(getContext(), MAIN_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_timer_black)
-                .setContentTitle(timeLeft)
+                .setContentTitle(currentTimerName + "  " + timeLeft)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setAutoCancel(true)
-                .setOngoing(false)
+                .setOngoing(true)
                 .setOnlyAlertOnce(true)
                 .setSound(null)
+                .setFullScreenIntent(pendingIntent, false)
                 .build();
 
         notificationManager.notify(1, notification);

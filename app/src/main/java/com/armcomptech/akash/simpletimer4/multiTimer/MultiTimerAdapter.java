@@ -104,7 +104,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             resetTimer((Item) holder);
         }
 
-        ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).getmStartTimeInMillis());
+        ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).getStartTimeInMillis());
 
         ((Item)holder).startButton.setOnClickListener(v -> {
             TabbedActivity.logFirebaseAnalyticsEvents("Start Timer in Multi-Timer");
@@ -170,23 +170,23 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void resetTimer(@NonNull Item holder) {
         int myPosition = holder.getAdapterPosition();
 
-        timers.get(myPosition).setmTimeLeftInMillis(timers.get(myPosition).getmStartTimeInMillis());
+        timers.get(myPosition).setTimeLeftInMillis(timers.get(myPosition).getStartTimeInMillis());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getmStartTimeInMillis(), true);
+            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getStartTimeInMillis(), true);
         } else {
-            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getmStartTimeInMillis());
+            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getStartTimeInMillis());
         }
         ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.WHITE);
         ((Item)holder).timerTime.setTextColor(Color.BLACK);
-        timers.get(myPosition).setmCountDownTimer(null);
-        timers.get(myPosition).setmTimeElapsedInMillis(0);
-        timers.get(myPosition).setmTimeToStoreInMillis(0);
+        timers.get(myPosition).setCountDownTimer(null);
+        timers.get(myPosition).setTimeElapsedInMillis(0);
+        timers.get(myPosition).setTimeToStoreInMillis(0);
         timers.get(myPosition).setCounter(0);
     }
 
     private void pauseTimer(@NonNull Item holder) {
         int myPosition = holder.getAdapterPosition();
-        timers.get(myPosition).getmCountDownTimer().cancel();
+        timers.get(myPosition).getCountDownTimer().cancel();
         timers.get(myPosition).setTimerPlaying(false);
         timers.get(myPosition).setTimerPaused(true);
     }
@@ -201,10 +201,10 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         int countDownInterval = 100;
         ticksToPass = 1000 / countDownInterval;
 
-        if (timers.get(position).getmCountDownTimer() != null) {
-            timers.get(position).getmCountDownTimer().cancel();
+        if (timers.get(position).getCountDownTimer() != null) {
+            timers.get(position).getCountDownTimer().cancel();
         }
-        timers.get(position).setmCountDownTimer(new CountDownTimer(timers.get(position).getmTimeLeftInMillis(), countDownInterval) {
+        timers.get(position).setCountDownTimer(new CountDownTimer(timers.get(position).getTimeLeftInMillis(), countDownInterval) {
             @Override
             public void onTick(long millisUntilFinished) {
                 int myPosition = holder.getAdapterPosition();
@@ -214,13 +214,13 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     if (!timers.get(myPosition).getTimerPlaying() && !timers.get(myPosition).getTimerPaused() && !timers.get(myPosition).getTimerIsDone()) {
                         resetTimer((Item)holder);
                     } else {
-                        timers.get(myPosition).setmTimeLeftInMillis(millisUntilFinished);
+                        timers.get(myPosition).setTimeLeftInMillis(millisUntilFinished);
                         ((Item)holder).timerTime.setText(timers.get(myPosition).getTimeLeftFormatted());
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getmTimeLeftInMillis(), true);
+                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getTimeLeftInMillis(), true);
                         } else {
-                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getmTimeLeftInMillis());
+                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getTimeLeftInMillis());
                         }
 
                         Timer tempTimer = timers.get(myPosition);
@@ -228,13 +228,13 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                         if (ticksToPass == tempTimer.getCounter()) {
                             //this algoritem still doesn't work prooperly but on right track, counter ofr each timer
 
-                            long currentElapsedTime = tempTimer.getmStartTimeInMillis() - tempTimer.getmTimeLeftInMillis();
-                            long oldElapsedTime = tempTimer.getmTimeElapsedInMillis();
-                            tempTimer.setmTimeElapsedInMillis(currentElapsedTime);
-                            long tempTime = (currentElapsedTime - oldElapsedTime) + tempTimer.getmTimeToStoreInMillis();
+                            long currentElapsedTime = tempTimer.getStartTimeInMillis() - tempTimer.getTimeLeftInMillis();
+                            long oldElapsedTime = tempTimer.getTimeElapsedInMillis();
+                            tempTimer.setTimeElapsedInMillis(currentElapsedTime);
+                            long tempTime = (currentElapsedTime - oldElapsedTime) + tempTimer.getTimeToStoreInMillis();
                             saveData(timers.get(myPosition).getTimerName(), 0, (int)(tempTime/1000)); //saving data every second to prevent lag
 
-                            tempTimer.setmTimeToStoreInMillis(tempTime%1000);
+                            tempTimer.setTimeToStoreInMillis(tempTime%1000);
                             tempTimer.setCounter(0);
                         }
                     }
@@ -298,7 +298,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         if (updateExistingTimer) {
-            timers.get(holder.getAdapterPosition()).setmStartTimeInMillis(finalSecond);
+            timers.get(holder.getAdapterPosition()).setStartTimeInMillis(finalSecond);
             resetTimer(holder);
             TabbedActivity.logFirebaseAnalyticsEvents("Update Existing Timer in Multi-Timer");
         }
