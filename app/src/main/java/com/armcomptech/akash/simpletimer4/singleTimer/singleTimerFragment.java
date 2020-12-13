@@ -366,6 +366,7 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        this.mCountDownTimer.cancel();
         notificationManager.cancel(notification_id);
         stopPlayer();
         showNotification = false;
@@ -374,7 +375,6 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        notificationManager.cancel(notification_id);
         stopPlayer();
         showNotification = true;
     }
@@ -389,7 +389,7 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        notificationManager.cancel(notification_id);
+//        notificationManager.cancel(notification_id);
         stopPlayer();
         showNotification = true;
     }
@@ -459,6 +459,9 @@ public class singleTimerFragment extends Fragment {
 
     public void timeUp() {
         //TODO: Wake up screen if off
+        if (getContext() == null) {
+            return;
+        }
         Intent openMainActivity = new Intent(getContext(), TabbedActivity.class);
         openMainActivity.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
         logFirebaseAnalyticsEvents("Time Up");
@@ -726,7 +729,12 @@ public class singleTimerFragment extends Fragment {
         int hours = (int) (mTimeLeftInMillis / 1000) / 3600;
         int minutes = (int) ((mTimeLeftInMillis / 1000) % 3600) / 60;
         int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
-        int screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        int screenSize;
+        if (!this.fragmentAttached) {
+            screenSize = Configuration.SCREENLAYOUT_SIZE_NORMAL;
+        } else {
+            screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        }
 
         String timeLeftFormatted;
 

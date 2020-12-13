@@ -77,6 +77,9 @@ public class stopwatchFragment extends Fragment {
     @SuppressLint("StaticFieldLeak")
     private static TabbedActivity instance;
 
+    java.util.Timer tempTimer;
+    TimerTask tempTimerTask;
+
     public static stopwatchFragment newInstance() {
         return new stopwatchFragment();
     }
@@ -189,17 +192,19 @@ public class stopwatchFragment extends Fragment {
         chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffset);
         chronometer.start();
 
-        new java.util.Timer().scheduleAtFixedRate(new TimerTask() {
+        tempTimer = new java.util.Timer();
+        tempTimerTask = new TimerTask() {
             @Override
             public void run() {
                 long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
-                if (showNotification) {
+                if (showNotification && stopWatchRunning) {
                     showNotification(String.valueOf(elapsedMillis), getTimerName());
                 } else {
                     notificationManager.cancel(notification_id);
                 }
             }
-        }, 0, 1000);//put here time 1000 milliseconds=1 second
+        };
+        tempTimer.scheduleAtFixedRate(tempTimerTask, 0, 1000); //show notificaiton every second
 
         chronometer.setOnChronometerTickListener(chronometer -> {
             if (countDownTimer != null) {
@@ -211,6 +216,13 @@ public class stopwatchFragment extends Fragment {
                     if (stopWatchRunning) {
 //                        mMillis.setText(String.format(Locale.getDefault(), "%02d", 1000 - millisUntilFinished));
                         mMillis.setText(String.valueOf((SystemClock.elapsedRealtime() - chronometer.getBase()) % 1000));
+                    }
+
+                    if (showNotification && stopWatchRunning) {
+                        long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
+                        showNotification(String.valueOf(elapsedMillis), getTimerName());
+                    } else {
+                        notificationManager.cancel(notification_id);
                     }
                 }
 
@@ -331,6 +343,8 @@ public class stopwatchFragment extends Fragment {
         super.onDestroy();
         showNotification = false;
         notificationManager.cancel(notification_id);
+        tempTimer.cancel();
+        tempTimerTask.cancel();
     }
 
     @Override
@@ -344,6 +358,12 @@ public class stopwatchFragment extends Fragment {
         super.onResume();
         showNotification = false;
         notificationManager.cancel(notification_id);
+        if (tempTimer != null) {
+            tempTimer.cancel();
+        }
+        if (tempTimerTask != null) {
+            tempTimerTask.cancel();
+        }
     }
 
     @Override
