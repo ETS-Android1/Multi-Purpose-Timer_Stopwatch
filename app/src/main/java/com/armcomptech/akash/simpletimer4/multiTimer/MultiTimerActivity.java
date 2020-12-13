@@ -95,6 +95,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                 timers.remove(viewHolder.getAdapterPosition());
                 holders.remove(viewHolder.getAdapterPosition());
                 Objects.requireNonNull(recyclerView.getAdapter()).notifyItemRemoved(viewHolder.getAdapterPosition());
+                NotificationManagerCompat.from(getApplicationContext()).cancel(viewHolder.getAdapterPosition() + 2); //cancel notification
             }
 
             @Override

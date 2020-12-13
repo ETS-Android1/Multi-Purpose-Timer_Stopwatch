@@ -79,14 +79,18 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         int myPosition = holder.getAdapterPosition();
-        timers.get(myPosition).setShowNotification(true);
+        if (myPosition != -1) {
+            timers.get(myPosition).setShowNotification(true);
+        }
     }
 
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         int myPosition = holder.getAdapterPosition();
-        timers.get(myPosition).setShowNotification(false);
+        if (myPosition != -1) {
+            timers.get(myPosition).setShowNotification(false);
+        }
     }
 
     @Override
