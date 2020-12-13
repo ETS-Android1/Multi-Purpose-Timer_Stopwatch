@@ -1,6 +1,10 @@
 package com.armcomptech.akash.simpletimer4.multiTimer;
 
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -16,11 +20,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.armcomptech.akash.simpletimer4.R;
-import com.armcomptech.akash.simpletimer4.Timer;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
+import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -32,6 +38,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.App.MAIN_CHANNEL_ID;
 
 public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements setNameAndTimerDialog.setTimerDialogListener{
 
@@ -41,10 +48,16 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private int ticksToPass = 0;
     InterstitialAd mResetButtonInterstitialAd;
 
+    private boolean showNotification;
+    private NotificationManagerCompat notificationManager;
+
     MultiTimerAdapter(Context context, ArrayList<Timer> timers, ArrayList<RecyclerView.ViewHolder> holders) {
         this.context = context;
         this.timers = timers;
         this.holders = holders;
+
+        notificationManager = NotificationManagerCompat.from(this.context);
+        showNotification = false;
 
         if (!TabbedActivity.disableFirebaseLogging) {
             TabbedActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
@@ -59,6 +72,33 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mResetButtonInterstitialAd.setAdUnitId(this.context.getString(R.string.resetButton_interstital_ad_id));
                 mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
+        }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        int myPosition = holder.getAdapterPosition();
+        timers.get(myPosition).setShowNotification(true);
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        int myPosition = holder.getAdapterPosition();
+        timers.get(myPosition).setShowNotification(false);
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        for (int i = 0; i < timers.size(); i++) {
+            cancelNotification(i+2);
         }
     }
 
@@ -145,6 +185,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             resetTimer((Item) holder);
             int myPosition = holder.getAdapterPosition();
+            cancelNotification(myPosition + 2);
 
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
@@ -208,6 +249,12 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             @Override
             public void onTick(long millisUntilFinished) {
                 int myPosition = holder.getAdapterPosition();
+
+                if (timers.get(myPosition).isShowNotification()) {
+                    showNotification(timers.get(myPosition).getTimeLeftFormatted(), timers.get(myPosition).getTimerName(), myPosition + 2);
+                } else {
+                    cancelNotification(myPosition + 2);
+                }
 
                 //to prevent new timers from continuing from other timer threads
                 if (myPosition != -1) {
@@ -412,5 +459,40 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             progressBarTimeHorizontal = itemView.findViewById(R.id.progressBarTimeHorizontal);
             invisibleTimeButton = itemView.findViewById(R.id.timerTimeInvisibleButtonInMultiTimer);
         }
+    }
+
+    public void cancelNotification(int notificationID) {
+        notificationManager.cancel(notificationID);
+    }
+
+    public void showNotification(String timeLeft, String currentTimerName, int notificationID) {
+
+        Intent notificationIntent = new Intent(MultiTimerActivity.class.getName());
+        notificationIntent.setComponent(new ComponentName("com.armcomptech.akash.simpletimer4", "com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity"));
+
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this.context, 0,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        String content;
+        if (currentTimerName.equals("General")) {
+            content = "Timer: " + timeLeft;
+        } else {
+            content = "Timer: " + currentTimerName + " - " + timeLeft;
+        }
+
+        Notification notification = new NotificationCompat.Builder(this.context, MAIN_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_timer_black)
+                .setContentTitle(content)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setAutoCancel(true)
+                .setOngoing(false)
+                .setOnlyAlertOnce(true)
+                .setSound(null)
+                .setFullScreenIntent(pendingIntent, false)
+                .setGroup("multiTimer")
+                .build();
+
+        notificationManager.notify(notificationID, notification);
     }
 }

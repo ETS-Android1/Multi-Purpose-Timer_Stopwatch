@@ -38,6 +38,7 @@
             android:configChanges="screenLayout|orientation|screenSize"/>
 
         <activity
+            android:launchMode="singleTop"
             android:name=".multiTimer.MultiTimerActivity"
             android:configChanges="screenLayout|orientation|screenSize" />
 

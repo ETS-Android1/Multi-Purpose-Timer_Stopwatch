@@ -286,7 +286,7 @@ public class singleTimerFragment extends Fragment {
                 }
             }
         });
-        showNotification = true;
+        showNotification = false;
 
         return root;
     }

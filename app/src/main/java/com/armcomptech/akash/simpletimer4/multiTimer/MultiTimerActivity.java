@@ -1,6 +1,9 @@
 package com.armcomptech.akash.simpletimer4.multiTimer;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
@@ -19,6 +22,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -43,6 +48,7 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static com.App.MAIN_CHANNEL_ID;
 import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
 public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener, BillingProcessor.IBillingHandler {
@@ -52,6 +58,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     ExtendedFloatingActionButton addTimerFab;
     private ArrayList<Timer> timers = new ArrayList<>();
     private ArrayList<RecyclerView.ViewHolder> holders = new ArrayList<>();
+    final static int GROUP_NOTIFICATION_ID = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -268,5 +275,75 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        destroyAllTimer();
+    }
 
+    private void destroyAllTimer() {
+        for (Timer timer: timers) {
+            timer.setShowNotification(false);
+            if (timer.getCountDownTimer() != null) {
+                timer.getCountDownTimer().cancel();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        for (Timer timer: timers) {
+            timer.setShowNotification(true);
+        }
+        showGroupNotification();
+    }
+
+    private void showGroupNotification() {
+        int count = 0;
+        for (Timer timer: timers) {
+            if (timer.getStartTimeInMillis() != timer.getTimeLeftInMillis()) {
+                if (!timer.getTimerPaused()) {
+                    count += 1;
+                }
+            }
+        }
+        if (count < 2) {
+            return;
+        }
+
+        Intent notificationIntent = new Intent(MultiTimerActivity.class.getName());
+        notificationIntent.setComponent(new ComponentName("com.armcomptech.akash.simpletimer4", "com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity"));
+
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification summaryNotification =
+                new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_video_library_black)
+                        .setGroup("multiTimer")
+                        .setGroupSummary(true)
+                        .setAutoCancel(true)
+                        .setFullScreenIntent(pendingIntent, false)
+                        .build();
+        NotificationManagerCompat.from(this).notify(GROUP_NOTIFICATION_ID, summaryNotification);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        for (Timer timer: timers) {
+            timer.setShowNotification(false);
+        }
+        NotificationManagerCompat.from(this).cancel(GROUP_NOTIFICATION_ID); //cancel group notification
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        for (Timer timer: timers) {
+            timer.setShowNotification(true);
+        }
+        showGroupNotification();
+    }
 }

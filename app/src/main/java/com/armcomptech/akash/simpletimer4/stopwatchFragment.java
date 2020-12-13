@@ -395,7 +395,7 @@ public class stopwatchFragment extends Fragment {
         }
 
         Notification notification = new NotificationCompat.Builder(getContext(), MAIN_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_timer_black)
+                .setSmallIcon(R.drawable.ic_baseline_timelapse_24)
                 .setContentTitle(content)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
