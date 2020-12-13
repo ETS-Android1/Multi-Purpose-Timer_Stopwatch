@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -132,7 +133,8 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
 
     @Override
     public void onBillingError(int errorCode, Throwable error) {
-        Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
+        Log.d("Billing", "Something went wrong in billing. Errorcode : " + errorCode);
+//        Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -222,7 +224,9 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         if (!disableFirebaseLogging) {
             Bundle bundle = new Bundle();
             bundle.putString("Event", eventName);
-            mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
+            if (mFirebaseAnalytics != null) {
+                mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
+            }
         }
     }
 }

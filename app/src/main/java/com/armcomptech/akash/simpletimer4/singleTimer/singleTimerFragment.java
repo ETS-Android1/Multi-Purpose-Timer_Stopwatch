@@ -435,8 +435,12 @@ public class singleTimerFragment extends Fragment {
 
     private void saveData() {
 //        if (getContext().getSharedPreferences("shared preferences", MODE_PRIVATE) == null) {
-//            return;
+//            return; //wait this might be something
 //        }
+        if (getContext() == null) {
+            return;
+        }
+
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
