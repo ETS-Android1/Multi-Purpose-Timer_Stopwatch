@@ -45,6 +45,7 @@ import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFi
 
 public class stopwatchFragment extends Fragment {
 
+    private static final int notification_id = 2;
     private FloatingActionButton mButtonStart;
     private FloatingActionButton mButtonPause;
     private FloatingActionButton mButtonReset;
@@ -195,7 +196,7 @@ public class stopwatchFragment extends Fragment {
                 if (showNotification) {
                     showNotification(String.valueOf(elapsedMillis), getTimerName());
                 } else {
-                    notificationManager.cancel(1);
+                    notificationManager.cancel(notification_id);
                 }
             }
         }, 0, 1000);//put here time 1000 milliseconds=1 second
@@ -329,7 +330,7 @@ public class stopwatchFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         showNotification = false;
-        notificationManager.cancel(1);
+        notificationManager.cancel(notification_id);
     }
 
     @Override
@@ -342,7 +343,7 @@ public class stopwatchFragment extends Fragment {
     public void onResume() {
         super.onResume();
         showNotification = false;
-        notificationManager.cancel(1);
+        notificationManager.cancel(notification_id);
     }
 
     @Override
@@ -364,9 +365,9 @@ public class stopwatchFragment extends Fragment {
         String timeLeftFormatted = String.format("%02d:%02d:%02d", timeLeftSecondsInt / 3600,
                 (timeLeftSecondsInt % 3600) / 60, (timeLeftSecondsInt % 60));
         if (currentTimerName.equals("")) {
-            content = timeLeftFormatted;
+            content = "Stopwatch: " + timeLeftFormatted;
         } else {
-            content = currentTimerName + "  " + timeLeftFormatted;
+            content = "Stopwatch: " + currentTimerName + " - " + timeLeftFormatted;
         }
 
         Notification notification = new NotificationCompat.Builder(getContext(), MAIN_CHANNEL_ID)
@@ -375,12 +376,12 @@ public class stopwatchFragment extends Fragment {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setAutoCancel(true)
-                .setOngoing(true)
+                .setOngoing(false)
                 .setOnlyAlertOnce(true)
                 .setSound(null)
                 .setFullScreenIntent(pendingIntent, false)
                 .build();
 
-        notificationManager.notify(1, notification);
+        notificationManager.notify(notification_id, notification);
     }
 }

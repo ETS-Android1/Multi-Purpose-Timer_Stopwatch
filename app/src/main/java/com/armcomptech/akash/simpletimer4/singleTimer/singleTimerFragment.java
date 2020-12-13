@@ -66,6 +66,7 @@ import static com.App.MAIN_CHANNEL_ID;
  */
 public class singleTimerFragment extends Fragment {
 
+    private static final int notification_id = 1;
     private static final String START_TIME = "start_time";
     private static final String BROADCAST_INTENT_FILTER = "com.armcomptech.akash.simpletimer4.timerAction";
 
@@ -365,7 +366,7 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        notificationManager.cancel(1);
+        notificationManager.cancel(notification_id);
         stopPlayer();
         showNotification = false;
     }
@@ -373,7 +374,7 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        notificationManager.cancel(1);
+        notificationManager.cancel(notification_id);
         stopPlayer();
         showNotification = true;
     }
@@ -381,14 +382,14 @@ public class singleTimerFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        notificationManager.cancel(1);
+        notificationManager.cancel(notification_id);
         showNotification = false;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        notificationManager.cancel(1);
+        notificationManager.cancel(notification_id);
         stopPlayer();
         showNotification = true;
     }
@@ -714,7 +715,7 @@ public class singleTimerFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mProgressBar.setProgress((int)mStartTimeInMillis,true);
         }
-        notificationManager.cancel(1);
+        notificationManager.cancel(notification_id);
     }
 
     public String getTimeLeftFormatted() {
@@ -776,7 +777,7 @@ public class singleTimerFragment extends Fragment {
         if (showNotification) {
             showNotification(timeLeftFormatted, currentTimerName);
         } else {
-            notificationManager.cancel(1);
+            notificationManager.cancel(notification_id);
         }
     }
 
@@ -840,13 +841,20 @@ public class singleTimerFragment extends Fragment {
         final PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0,
                 notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        String content;
+        if (currentTimerName.equals("General")) {
+            content = "Timer: " + timeLeft;
+        } else {
+            content = "Timer: " + currentTimerName + " - " + timeLeft;
+        }
+
         Notification notification = new NotificationCompat.Builder(getContext(), MAIN_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_timer_black)
-                .setContentTitle(currentTimerName + "  " + timeLeft)
+                .setContentTitle(content)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setAutoCancel(true)
-                .setOngoing(true)
+                .setOngoing(false)
                 .setOnlyAlertOnce(true)
                 .setSound(null)
                 .setFullScreenIntent(pendingIntent, false)
