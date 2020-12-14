@@ -41,7 +41,6 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
     public static Boolean disableFirebaseLogging = true;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
-    private static final String START_TIME = "start_time";
     BillingProcessor bp;
     String activityToOpen;
 
@@ -171,15 +170,12 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         return sb;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (item.isChecked()) {
-            item.setChecked(false);
-        } else {
-            item.setChecked(true);
-        }
+        item.setChecked(!item.isChecked());
 
         switch (id) {
             case R.id.check_sound:
