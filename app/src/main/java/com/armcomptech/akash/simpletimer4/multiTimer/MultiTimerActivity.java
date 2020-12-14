@@ -56,8 +56,8 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     BillingProcessor bp;
     RecyclerView recyclerView;
     ExtendedFloatingActionButton addTimerFab;
-    private ArrayList<Timer> timers = new ArrayList<>();
-    private ArrayList<RecyclerView.ViewHolder> holders = new ArrayList<>();
+    private final ArrayList<Timer> timers = new ArrayList<>();
+    private final ArrayList<RecyclerView.ViewHolder> holders = new ArrayList<>();
     final static int GROUP_NOTIFICATION_ID = 1000;
 
     @Override
@@ -204,15 +204,12 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         return sb;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (item.isChecked()) {
-            item.setChecked(false);
-        } else {
-            item.setChecked(true);
-        }
+        item.setChecked(!item.isChecked());
 
         switch (id) {
             case R.id.statistics_activity:
