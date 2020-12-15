@@ -66,9 +66,8 @@ import static com.App.MAIN_CHANNEL_ID;
  */
 public class singleTimerFragment extends Fragment {
 
-    private static final int notification_id = 1;
+    private static int notification_id = 1;
     private static final String START_TIME = "start_time";
-    private static final String BROADCAST_INTENT_FILTER = "com.armcomptech.akash.simpletimer4.timerAction";
 
     private TextView mTextViewCountDown;
     private FloatingActionButton mButtonStart;
@@ -110,12 +109,13 @@ public class singleTimerFragment extends Fragment {
     private EditText editTextTimer;
     private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
 
-    private BroadcastReceiver broadcastReceiver;
-
     //TODO: Change disableFirebaseLogging to false when releasing
     public static Boolean disableFirebaseLogging = true;
     private static FirebaseAnalytics mFirebaseAnalytics;
     private boolean fragmentAttached;
+
+    public singleTimerFragment() {
+    }
 
     public static singleTimerFragment newInstance() {
         return new singleTimerFragment();
@@ -129,16 +129,26 @@ public class singleTimerFragment extends Fragment {
         instance = (TabbedActivity) requireContext();
         notificationManager = NotificationManagerCompat.from(requireContext());
 
-        broadcastReceiver = new BroadcastReceiver() {
+        IntentFilter intentFilter1 = new IntentFilter("onTick");
+        BroadcastReceiver broadcastReceiver1 = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String timerAction = intent.getStringExtra("timer_action");
-                if (timerAction.equals("pause")) {
-                    pauseTimer();
-                }
+                long untilFinished = intent.getLongExtra("TimeRemaining", 0);
+                timerOnTick(untilFinished);
+                mTimeLeftInMillis = untilFinished;
             }
         };
-        instance.registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_INTENT_FILTER));
+
+        IntentFilter intentFilter2 = new IntentFilter("onFinish");
+        BroadcastReceiver broadcastReceiver2 = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                timerOnFinish();
+            }
+        };
+
+        instance.registerReceiver(broadcastReceiver1, intentFilter1);
+        instance.registerReceiver(broadcastReceiver2, intentFilter2);
 
         if (!disableFirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
@@ -206,7 +216,12 @@ public class singleTimerFragment extends Fragment {
 
         mButtonPause.hide();
 
-        setTime(requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE).getLong(START_TIME, 60000)); //default 1 minute timer
+        if (savedInstanceState != null) {
+            mTimerRunning = savedInstanceState.getBoolean("mTimerRunning");
+        }
+        if (!mTimerRunning) {
+            setTime(requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE).getLong(START_TIME, 60000)); //default 1 minute timer
+        }
 
         mButtonStart.setOnClickListener( v -> {
 
@@ -328,39 +343,44 @@ public class singleTimerFragment extends Fragment {
     public void onViewStateRestored(@NonNull Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-//        mTimerRunning = savedInstanceState.getBoolean("mTimerRunning");
-//        BlinkTimerStopRequest = savedInstanceState.getBoolean("BlinkTimerStopRequest");
+        if (savedInstanceState == null) {
+            return;
+        }
+        mTimerRunning = savedInstanceState.getBoolean("mTimerRunning");
+        BlinkTimerStopRequest = savedInstanceState.getBoolean("BlinkTimerStopRequest");
 //        heartbeatChecked = savedInstanceState.getBoolean("heartbeatChecked");
-//        soundChecked = savedInstanceState.getBoolean("soundChecked");
-//        showNotification = savedInstanceState.getBoolean("showNotification");
-//
-//        mStartTimeInMillis = savedInstanceState.getLong("mStartTimeInMillis");
-//        mTimeLeftInMillis = savedInstanceState.getLong("mTimeLeftInMillis");
-//
-//        alternate = savedInstanceState.getInt("alternate");
-//        currentTimerNamePosition = savedInstanceState.getInt("currentTimerNamePosition");
-//        ticksToPass = savedInstanceState.getInt("ticksToPass");
-//        counter = savedInstanceState.getInt("counter");
-//
-//
-//        currentTimerName = savedInstanceState.getString("currentTimerName");
-//
-//        if (mTimerRunning) {
-//            mTimerNameAutoComplete.setText(currentTimerName);
-//            mButtonStart.performClick();
-//
-//            //update interface to show timer name
-//            mTimerNameTextView.setVisibility(View.VISIBLE);
-//            mTimerNameTextView.setText(currentTimerName);
-//            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
-//        } else if (mTimeLeftInMillis != mStartTimeInMillis) {
-//            //update interface to show timer name
-//            mTimerNameTextView.setVisibility(View.VISIBLE);
-//            mTimerNameTextView.setText(currentTimerName);
-//            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
-//            updateCountDownText();
-//            updateWatchInterface();
-//        }
+        soundChecked = savedInstanceState.getBoolean("soundChecked");
+        showNotification = savedInstanceState.getBoolean("showNotification");
+
+        mStartTimeInMillis = savedInstanceState.getLong("mStartTimeInMillis");
+        mTimeLeftInMillis = savedInstanceState.getLong("mTimeLeftInMillis");
+
+        alternate = savedInstanceState.getInt("alternate");
+        currentTimerNamePosition = savedInstanceState.getInt("currentTimerNamePosition");
+        ticksToPass = savedInstanceState.getInt("ticksToPass");
+        counter = savedInstanceState.getInt("counter");
+
+
+        currentTimerName = savedInstanceState.getString("currentTimerName");
+
+        if (mTimerRunning) {
+            mButtonStart.hide();
+            mButtonPause.show();
+            mButtonReset.hide();
+
+            //update interface to show timer name
+            mTimerNameAutoComplete.setText(currentTimerName);
+            mTimerNameTextView.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setText(currentTimerName);
+            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
+        } else if (mTimeLeftInMillis != mStartTimeInMillis) {
+            //update interface to show timer name
+            mTimerNameTextView.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setText(currentTimerName);
+            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
+            updateCountDownText();
+            updateWatchInterface();
+        }
     }
 
     @Override
@@ -642,6 +662,48 @@ public class singleTimerFragment extends Fragment {
         closeKeyboard();
     }
 
+    public void timerOnTick(long millisUntilFinished) {
+        mTimeLeftInMillis = millisUntilFinished;
+        updateCountDownText();
+
+        //basically increment by one every second
+        counter++;
+        if (ticksToPass == counter) {
+            timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
+            saveData();
+            counter = 0;
+        }
+    }
+
+    public void timerOnFinish() {
+        if (mRepeatSwitch.isChecked()) {
+            resetTimer();
+            mTimerRunning = false;
+
+            if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
+                try {
+                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Ringtone r = RingtoneManager.getRingtone(instance.getApplicationContext(), notification);
+                    r.play();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            mButtonStart.performClick();
+        } else {
+            mTimerRunning = false;
+            updateWatchInterface();
+            mTimeLeftInMillis = 0;
+            mMillis.setText("000");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mProgressBar.setProgress(0, true);
+            }
+            stopPlayer();
+            timeUp();
+        }
+    }
+
     public void startTimer() {
 
         heartbeat();
@@ -652,52 +714,16 @@ public class singleTimerFragment extends Fragment {
 
         ticksToPass = 1000 / countDownInterval;
 
-        mCountDownTimer = new CountDownTimer(mTimeLeftInMillis, countDownInterval) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                mTimeLeftInMillis = millisUntilFinished;
-                updateCountDownText();
-
-                //basically increment by one every second
-                counter++;
-                if (ticksToPass == counter) {
-                    timeInSeconds.set(currentTimerNamePosition, timeInSeconds.get(currentTimerNamePosition) + 1);
-                    saveData();
-                    counter = 0;
-                }
-            }
-
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onFinish() {
-                if (mRepeatSwitch.isChecked()) {
-                    resetTimer();
-                    mTimerRunning = false;
-
-                    if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
-                        try {
-                            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                            Ringtone r = RingtoneManager.getRingtone(instance.getApplicationContext(), notification);
-                            r.play();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    mButtonStart.performClick();
-                } else {
-                    mTimerRunning = false;
-                    updateWatchInterface();
-                    mTimeLeftInMillis = 0;
-                    mMillis.setText("000");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        mProgressBar.setProgress(0, true);
-                    }
-                    stopPlayer();
-                    timeUp();
-                }
-            }
-        }.start();
+        Intent intentService = new Intent(instance, timerWithService.class);
+        long integerTimeSet;
+        if (mTimeLeftInMillis != 0) {
+            integerTimeSet = mTimeLeftInMillis;
+        } else {
+            integerTimeSet = mStartTimeInMillis;
+        }
+        intentService.putExtra("TimeValue", integerTimeSet);
+        intentService.putExtra("timerName", getTimerName());
+        instance.startService(intentService);
 
         mTimerRunning = true;
         updateWatchInterface();
@@ -711,6 +737,12 @@ public class singleTimerFragment extends Fragment {
         updateWatchInterface();
         stopPlayer();
 //        pauseNotification(getTimeLeftFormatted());
+
+
+        Intent intent1local = new Intent();
+        intent1local.setAction("timerPlayer");
+        intent1local.putExtra("player", "Pause");
+        instance.sendBroadcast(intent1local);
     }
 
     public void resetTimer() {
@@ -725,6 +757,11 @@ public class singleTimerFragment extends Fragment {
             mProgressBar.setProgress((int)mStartTimeInMillis,true);
         }
         notificationManager.cancel(notification_id);
+
+        Intent intent1local = new Intent();
+        intent1local.setAction("timerPlayer");
+        intent1local.putExtra("player", "Reset");
+        instance.sendBroadcast(intent1local);
     }
 
     public String getTimeLeftFormatted() {
@@ -789,7 +826,7 @@ public class singleTimerFragment extends Fragment {
         }
 
         if (showNotification) {
-            showNotification(timeLeftFormatted, currentTimerName);
+//            showNotification(timeLeftFormatted, currentTimerName);
         } else {
             notificationManager.cancel(notification_id);
         }
