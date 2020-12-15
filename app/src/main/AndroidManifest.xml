@@ -24,6 +24,7 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <service android:name=".singleTimer.timerWithService"/>
+        <service android:name=".stopwatch.stopwatchWithService"/>
         <activity
             android:launchMode="singleTop"
             android:name=".TabbedView.TabbedActivity"

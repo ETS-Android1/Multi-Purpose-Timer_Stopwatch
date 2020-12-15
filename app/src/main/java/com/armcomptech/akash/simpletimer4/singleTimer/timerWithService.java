@@ -24,11 +24,11 @@ import static com.App.MAIN_CHANNEL_ID;
 
 public class timerWithService extends Service {
 
-    private static final String CHANNEL_ID = "Single_Timer";
     CountDownTimer countDownTimer;
 
     long timeRemaining;
     String timerName;
+    BroadcastReceiver broadcastReceiver2;
 
     public long getTimeRemaining() {
         return this.timeRemaining;
@@ -51,9 +51,8 @@ public class timerWithService extends Service {
         timerName = intent.getStringExtra("timerName");
 
         startTimer(timeRemaining);
-        IntentFilter intentFilter2 = new IntentFilter();
-        intentFilter2.addAction("timerPlayer");
-        BroadcastReceiver broadcastReceiver2 = new BroadcastReceiver() {
+        IntentFilter intentFilter2 = new IntentFilter("timerPlayer");
+        broadcastReceiver2 = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getStringExtra("player");
@@ -81,8 +80,13 @@ public class timerWithService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        NotificationManagerCompat.from(this).cancel(1);
-        stopSelf();
+        cleanUp();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cleanUp();
     }
 
     public void startTimer(long timeRemaining) {
@@ -116,6 +120,13 @@ public class timerWithService extends Service {
         stopSelf();
         countDownTimer.cancel();
         NotificationManagerCompat.from(this).cancel(1);
+    }
+
+    public void cleanUp() {
+        unregisterReceiver(broadcastReceiver2);
+        NotificationManagerCompat.from(this).cancel(1);
+        stopSelf();
+        countDownTimer.cancel();
     }
 
     public void showNotification(String timeLeft, String currentTimerName) {

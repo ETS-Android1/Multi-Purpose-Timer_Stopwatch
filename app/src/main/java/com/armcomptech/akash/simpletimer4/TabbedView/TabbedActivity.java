@@ -225,4 +225,11 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
             }
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        stopService(new Intent(this, timerWithService.class));
+//        stopService(new Intent(this, stopwatchWithService.class));
+    }
 }

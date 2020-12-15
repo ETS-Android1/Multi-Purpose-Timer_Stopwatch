@@ -1,11 +1,9 @@
-package com.armcomptech.akash.simpletimer4;
+package com.armcomptech.akash.simpletimer4.stopwatch;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
@@ -22,11 +20,13 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
+import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
@@ -40,7 +40,6 @@ import java.util.TimerTask;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static com.App.MAIN_CHANNEL_ID;
 import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
 public class stopwatchFragment extends Fragment {
@@ -70,7 +69,7 @@ public class stopwatchFragment extends Fragment {
     int milliseconds = 0;
     long pauseOffset = 0;
     ArrayList<String> lapTimeInfo = new ArrayList<>();
-    ArrayList<Long> lapTimeStamp = new ArrayList<>();
+    ArrayList<Integer> lapTimeStamp = new ArrayList<>();
     ArrayList<String> timerName = new ArrayList<>();
     ArrayAdapter<String> lapListAdapter;
 
@@ -79,6 +78,8 @@ public class stopwatchFragment extends Fragment {
 
     java.util.Timer tempTimer;
     TimerTask tempTimerTask;
+    private boolean watchIsReset;
+    private boolean fragmentAttached;
 
     public static stopwatchFragment newInstance() {
         return new stopwatchFragment();
@@ -98,6 +99,7 @@ public class stopwatchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        setRetainInstance(true);
         View root = inflater.inflate(R.layout.fragment_stopwatch, container, false);
         lapListAdapter = new ArrayAdapter<>(getContext(), R.layout.listview_adapter, lapTimeInfo);
 
@@ -188,7 +190,10 @@ public class stopwatchFragment extends Fragment {
     }
 
     public void startWatch() {
+        instance.startService(new Intent(instance, stopwatchWithService.class));
+
         stopWatchRunning = true;
+        watchIsReset = false;
         chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffset);
         chronometer.start();
 
@@ -196,12 +201,7 @@ public class stopwatchFragment extends Fragment {
         tempTimerTask = new TimerTask() {
             @Override
             public void run() {
-                long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
-                if (showNotification && stopWatchRunning) {
-                    showNotification(String.valueOf(elapsedMillis), getTimerName());
-                } else {
-                    notificationManager.cancel(notification_id);
-                }
+                showNotification();
             }
         };
         tempTimer.scheduleAtFixedRate(tempTimerTask, 0, 1000); //show notificaiton every second
@@ -214,15 +214,7 @@ public class stopwatchFragment extends Fragment {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     if (stopWatchRunning) {
-//                        mMillis.setText(String.format(Locale.getDefault(), "%02d", 1000 - millisUntilFinished));
                         mMillis.setText(String.valueOf((SystemClock.elapsedRealtime() - chronometer.getBase()) % 1000));
-                    }
-
-                    if (showNotification && stopWatchRunning) {
-                        long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
-                        showNotification(String.valueOf(elapsedMillis), getTimerName());
-                    } else {
-                        notificationManager.cancel(notification_id);
                     }
                 }
 
@@ -238,14 +230,17 @@ public class stopwatchFragment extends Fragment {
         stopWatchRunning = false;
         chronometer.stop();
         pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
+        cancelNotification();
     }
 
     public void resetWatch() {
         chronometer.setBase(SystemClock.elapsedRealtime());
         pauseOffset = 0;
+        watchIsReset = true;
         lapTimeInfo.clear();
         lapTimeStamp.clear();
         lapListViewConstraintLayout.setVisibility(View.GONE);
+        cancelNotification();
     }
 
     public void lapWatch() {
@@ -266,7 +261,7 @@ public class stopwatchFragment extends Fragment {
         } else {
             stringBuilder.append(getTimeFormatted(SystemClock.elapsedRealtime() - chronometer.getBase() - lapTimeStamp.get(lapTimeStamp.size() - 1)));
         }
-        lapTimeStamp.add(SystemClock.elapsedRealtime() - chronometer.getBase());
+        lapTimeStamp.add((int) (SystemClock.elapsedRealtime() - chronometer.getBase()));
         lapTimeInfo.add(stringBuilder.toString());
         lapListAdapter.notifyDataSetChanged();
         lapListView.smoothScrollToPosition(lapTimeInfo.size());
@@ -376,36 +371,126 @@ public class stopwatchFragment extends Fragment {
         showNotification = true;
     }
 
-    public void showNotification(String timeLeft, String currentTimerName) {
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        PackageManager client = getContext().getPackageManager();
-        final Intent notificationIntent = client.getLaunchIntentForPackage("com.armcomptech.akash.simpletimer4");
+        outState.putBoolean("watchIsReset", watchIsReset);
+        outState.putBoolean("stopWatchRunning", stopWatchRunning);
+        outState.putLong("pauseOffset", SystemClock.elapsedRealtime() - chronometer.getBase());
+        outState.putStringArrayList("lapTimeInfo", lapTimeInfo);
+        outState.putIntegerArrayList("lapTimeStamp", lapTimeStamp);
+    }
 
-        final PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0,
-                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
 
-        String content;
-        int timeLeftSecondsInt = (Integer.parseInt(timeLeft))/1000;
-        String timeLeftFormatted = String.format("%02d:%02d:%02d", timeLeftSecondsInt / 3600,
-                (timeLeftSecondsInt % 3600) / 60, (timeLeftSecondsInt % 60));
-        if (currentTimerName.equals("")) {
-            content = "Stopwatch: " + timeLeftFormatted;
-        } else {
-            content = "Stopwatch: " + currentTimerName + " - " + timeLeftFormatted;
+        if (savedInstanceState == null) {
+            return;
         }
 
-        Notification notification = new NotificationCompat.Builder(getContext(), MAIN_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_baseline_timelapse_24)
-                .setContentTitle(content)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setCategory(NotificationCompat.CATEGORY_STATUS)
-                .setAutoCancel(true)
-                .setOngoing(false)
-                .setOnlyAlertOnce(true)
-                .setSound(null)
-                .setFullScreenIntent(pendingIntent, false)
-                .build();
+        lapListView.setAdapter(lapListAdapter);
 
-        notificationManager.notify(notification_id, notification);
+        watchIsReset = savedInstanceState.getBoolean("watchIsReset");
+        stopWatchRunning = savedInstanceState.getBoolean("stopWatchRunning");
+        lapTimeInfo = savedInstanceState.getStringArrayList("lapTimeInfo");
+        lapTimeStamp = savedInstanceState.getIntegerArrayList("lapTimeStamp");
+
+        if (watchIsReset) {
+            mButtonStart.setVisibility(View.VISIBLE);
+            mButtonPause.setVisibility(View.INVISIBLE);
+            mButtonReset.setVisibility(View.INVISIBLE);
+            mButtonLap.setVisibility(View.INVISIBLE);
+            mTimerNameTextView.setVisibility(View.INVISIBLE);
+            mTimerNameAutoComplete.setVisibility(View.VISIBLE);
+            mMillis.setText("000");
+            setWithoutLapView();
+            lapListViewConstraintLayout.setVisibility(View.GONE);
+        } else if (stopWatchRunning) {
+            pauseOffset = savedInstanceState.getLong("pauseOffset");
+            startWatch();
+
+            //setup UI
+            mButtonStart.setVisibility(View.INVISIBLE);
+            mButtonPause.setVisibility(View.VISIBLE);
+            mButtonReset.setVisibility(View.INVISIBLE);
+            mButtonLap.setVisibility(View.VISIBLE);
+            if (!getTimerName().equals("")) {
+                mTimerNameTextView.setVisibility(View.VISIBLE);
+                mTimerNameTextView.setText(getTimerName());
+            } else {
+                mTimerNameTextView.setVisibility(View.GONE);
+            }
+            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
+
+            if (lapTimeInfo.isEmpty()) {
+                setWithoutLapView();
+                lapListViewConstraintLayout.setVisibility(View.GONE);
+            } else {
+                setWithLapView();
+                lapListViewConstraintLayout.setVisibility(View.VISIBLE);
+            }
+        } else {
+            mButtonStart.setVisibility(View.VISIBLE);
+            mButtonPause.setVisibility(View.INVISIBLE);
+            mButtonReset.setVisibility(View.VISIBLE);
+            mButtonLap.setVisibility(View.INVISIBLE);
+            if (!getTimerName().equals("")) {
+                mTimerNameTextView.setVisibility(View.VISIBLE);
+                mTimerNameTextView.setText(getTimerName());
+            } else {
+                mTimerNameTextView.setVisibility(View.GONE);
+            }
+            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
+            startWatch();
+            pauseWatch();
+            cancelNotification();
+
+            if (lapTimeInfo.isEmpty()) {
+                setWithoutLapView();
+                lapListViewConstraintLayout.setVisibility(View.GONE);
+            } else {
+                setWithLapView();
+                lapListViewConstraintLayout.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        fragmentAttached = true;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        fragmentAttached = false;
+    }
+
+    public void showNotification() {
+        if (!fragmentAttached) {
+            return;
+        }
+        synchronized (requireContext()) {
+            long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
+            Intent intent1local = new Intent("stopwatchPlayer");
+            intent1local.putExtra("notification", "updateNotification");
+            intent1local.putExtra("timeLeft", String.valueOf(elapsedMillis));
+            intent1local.putExtra("name", getTimerName());
+            requireContext().sendBroadcast(intent1local);
+        }
+    }
+
+    public void cancelNotification() {
+        if (!fragmentAttached) {
+            return;
+        }
+        synchronized (requireContext()) {
+            Intent intent1local = new Intent("stopwatchPlayer");
+            intent1local.putExtra("notification", "cancelNotification");
+            requireContext().sendBroadcast(intent1local);
+        }
     }
 }

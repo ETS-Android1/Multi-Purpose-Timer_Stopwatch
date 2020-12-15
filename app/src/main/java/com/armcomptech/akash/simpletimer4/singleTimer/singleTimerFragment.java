@@ -182,6 +182,8 @@ public class singleTimerFragment extends Fragment {
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+
+        setRetainInstance(true);
         View root = inflater.inflate(R.layout.activity_single_timer, container, false);
 
         mProgressBar = root.findViewById(R.id.progressBar);
@@ -301,7 +303,9 @@ public class singleTimerFragment extends Fragment {
                 }
             }
         });
+
         showNotification = false;
+        NotificationManagerCompat.from(requireContext()).cancel(1);
 
         return root;
     }

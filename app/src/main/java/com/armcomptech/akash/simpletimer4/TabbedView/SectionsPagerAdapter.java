@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.armcomptech.akash.simpletimer4.singleTimer.singleTimerFragment;
-import com.armcomptech.akash.simpletimer4.stopwatchFragment;
+import com.armcomptech.akash.simpletimer4.stopwatch.stopwatchFragment;
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
