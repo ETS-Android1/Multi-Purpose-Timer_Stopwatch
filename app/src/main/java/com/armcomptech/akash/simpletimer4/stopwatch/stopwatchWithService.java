@@ -72,7 +72,9 @@ public class stopwatchWithService extends Service {
     }
 
     public void cleanUp() {
-        unregisterReceiver(broadcastReceiver2);
+        if (broadcastReceiver2 != null) {
+            unregisterReceiver(broadcastReceiver2);
+        }
         NotificationManagerCompat.from(this).cancel(2);
         stopSelf();
     }
