@@ -155,7 +155,8 @@ public class timerWithService extends Service {
                 .setOngoing(false)
                 .setOnlyAlertOnce(true)
                 .setSound(null)
-                .setFullScreenIntent(pendingIntent, false)
+                .setFullScreenIntent(pendingIntent, true)
+                .setContentIntent(pendingIntent)
                 .build();
 
         startForeground(1, notification);

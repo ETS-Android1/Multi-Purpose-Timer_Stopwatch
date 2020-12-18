@@ -6,14 +6,16 @@
 
     <item
         android:id="@+id/timer_and_stopwatch"
-        app:showAsAction="never"
-        android:visible="false"
+        app:showAsAction="ifRoom"
+        android:visible="true"
+        android:icon="@drawable/ic_timer_white"
         android:title="Timer and Stopwatch" />
 
     <item
         android:id="@+id/multi_Timer_Mode"
-        app:showAsAction="never"
-        android:visible="false"
+        app:showAsAction="ifRoom"
+        android:visible="true"
+        android:icon="@drawable/ic_video_library_white"
         android:title="@string/multi_timer_mode" />
 
     <item
@@ -29,23 +31,23 @@
     <item
         android:id="@+id/statistics_activity"
         android:title="@string/statistics"
-        android:icon="@drawable/ic_data_usage_black"
-        app:showAsAction="never"
-        android:visible="false"/>
+        android:icon="@drawable/ic_data_usage_white"
+        app:showAsAction="ifRoom"
+        android:visible="true"/>
 
     <item
         android:id="@+id/privacy_policy"
         android:title="@string/privacy_policy"
-        android:icon="@drawable/ic_lock_black"
-        app:showAsAction="never"
-        android:visible="false" />
+        android:icon="@drawable/ic_lock_white"
+        app:showAsAction="ifRoom"
+        android:visible="true" />
 
     <item
         android:id="@+id/setting_activity"
         android:title="@string/setting"
-        android:icon="@drawable/ic_settings_black"
-        app:showAsAction="never"
-        android:visible="false"/>
+        android:icon="@drawable/ic_settings_white"
+        app:showAsAction="ifRoom"
+        android:visible="true"/>
 
     <item
         android:id="@+id/remove_Ads"

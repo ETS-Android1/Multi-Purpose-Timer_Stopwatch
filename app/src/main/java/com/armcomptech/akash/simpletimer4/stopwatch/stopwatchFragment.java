@@ -66,7 +66,6 @@ public class stopwatchFragment extends Fragment {
 
     boolean stopWatchRunning = false;
 
-    int milliseconds = 0;
     long pauseOffset = 0;
     ArrayList<String> lapTimeInfo = new ArrayList<>();
     ArrayList<Integer> lapTimeStamp = new ArrayList<>();
@@ -95,13 +94,14 @@ public class stopwatchFragment extends Fragment {
         loadData();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         setRetainInstance(true);
         View root = inflater.inflate(R.layout.fragment_stopwatch, container, false);
-        lapListAdapter = new ArrayAdapter<>(getContext(), R.layout.listview_adapter, lapTimeInfo);
+        lapListAdapter = new ArrayAdapter<>(requireContext(), R.layout.listview_adapter, lapTimeInfo);
 
         lapListViewConstraintLayout = root.findViewById(R.id.lapListParentView);
         lapListViewConstraintLayout.setVisibility(View.GONE);
@@ -122,7 +122,7 @@ public class stopwatchFragment extends Fragment {
         mButtonLap.setVisibility(View.INVISIBLE);
         mTimerNameAutoComplete = root.findViewById(R.id.stopWatchAutoComplete);
         mTimerNameAutoComplete.setAdapter(new ArrayAdapter<>(
-                getActivity(), R.layout.timername_autocomplete_textview, timerName));
+                requireActivity(), R.layout.timername_autocomplete_textview, timerName));
         mTimerNameAutoComplete.setThreshold(0);
         mTimerNameAutoComplete.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_GO
@@ -244,7 +244,7 @@ public class stopwatchFragment extends Fragment {
     }
 
     public void lapWatch() {
-        int lap = 0;
+        int lap;
         if (lapTimeInfo.isEmpty()) {
             lap = 1;
             lapListViewConstraintLayout.setVisibility(View.VISIBLE);
@@ -253,7 +253,7 @@ public class stopwatchFragment extends Fragment {
         }
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Lap " + lap + " : ");
+        stringBuilder.append("Lap ").append(lap).append(" : ");
         stringBuilder.append(getTimeFormatted(SystemClock.elapsedRealtime() - chronometer.getBase()));
         stringBuilder.append("    ");
         if (lapTimeStamp.isEmpty()) {
@@ -292,7 +292,7 @@ public class stopwatchFragment extends Fragment {
     }
 
     public int dpToPx(int dp) {
-        float density = getContext().getResources()
+        float density = requireContext().getResources()
                 .getDisplayMetrics()
                 .density;
         return Math.round((float) dp * density);
@@ -303,7 +303,7 @@ public class stopwatchFragment extends Fragment {
         int minutes = (int) ((milliseconds / 1000) % 3600) / 60;
         int seconds = (int) (milliseconds / 1000) % 60;
 
-        String timeLeftFormatted = "";
+        String timeLeftFormatted;
 
         if (hours > 0) {
             timeLeftFormatted = String.format(Locale.getDefault(), "%d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds % 1000);
@@ -319,13 +319,14 @@ public class stopwatchFragment extends Fragment {
         View view = instance.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) instance.getSystemService(INPUT_METHOD_SERVICE);
-            assert imm != null;
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
     }
 
     private void loadData() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
 
         String timerNameJson = sharedPreferences.getString("timerName", null);
@@ -382,6 +383,7 @@ public class stopwatchFragment extends Fragment {
         outState.putIntegerArrayList("lapTimeStamp", lapTimeStamp);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);

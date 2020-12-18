@@ -609,8 +609,9 @@ public class singleTimerFragment extends Fragment {
 
             editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
                 InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                assert imm != null;
-                imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
+                if (imm != null) {
+                    imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
+                }
             }));
             editTextTimer.requestFocus();
         } else {
@@ -866,8 +867,9 @@ public class singleTimerFragment extends Fragment {
         View view = instance.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) instance.getSystemService(INPUT_METHOD_SERVICE);
-            assert imm != null;
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
     }
 

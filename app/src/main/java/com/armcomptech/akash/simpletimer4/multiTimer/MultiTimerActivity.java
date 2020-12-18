@@ -184,9 +184,10 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         inflater.inflate(R.menu.option_menu, menu);
 
         menu.findItem(R.id.check_sound).setVisible(false);
-        menu.add(0, R.id.timer_and_stopwatch, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer_black), "Timer and Stopwatch"));
-        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
-        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
+        menu.findItem(R.id.multi_Timer_Mode).setVisible(false);
+//        menu.add(0, R.id.timer_and_stopwatch, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer_black), "Timer and Stopwatch"));
+//        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
+//        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
         if (!isRemovedAds()) {
             menu.add(0, R.id.remove_Ads, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_remove_circle_outline_black), "Remove Ads"));
         }
@@ -326,7 +327,8 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                         .setGroup("multiTimer")
                         .setGroupSummary(true)
                         .setAutoCancel(true)
-                        .setFullScreenIntent(pendingIntent, false)
+                        .setFullScreenIntent(pendingIntent, true)
+                        .setContentIntent(pendingIntent)
                         .build();
         NotificationManagerCompat.from(this).notify(GROUP_NOTIFICATION_ID, summaryNotification);
     }

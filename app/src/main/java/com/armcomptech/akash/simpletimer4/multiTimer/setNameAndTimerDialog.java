@@ -86,8 +86,9 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
             if (actionId == EditorInfo.IME_ACTION_GO
                     || actionId == EditorInfo.IME_ACTION_DONE) {
                 InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                assert imm != null;
-                imm.hideSoftInputFromWindow(autoCompleteTimerName.getWindowToken(), 0);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(autoCompleteTimerName.getWindowToken(), 0);
+                }
                 return true;
             }
             return false;
@@ -103,8 +104,9 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
                 timePicker.setVisibility(View.GONE);
                 editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
                     InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    assert imm != null;
-                    imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
+                    if (imm != null) {
+                        imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
+                    }
                 }));
                 editTextTimer.requestFocus();
             } else {
@@ -136,8 +138,9 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
         } else if (this.creatingNewTimer) {
             autoCompleteTimerName.setOnFocusChangeListener((v, hasFocus) -> autoCompleteTimerName.post(() -> {
                 InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                assert imm != null;
-                imm.showSoftInput(autoCompleteTimerName, InputMethodManager.SHOW_IMPLICIT);
+                if (imm != null) {
+                    imm.showSoftInput(autoCompleteTimerName, InputMethodManager.SHOW_IMPLICIT);
+                }
             }));
             autoCompleteTimerName.requestFocus();
 

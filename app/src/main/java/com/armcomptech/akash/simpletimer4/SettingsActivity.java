@@ -51,7 +51,10 @@ public class SettingsActivity extends AppCompatActivity {
         inflater.inflate(R.menu.option_menu, menu);
 
         menu.findItem(R.id.check_sound).setVisible(false);
-        menu.add(0, R.id.privacy_policy, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
+        menu.findItem(R.id.timer_and_stopwatch).setVisible(false);
+        menu.findItem(R.id.multi_Timer_Mode).setVisible(false);
+        menu.findItem(R.id.setting_activity).setVisible(false);
+//        menu.add(0, R.id.privacy_policy, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
 
         return true;
     }

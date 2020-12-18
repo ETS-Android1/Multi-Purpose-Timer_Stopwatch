@@ -25,7 +25,9 @@ import com.anjlab.android.iab.v3.TransactionDetails;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
+import com.armcomptech.akash.simpletimer4.singleTimer.timerWithService;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
+import com.armcomptech.akash.simpletimer4.stopwatch.stopwatchWithService;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -149,9 +151,10 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         inflater.inflate(R.menu.option_menu, menu);
 
         menu.findItem(R.id.check_sound).setChecked(getSharedPreferences("shared preferences", MODE_PRIVATE).getBoolean("SOUND_CHECKED", true));
-        menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_video_library_black), "Multi Timer Mode"));
-        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
-        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
+        menu.findItem(R.id.timer_and_stopwatch).setVisible(false);
+//        menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_video_library_black), "Multi Timer Mode"));
+//        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
+//        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
 
         if (!isRemovedAds()) {
             menu.add(0, R.id.remove_Ads, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_remove_circle_outline_black), "Remove Ads"));
@@ -193,6 +196,10 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
                 break;
 
             case R.id.multi_Timer_Mode:
+                //destroy services
+                stopService(new Intent(this, timerWithService.class));
+                stopService(new Intent(this, stopwatchWithService.class));
+
                 Intent intent = new Intent(this, MultiTimerActivity.class);
                 intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -229,7 +236,5 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        stopService(new Intent(this, timerWithService.class));
-//        stopService(new Intent(this, stopwatchWithService.class));
     }
 }

@@ -493,7 +493,8 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 .setOngoing(false)
                 .setOnlyAlertOnce(true)
                 .setSound(null)
-                .setFullScreenIntent(pendingIntent, false)
+                .setFullScreenIntent(pendingIntent, true)
+                .setContentIntent(pendingIntent)
                 .setGroup("multiTimer")
                 .build();
 
