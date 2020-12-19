@@ -492,7 +492,7 @@ public class singleTimerFragment extends Fragment {
         logFirebaseAnalyticsEvents("Time Up");
 //        startActivityIfNeeded(openMainActivity, 0);
 
-        soundChecked = soundChecked = instance.getSharedPreferences("shared preferences", MODE_PRIVATE).getBoolean("SOUND_CHECKED", true);
+        soundChecked = instance.getSharedPreferences("shared preferences", MODE_PRIVATE).getBoolean("SOUND_CHECKED", true);
 
         if (soundChecked && this.getLifecycle().getCurrentState() == Lifecycle.State.RESUMED) {
             if (player != null) {

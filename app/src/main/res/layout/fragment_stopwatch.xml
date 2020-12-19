@@ -14,7 +14,7 @@
 
         <AutoCompleteTextView
             android:id="@+id/stopWatchAutoComplete"
-            android:layout_width="250dp"
+            android:layout_width="300dp"
             android:layout_height="50dp"
             android:layout_margin="10dp"
             android:hint="@string/enter_stopwatch_name_optional"

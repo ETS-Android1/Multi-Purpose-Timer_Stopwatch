@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -73,7 +74,11 @@ public class stopwatchWithService extends Service {
 
     public void cleanUp() {
         if (broadcastReceiver2 != null) {
-            unregisterReceiver(broadcastReceiver2);
+            try {
+                unregisterReceiver(broadcastReceiver2);
+            } catch (IllegalArgumentException e) {
+                Log.d("Timer with Service", "unregisterReceiver");
+            }
         }
         NotificationManagerCompat.from(this).cancel(2);
         stopSelf();

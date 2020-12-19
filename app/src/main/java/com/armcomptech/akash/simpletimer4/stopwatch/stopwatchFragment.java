@@ -74,7 +74,7 @@ public class stopwatchFragment extends Fragment {
 
     java.util.Timer tempTimer;
     TimerTask tempTimerTask;
-    private boolean watchIsReset;
+    private boolean watchIsReset = true;
     private boolean fragmentAttached;
 
     public static stopwatchFragment newInstance() {
@@ -139,12 +139,8 @@ public class stopwatchFragment extends Fragment {
             mButtonPause.setVisibility(View.VISIBLE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.VISIBLE);
-            if (!getTimerName().equals("")) {
-                mTimerNameTextView.setVisibility(View.VISIBLE);
-                mTimerNameTextView.setText(getTimerName());
-            } else {
-                mTimerNameTextView.setVisibility(View.GONE);
-            }
+            mTimerNameTextView.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setText(getTimerName());
             mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.VISIBLE);
 
@@ -414,12 +410,8 @@ public class stopwatchFragment extends Fragment {
             mButtonPause.setVisibility(View.VISIBLE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.VISIBLE);
-            if (!getTimerName().equals("")) {
-                mTimerNameTextView.setVisibility(View.VISIBLE);
-                mTimerNameTextView.setText(getTimerName());
-            } else {
-                mTimerNameTextView.setVisibility(View.GONE);
-            }
+            mTimerNameTextView.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setText(getTimerName());
             mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
 
             if (lapTimeInfo.isEmpty()) {
@@ -432,12 +424,8 @@ public class stopwatchFragment extends Fragment {
             mButtonPause.setVisibility(View.GONE);
             mButtonReset.setVisibility(View.VISIBLE);
             mButtonLap.setVisibility(View.INVISIBLE);
-            if (!getTimerName().equals("")) {
-                mTimerNameTextView.setVisibility(View.VISIBLE);
-                mTimerNameTextView.setText(getTimerName());
-            } else {
-                mTimerNameTextView.setVisibility(View.GONE);
-            }
+            mTimerNameTextView.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setText(getTimerName());
             mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
             startWatch();
             pauseWatch();
