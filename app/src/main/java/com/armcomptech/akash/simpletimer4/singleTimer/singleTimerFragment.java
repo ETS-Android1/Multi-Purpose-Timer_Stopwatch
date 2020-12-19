@@ -60,6 +60,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static com.App.MAIN_CHANNEL_ID;
+import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.disableFirebaseLogging;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -109,8 +110,6 @@ public class singleTimerFragment extends Fragment {
     private EditText editTextTimer;
     private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
 
-    //TODO: Change disableFirebaseLogging to false when releasing
-    public static Boolean disableFirebaseLogging = true;
     private static FirebaseAnalytics mFirebaseAnalytics;
     private boolean fragmentAttached;
 
@@ -793,6 +792,27 @@ public class singleTimerFragment extends Fragment {
                     mTextViewCountDown.setTextSize(45);
                     mMillis.setTextSize(20);
                 }
+            } else if (screenSize == Configuration.SCREENLAYOUT_SIZE_NORMAL) {
+                mTextViewCountDown.setTextSize(54);
+                mMillis.setTextSize(25);
+                if (hours > 9) {
+                    mTextViewCountDown.setTextSize(51);
+                    mMillis.setTextSize(20);
+                }
+            } else if (screenSize == Configuration.SCREENLAYOUT_SIZE_LARGE) {
+                mTextViewCountDown.setTextSize(85);
+                mMillis.setTextSize(50);
+                if (hours > 9) {
+                    mTextViewCountDown.setTextSize(80);
+                    mMillis.setTextSize(47);
+                }
+            } else if (screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE) {
+                mTextViewCountDown.setTextSize(155);
+                mMillis.setTextSize(70);
+                if (hours > 9) {
+                    mTextViewCountDown.setTextSize(145);
+                    mMillis.setTextSize(70);
+                }
             } else {
                 mTextViewCountDown.setTextSize(60);
                 mMillis.setTextSize(25);
@@ -808,6 +828,15 @@ public class singleTimerFragment extends Fragment {
             if (screenSize == Configuration.SCREENLAYOUT_SIZE_SMALL) {
                 mTextViewCountDown.setTextSize(55);
                 mMillis.setTextSize(25);
+            } if (screenSize == Configuration.SCREENLAYOUT_SIZE_NORMAL) {
+                mTextViewCountDown.setTextSize(70);
+                mMillis.setTextSize(30);
+            } else if (screenSize == Configuration.SCREENLAYOUT_SIZE_LARGE) {
+                mTextViewCountDown.setTextSize(120);
+                mMillis.setTextSize(55);
+            } else if (screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE) {
+                mTextViewCountDown.setTextSize(215);
+                mMillis.setTextSize(85);
             } else {
                 mTextViewCountDown.setTextSize(70);
                 mMillis.setTextSize(30);

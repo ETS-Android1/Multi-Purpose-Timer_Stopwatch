@@ -17,7 +17,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,7 +38,6 @@ import java.util.TimerTask;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
 public class stopwatchFragment extends Fragment {
@@ -49,14 +47,13 @@ public class stopwatchFragment extends Fragment {
     private FloatingActionButton mButtonPause;
     private FloatingActionButton mButtonReset;
     private FloatingActionButton mButtonLap;
-    private ProgressBar mProgressBar;
     private TextView mMillis;
     private AutoCompleteTextView mTimerNameAutoComplete;
     private TextView mTimerNameTextView;
     private TextView mTextViewCountDown;
     private ListView lapListView;
     ConstraintLayout lapListViewConstraintLayout;
-    ConstraintLayout buttonConstraintLayout;
+    LinearLayout buttonLinearLayout;
 
     boolean showNotification;
     private NotificationManagerCompat notificationManager;
@@ -105,17 +102,15 @@ public class stopwatchFragment extends Fragment {
 
         lapListViewConstraintLayout = root.findViewById(R.id.lapListParentView);
         lapListViewConstraintLayout.setVisibility(View.GONE);
-        buttonConstraintLayout = root.findViewById(R.id.stopwatchButtonView);
+        buttonLinearLayout = root.findViewById(R.id.stopwatchButtonView);
 
         lapListView = root.findViewById(R.id.lapListView);
         lapListView.setAdapter(lapListAdapter);
         chronometer = root.findViewById(R.id.stopWatchText_view_countdown);
-        mProgressBar = root.findViewById(R.id.stopWatchProgressBar);
-        mProgressBar.setVisibility(View.INVISIBLE);
         mButtonStart = root.findViewById(R.id.stopWatchButton_start);
         mButtonStart.setVisibility(View.VISIBLE);
         mButtonPause = root.findViewById(R.id.stopWatchButton_pause);
-        mButtonPause.setVisibility(View.INVISIBLE);
+        mButtonPause.setVisibility(View.GONE);
         mButtonReset = root.findViewById(R.id.stopWatchButton_reset);
         mButtonReset.setVisibility(View.INVISIBLE);
         mButtonLap = root.findViewById(R.id.stopWatchLapFloatingActionButton);
@@ -140,7 +135,7 @@ public class stopwatchFragment extends Fragment {
 
         mButtonStart.setOnClickListener(v -> {
             startWatch();
-            mButtonStart.setVisibility(View.INVISIBLE);
+            mButtonStart.setVisibility(View.GONE);
             mButtonPause.setVisibility(View.VISIBLE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.VISIBLE);
@@ -159,7 +154,7 @@ public class stopwatchFragment extends Fragment {
         mButtonPause.setOnClickListener(v -> {
             pauseWatch();
             mButtonStart.setVisibility(View.VISIBLE);
-            mButtonPause.setVisibility(View.INVISIBLE);
+            mButtonPause.setVisibility(View.GONE);
             mButtonReset.setVisibility(View.VISIBLE);
             mButtonLap.setVisibility(View.INVISIBLE);
 
@@ -169,7 +164,7 @@ public class stopwatchFragment extends Fragment {
         mButtonReset.setOnClickListener(v -> {
             resetWatch();
             mButtonStart.setVisibility(View.VISIBLE);
-            mButtonPause.setVisibility(View.INVISIBLE);
+            mButtonPause.setVisibility(View.GONE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.INVISIBLE);
             mTimerNameTextView.setVisibility(View.INVISIBLE);
@@ -270,7 +265,7 @@ public class stopwatchFragment extends Fragment {
     private String getTimerName() {
         String timerName = mTimerNameAutoComplete.getText().toString();
         if (timerName.matches("")) {
-            timerName = "";
+            timerName = "General";
         }
 
         logFirebaseAnalyticsEvents("TimerName: " + timerName);
@@ -278,17 +273,19 @@ public class stopwatchFragment extends Fragment {
     }
 
     public void setWithoutLapView() {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(MATCH_PARENT, dpToPx(150));
-//        layoutParams.height = 200;
-        buttonConstraintLayout.setLayoutParams(layoutParams);
-        chronometer.setTextSize(dpToPx(30));
+//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(MATCH_PARENT, dpToPx(150));
+////        layoutParams.height = 200;
+//        buttonLinearLayout.setLayoutParams(layoutParams);
+//        chronometer.setTextSize(dpToPx(30));
+        lapListViewConstraintLayout.setVisibility(View.GONE);
     }
 
     public void setWithLapView() {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(MATCH_PARENT, dpToPx(70));
-//        layoutParams.height = 70;
-        buttonConstraintLayout.setLayoutParams(layoutParams);
-        chronometer.setTextSize(dpToPx(25));
+//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(MATCH_PARENT, dpToPx(70));
+////        layoutParams.height = 70;
+//        buttonLinearLayout.setLayoutParams(layoutParams);
+//        chronometer.setTextSize(dpToPx(25));
+        lapListViewConstraintLayout.setVisibility(View.VISIBLE);
     }
 
     public int dpToPx(int dp) {
@@ -401,20 +398,19 @@ public class stopwatchFragment extends Fragment {
 
         if (watchIsReset) {
             mButtonStart.setVisibility(View.VISIBLE);
-            mButtonPause.setVisibility(View.INVISIBLE);
+            mButtonPause.setVisibility(View.GONE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.INVISIBLE);
             mTimerNameTextView.setVisibility(View.INVISIBLE);
             mTimerNameAutoComplete.setVisibility(View.VISIBLE);
             mMillis.setText("000");
             setWithoutLapView();
-            lapListViewConstraintLayout.setVisibility(View.GONE);
         } else if (stopWatchRunning) {
             pauseOffset = savedInstanceState.getLong("pauseOffset");
             startWatch();
 
             //setup UI
-            mButtonStart.setVisibility(View.INVISIBLE);
+            mButtonStart.setVisibility(View.GONE);
             mButtonPause.setVisibility(View.VISIBLE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.VISIBLE);
@@ -428,14 +424,12 @@ public class stopwatchFragment extends Fragment {
 
             if (lapTimeInfo.isEmpty()) {
                 setWithoutLapView();
-                lapListViewConstraintLayout.setVisibility(View.GONE);
             } else {
                 setWithLapView();
-                lapListViewConstraintLayout.setVisibility(View.VISIBLE);
             }
         } else {
             mButtonStart.setVisibility(View.VISIBLE);
-            mButtonPause.setVisibility(View.INVISIBLE);
+            mButtonPause.setVisibility(View.GONE);
             mButtonReset.setVisibility(View.VISIBLE);
             mButtonLap.setVisibility(View.INVISIBLE);
             if (!getTimerName().equals("")) {
@@ -451,10 +445,8 @@ public class stopwatchFragment extends Fragment {
 
             if (lapTimeInfo.isEmpty()) {
                 setWithoutLapView();
-                lapListViewConstraintLayout.setVisibility(View.GONE);
             } else {
                 setWithLapView();
-                lapListViewConstraintLayout.setVisibility(View.VISIBLE);
             }
         }
     }

@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".singleTimer.SingleTimerActivity"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:baselineAligned="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
@@ -20,12 +20,12 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="50">
+                android:layout_weight="40">
 
                 <AutoCompleteTextView
                     android:id="@+id/timerNameAutoComplete"
-                    android:layout_width="250dp"
-                    android:layout_height="50dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:autofillHints="@string/enter_timer_name_optional"
                     android:hint="@string/enter_timer_name_optional"
                     android:inputType="text"
@@ -36,7 +36,8 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    tools:visibility="invisible" />
+                    android:textSize="20sp"
+                    tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/timerNameTextView"
@@ -59,7 +60,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="50" >
+                android:layout_weight="60" >
 
                 <LinearLayout
                     android:layout_width="match_parent"

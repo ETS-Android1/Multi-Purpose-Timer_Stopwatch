@@ -96,7 +96,7 @@ public class stopwatchWithService extends Service {
         int timeLeftSecondsInt = (Integer.parseInt(timeLeft))/1000;
         String timeLeftFormatted = String.format("%02d:%02d:%02d", timeLeftSecondsInt / 3600,
                 (timeLeftSecondsInt % 3600) / 60, (timeLeftSecondsInt % 60));
-        if (currentTimerName.equals("")) {
+        if (currentTimerName.equals("General")) {
             content = "Stopwatch: " + timeLeftFormatted;
         } else {
             content = "Stopwatch: " + currentTimerName + " - " + timeLeftFormatted;
