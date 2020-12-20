@@ -56,4 +56,11 @@
         app:showAsAction="never"
         android:visible="false"/>
 
+    <item
+        android:id="@+id/send_feedback"
+        android:title="Send Feedback"
+        android:icon="@drawable/ic_feedback_white"
+        app:showAsAction="ifRoom"
+        android:visible="true"/>
+
 </menu>

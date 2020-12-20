@@ -17,10 +17,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -33,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
+import com.armcomptech.akash.simpletimer4.EmailLogic.SendMailTask;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Settings.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
@@ -40,7 +43,10 @@ import com.armcomptech.akash.simpletimer4.Timer;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
@@ -231,6 +237,29 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
             case R.id.remove_Ads:
                 bp.purchase(this, "remove_ads");
+                break;
+
+            case R.id.send_feedback:
+                final EditText edittext = new EditText(this);
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                alert.setTitle("Send Feedback");
+                alert.setMessage("How can this app be improved?");
+
+                alert.setView(edittext);
+
+                alert.setPositiveButton("Send", (dialog, whichButton) -> {
+                    String feedback = String.valueOf(edittext.getText());
+                    String subject = "Feedback for Timer Application";
+                    List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
+                    new SendMailTask(this).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
+                    Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
+                });
+
+                alert.setNegativeButton("Cancel", (dialog, whichButton) ->
+                        Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show());
+
+                alert.show();
+                break;
 
             default:
                 break;
