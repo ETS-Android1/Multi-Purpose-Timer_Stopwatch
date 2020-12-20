@@ -34,7 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.armcomptech.akash.simpletimer4.R;
-import com.armcomptech.akash.simpletimer4.SettingsActivity;
+import com.armcomptech.akash.simpletimer4.Settings.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
