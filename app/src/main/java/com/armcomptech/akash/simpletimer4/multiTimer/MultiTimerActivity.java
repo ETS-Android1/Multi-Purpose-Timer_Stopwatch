@@ -193,13 +193,10 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         menu.findItem(R.id.check_sound).setVisible(false);
         menu.findItem(R.id.multi_Timer_Mode).setVisible(false);
         menu.findItem(R.id.privacy_policy).setVisible(false);
-//        menu.add(0, R.id.timer_and_stopwatch, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer_black), "Timer and Stopwatch"));
-//        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
-//        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
+
         if (!isRemovedAds()) {
             menu.add(0, R.id.remove_Ads, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_baseline_remove_circle_outline_black), "Remove Ads"));
         }
-
         return true;
     }
 

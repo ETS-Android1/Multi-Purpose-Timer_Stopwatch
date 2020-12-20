@@ -8,8 +8,6 @@ import java.util.Locale;
 
 public class Timer {
 
-    public static final String SINGLETIMER = "com.armcomptech.singleTimer";
-
     String timerName;
     CountDownTimer countDownTimer;
     boolean mRepeat = false;
@@ -19,7 +17,6 @@ public class Timer {
     boolean showNotification;
 
     long mStartTimeInMillis;
-    int countDownInterval;
 
     public String getTimerName() {
         return timerName;
@@ -125,69 +122,6 @@ public class Timer {
     CountDownTimer mCountDownTimer;
     RecyclerView.ViewHolder myHolder;
 
-    Timer() {
-        this.timerPlaying = false;
-        this.timerPaused = false;
-        this.timerIsDone = false;
-        this.showNotification = false;
-        this.mStartTimeInMillis = 5000; // 1 minute and 40 seconds 100000
-        this.mTimeLeftInMillis = 5000;
-        this.mTimeToStoreInMillis = 0;
-        this.mTimeElapsedInMillis = 0;
-        this.myHolder = null;
-        this.counter = 0;
-    }
-
-//    @Nullable
-//    @Override
-//    public IBinder onBind(Intent intent) {
-//        return null;
-//    }
-//
-//    @Override
-//    public void onCreate() {
-//        super.onCreate();
-//    }
-//
-//    @Override
-//    public int onStartCommand(Intent intent, int flags, int startId) {
-////        this.mStartTimeInMillis = intent.getLongExtra("mTimeLeftInMillis", 1000);
-////
-////        if ((intent.getStringExtra("name")).isEmpty()) {
-////            this.timerName = intent.getStringExtra("name");
-////        } else {
-////            this.timerName = "General";
-////        }
-////
-////        this.countDownInterval = 1000;
-//
-//        countDownTimer = new CountDownTimer(this.mStartTimeInMillis, this.countDownInterval) {
-//            @Override
-//            public void onTick(long millisUntilFinished) {
-//                Log.d("Timer", "Countdown seconds remaining: " + millisUntilFinished / 1000);
-//                Intent intent = new Intent(SINGLETIMER);
-//                intent.putExtra("mTimeLeftInMillis", mTimeLeftInMillis);
-//                sendBroadcast(intent);
-//                mTimeLeftInMillis = millisUntilFinished;
-//            }
-//
-//            @Override
-//            public void onFinish() {
-//                Log.d("Timer", "Count down timer finished");
-//            }
-//        };
-//
-//        return START_STICKY;
-//    }
-//
-//    void updateTimer() {
-//        Intent intent = new Intent(SINGLETIMER);
-//        intent.putExtra("mTimeLeftInMillis", mTimeLeftInMillis);
-//        intent.putExtra("mStartTimeInMillis", mStartTimeInMillis);
-//        intent.putExtra("mRepeat", mRepeat);
-//        sendBroadcast(intent);
-//    }
-
     public Timer(long startTimeInMillis, String name) {
         this.timerPlaying = false;
         this.timerPaused = false;
@@ -210,15 +144,18 @@ public class Timer {
 
         String timeLeftFormatted;
 
-        if (hours > 0) {
+        if (hours >= 10) {
+            timeLeftFormatted = String.format(Locale.getDefault(),
+                    "%02d:%02d:%02d", hours, minutes, seconds);
+        } else if (hours >= 1) {
             timeLeftFormatted = String.format(Locale.getDefault(),
                     "%d:%02d:%02d", hours, minutes, seconds);
-        } else if (minutes > 0) {
+        } else if (minutes >= 1) {
             timeLeftFormatted = String.format(Locale.getDefault(),
                     "%02d:%02d", minutes, seconds);
         } else {
             timeLeftFormatted = String.format(Locale.getDefault(),
-                    "00:%02d", seconds);
+                    "%02d:%03d", seconds, millis);
         }
 
         return timeLeftFormatted;
