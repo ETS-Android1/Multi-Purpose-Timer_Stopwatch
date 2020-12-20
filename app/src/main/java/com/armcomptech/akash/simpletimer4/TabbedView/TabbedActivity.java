@@ -27,6 +27,7 @@ import com.anjlab.android.iab.v3.TransactionDetails;
 import com.armcomptech.akash.simpletimer4.EmailLogic.SendMailTask;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Settings.SettingsActivity;
+import com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
 import com.armcomptech.akash.simpletimer4.singleTimer.timerWithService;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
@@ -100,6 +101,11 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
                     intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
                     break;
+                case "Build Timer":
+                    Intent intent2 = new Intent(this , buildTimer_Activity.class);
+                    intent2.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent2);
+                    break;
                 case "Statistics":
                     startActivity(new Intent(this, StatisticsActivity.class));
                     break;
@@ -160,6 +166,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
 
         menu.findItem(R.id.check_sound).setChecked(getSharedPreferences("shared preferences", MODE_PRIVATE).getBoolean("SOUND_CHECKED", true));
         menu.findItem(R.id.timer_and_stopwatch).setVisible(false);
+        menu.findItem(R.id.privacy_policy).setVisible(false);
 //        menu.add(0, R.id.multi_Timer_Mode, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_video_library_black), "Multi Timer Mode"));
 //        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
 //        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
@@ -211,6 +218,16 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
                 Intent intent = new Intent(this, MultiTimerActivity.class);
                 intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                break;
+
+            case R.id.build_Timer_Mode:
+                //destroy services
+                stopService(new Intent(this, timerWithService.class));
+                stopService(new Intent(this, stopwatchWithService.class));
+
+                Intent intent2 = new Intent(this, buildTimer_Activity.class);
+                intent2.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent2);
                 break;
 
             case R.id.setting_activity:

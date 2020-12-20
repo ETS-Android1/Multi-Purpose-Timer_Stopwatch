@@ -19,6 +19,13 @@
         android:title="@string/multi_timer_mode" />
 
     <item
+        android:id="@+id/build_Timer_Mode"
+        app:showAsAction="ifRoom"
+        android:visible="true"
+        android:icon="@drawable/ic_build_white"
+        android:title="@string/build_your_timer" />
+
+    <item
         android:id="@+id/check_sound"
         android:checkable="true"
         android:enabled="true"

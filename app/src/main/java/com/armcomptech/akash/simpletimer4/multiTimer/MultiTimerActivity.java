@@ -40,6 +40,7 @@ import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Settings.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
+import com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
@@ -191,6 +192,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
         menu.findItem(R.id.check_sound).setVisible(false);
         menu.findItem(R.id.multi_Timer_Mode).setVisible(false);
+        menu.findItem(R.id.privacy_policy).setVisible(false);
 //        menu.add(0, R.id.timer_and_stopwatch, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_timer_black), "Timer and Stopwatch"));
 //        menu.add(0, R.id.statistics_activity, 2, menuIconWithText(getResources().getDrawable(R.drawable.ic_data_usage_black), "Statistics"));
 //        menu.add(0, R.id.setting_activity, 3, menuIconWithText(getResources().getDrawable(R.drawable.ic_settings_black), "Settings"));
@@ -229,6 +231,13 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                 intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("overrideActivityToOpen", true);
                 startActivity(intent);
+                break;
+
+            case R.id.build_Timer_Mode:
+
+                Intent intent2 = new Intent(this, buildTimer_Activity.class);
+                intent2.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent2);
                 break;
 
             case R.id.setting_activity:

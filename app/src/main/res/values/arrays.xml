@@ -2,11 +2,13 @@
     <string-array name="activityToOpen_entries">
         <item>Timer and Stopwatch</item>
         <item>Multi Timer</item>
+        <item>Build Timer</item>
     </string-array>
 
     <string-array name="activityToOpen_values">
         <item>Timer and Stopwatch</item>
         <item>Multi Timer</item>
+        <item>Build Timer</item>
     </string-array>
 
 

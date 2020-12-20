@@ -128,7 +128,7 @@ public class singleTimerFragment extends Fragment {
         instance = (TabbedActivity) requireContext();
         notificationManager = NotificationManagerCompat.from(requireContext());
 
-        IntentFilter intentFilter1 = new IntentFilter("onTick");
+        IntentFilter intentFilter1 = new IntentFilter("SingleTimerOnTick");
         BroadcastReceiver broadcastReceiver1 = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -138,7 +138,7 @@ public class singleTimerFragment extends Fragment {
             }
         };
 
-        IntentFilter intentFilter2 = new IntentFilter("onFinish");
+        IntentFilter intentFilter2 = new IntentFilter("SingleTimerOnFinish");
         BroadcastReceiver broadcastReceiver2 = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -725,8 +725,8 @@ public class singleTimerFragment extends Fragment {
         } else {
             integerTimeSet = mStartTimeInMillis;
         }
-        intentService.putExtra("TimeValue", integerTimeSet);
-        intentService.putExtra("timerName", getTimerName());
+        intentService.putExtra("SingleTimerTimeValue", integerTimeSet);
+        intentService.putExtra("SingleTimerTimerName", getTimerName());
         instance.startService(intentService);
 
         mTimerRunning = true;
@@ -744,8 +744,8 @@ public class singleTimerFragment extends Fragment {
 
 
         Intent intent1local = new Intent();
-        intent1local.setAction("timerPlayer");
-        intent1local.putExtra("player", "Pause");
+        intent1local.setAction("SingleTimerTimerPlayer");
+        intent1local.putExtra("SingleTimerPlayer", "Pause");
         instance.sendBroadcast(intent1local);
     }
 
@@ -763,8 +763,8 @@ public class singleTimerFragment extends Fragment {
         notificationManager.cancel(notification_id);
 
         Intent intent1local = new Intent();
-        intent1local.setAction("timerPlayer");
-        intent1local.putExtra("player", "Reset");
+        intent1local.setAction("SingleTimerTimerPlayer");
+        intent1local.putExtra("SingleTimerPlayer", "Reset");
         instance.sendBroadcast(intent1local);
     }
 

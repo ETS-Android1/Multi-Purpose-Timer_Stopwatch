@@ -1,4 +1,4 @@
-package com.armcomptech.akash.simpletimer4.singleTimer;
+package com.armcomptech.akash.simpletimer4.buildTimer;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -23,7 +23,7 @@ import java.util.Objects;
 
 import static com.App.MAIN_CHANNEL_ID;
 
-public class timerWithService extends Service {
+public class buildTimerWithService extends Service {
 
     CountDownTimer countDownTimer;
 

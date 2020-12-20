@@ -49,6 +49,12 @@
 
         <activity android:name=".statistics.StatisticsActivity" />
 
+        <service android:name=".buildTimer.buildTimerWithService"/>
+        <activity
+            android:launchMode="singleTop"
+            android:name=".buildTimer.buildTimer_Activity"
+            android:configChanges="screenLayout|orientation|screenSize" />
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
