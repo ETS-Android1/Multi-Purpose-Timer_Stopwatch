@@ -1,9 +1,13 @@
 package com.armcomptech.akash.simpletimer4.buildTimer;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -103,7 +107,26 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
             }
         });
 
+        ((Item)holder).groupName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView view, int actionId, KeyEvent event){
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    hideKeyboard(view);
+                    return true;
+                }
+                return false;
+            }
+        });
+
         updateUI(holder, myPosition);
+    }
+
+    public void hideKeyboard(TextView view) {
+        InputMethodManager imm = (InputMethodManager) view.getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void subtractGroupCount(int myPosition) {
@@ -114,6 +137,7 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
         groupSetCounts.set(myPosition, groupSetCounts.get(myPosition) + 1);
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateUI(RecyclerView.ViewHolder holder, int myPosition) {
         ((Item)holder).groupName.setHint("Group: " + (myPosition + 1));
 

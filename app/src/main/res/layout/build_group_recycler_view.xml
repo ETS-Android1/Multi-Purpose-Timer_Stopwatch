@@ -22,6 +22,8 @@
 
             <EditText
                 android:id="@+id/editText_group_name_build_timer"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:hint="Enter Group Name (Optional)"

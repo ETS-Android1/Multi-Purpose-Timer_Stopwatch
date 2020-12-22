@@ -1,5 +1,6 @@
 package com.armcomptech.akash.simpletimer4.buildTimer;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,7 @@ public class buildTimerAdapter extends RecyclerView.Adapter {
         return new buildTimerAdapter.Item(row);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         int myPosition = holder.getAdapterPosition();
@@ -58,12 +60,9 @@ public class buildTimerAdapter extends RecyclerView.Adapter {
             }
         });
 
-        ((Item)holder).delete_timer_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                timers.remove(myPosition);
-                notifyItemRemoved(myPosition);
-            }
+        ((Item)holder).delete_timer_button.setOnClickListener(v -> {
+            timers.remove(myPosition);
+            notifyItemRemoved(myPosition);
         });
 
         String timerName = timers.get(myPosition).getTimerName();
