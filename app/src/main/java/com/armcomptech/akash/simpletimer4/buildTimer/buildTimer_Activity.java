@@ -3,6 +3,7 @@ package com.armcomptech.akash.simpletimer4.buildTimer;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -12,13 +13,20 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
@@ -26,13 +34,16 @@ import com.armcomptech.akash.simpletimer4.EmailLogic.SendMailTask;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Settings.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
+import com.armcomptech.akash.simpletimer4.Timer;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
@@ -42,11 +53,17 @@ import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFi
 public class buildTimer_Activity extends AppCompatActivity implements BillingProcessor.IBillingHandler{
 
     BillingProcessor bp;
+    RecyclerView recyclerView;
+    ExtendedFloatingActionButton addGroupFab;
+    ExtendedFloatingActionButton startTimerFab;
+    private ArrayList<ArrayList<Timer>> groups = new ArrayList<>();
+    ArrayList<Integer> groupSetCounts = new ArrayList<>();
+    private final ArrayList<RecyclerView.ViewHolder> holders = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_build_timer_);
+        setContentView(R.layout.activity_build_timer);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setTitle("   Build your timer");
@@ -58,6 +75,63 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
 
         bp = new BillingProcessor(this, getString(R.string.licence_key), this);
         bp.initialize();
+
+        ArrayList<Timer> tempTimerArray = new ArrayList<>();
+        Timer tempTimer = new Timer(60 * 1000 , "one minute");
+        tempTimerArray.add(tempTimer);
+        groups.add(tempTimerArray);
+        groupSetCounts.add(2);
+
+        recyclerView = findViewById(R.id.buildTimerRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(new BuildGroupAdapter(this, groups, groupSetCounts, holders));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+        ViewGroup.LayoutParams params= recyclerView.getLayoutParams();
+        params.height = Resources.getSystem().getDisplayMetrics().heightPixels - dpToPx(125);
+        recyclerView.setLayoutParams(params);
+
+        recyclerView.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
+            @Override
+            public void onChildViewAttachedToWindow(@NonNull View view) {
+                if (groups.size() > 0) {
+                    startTimerFab.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onChildViewDetachedFromWindow(@NonNull View view) {
+                if (groups.size() == 0) {
+                    startTimerFab.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        addGroupFab = findViewById(R.id.addGroupFloatingActionButton);
+        addGroupFab.setOnClickListener(v -> {
+            ArrayList<Timer> tempTimerArray1 = new ArrayList<>();
+            Timer tempTimer1 = new Timer(60 * 1000 , "one minute");
+            tempTimerArray1.add(tempTimer1);
+            groups.add(tempTimerArray1);
+            groupSetCounts.add(2);
+
+            Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(groups.size() - 1);
+        });
+
+        startTimerFab = findViewById(R.id.startTimerFloatingActionButton);
+        startTimerFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+    }
+
+    public int dpToPx(int dp) {
+        float density = getApplicationContext().getResources()
+                .getDisplayMetrics()
+                .density;
+        return Math.round((float) dp * density);
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
