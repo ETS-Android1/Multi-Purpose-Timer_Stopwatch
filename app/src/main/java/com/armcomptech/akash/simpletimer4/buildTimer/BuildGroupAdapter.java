@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -71,10 +72,10 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
 
         ((Item)holder).timerRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         ((Item)holder).timerRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        ((Item)holder).timerRecyclerView.setAdapter(new buildTimerAdapter(context, holders, groups.get(myPosition)));
+        ((Item)holder).timerRecyclerView.setAdapter(new BuildTimerAdapter(context, holders, groups.get(myPosition)));
 
         ((Item)holder).addTimerButton.setOnClickListener(v -> {
-            groups.get(myPosition).add(new Timer(60000, "group"));
+            openNameAndTimerDialog((Item)holder);
             Objects.requireNonNull(((Item)holder).timerRecyclerView.getAdapter()).notifyDataSetChanged();
             updateUI(holder, myPosition);
         });
@@ -165,5 +166,14 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         return groups.size();
+    }
+
+    public void openNameAndTimerDialog(@NonNull Item holder) {
+        setNameAndTimerDialogForBuildTimer setNameAndTimerDialogForBuildTimer = new setNameAndTimerDialogForBuildTimer(
+                false,
+                true,
+                holder.getAdapterPosition(),
+                groups.get(holder.getAdapterPosition()));
+        setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
     }
 }

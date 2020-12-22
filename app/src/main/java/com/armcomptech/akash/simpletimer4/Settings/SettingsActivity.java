@@ -66,6 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
         menu.findItem(R.id.multi_Timer_Mode).setVisible(false);
         menu.findItem(R.id.setting_activity).setVisible(false);
         menu.findItem(R.id.statistics_activity).setVisible(false);
+        menu.findItem(R.id.build_Timer_Mode).setVisible(false);
 //        menu.add(0, R.id.privacy_policy, 4, menuIconWithText(getResources().getDrawable(R.drawable.ic_lock_black), "Privacy Policy"));
 
         return true;

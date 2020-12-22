@@ -617,6 +617,14 @@ public class singleTimerFragment extends Fragment {
             editTextTimer.setEnabled(false);
             editTextTimer.setVisibility(View.GONE);
             timePicker = view.findViewById(R.id.scrollHmsPicker);
+
+            int hours = (int) (mStartTimeInMillis / 1000) / 3600;
+            int minutes = (int) ((mStartTimeInMillis / 1000) % 3600) / 60;
+            int seconds = (int) (mStartTimeInMillis / 1000) % 60;
+
+            timePicker.setHours(hours);
+            timePicker.setMinutes(minutes);
+            timePicker.setSeconds(seconds);
         }
 
         builder.create().show();

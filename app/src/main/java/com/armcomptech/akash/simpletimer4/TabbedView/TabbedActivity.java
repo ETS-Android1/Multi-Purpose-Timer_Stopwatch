@@ -101,7 +101,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
                     intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
                     break;
-                case "Build Timer":
+                case "Build Your Timer":
                     Intent intent2 = new Intent(this , buildTimer_Activity.class);
                     intent2.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent2);

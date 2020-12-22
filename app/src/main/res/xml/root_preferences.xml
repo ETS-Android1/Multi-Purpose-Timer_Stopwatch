@@ -39,4 +39,17 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Build Your Timer">
+
+        <ListPreference
+            app:defaultValue="Typing"
+            app:entries="@array/timePicker_entries"
+            app:entryValues="@array/timePicker_values"
+            app:key="buildTimerTimePicker"
+            app:title="Time Input Option"
+            app:summary="Select how you would like to pick time while building your custom timer"
+            />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

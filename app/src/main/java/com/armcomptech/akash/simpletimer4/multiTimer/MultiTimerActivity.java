@@ -135,6 +135,11 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         long millisInput;
         long finalSecond;
 
+        if (time.length() == 0) {
+            Toast.makeText(this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (!time.equals("null")) {
             long input = Long.parseLong(time);
             long hour = input / 10000;
@@ -144,11 +149,6 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             long minute = (minuteOne * 10) + minuteTwo;
             long second = input - ((hour * 10000) + (minute * 100));
             finalSecond = (hour * 3600) + (minute * 60) + second;
-
-            if (time.length() == 0) {
-                Toast.makeText(this, "Field can't be empty", Toast.LENGTH_SHORT).show();
-                return;
-            }
 
             millisInput = finalSecond * 1000;
             if (millisInput == 0) {

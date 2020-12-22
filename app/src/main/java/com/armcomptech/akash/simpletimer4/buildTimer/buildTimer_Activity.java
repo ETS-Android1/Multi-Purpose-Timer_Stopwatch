@@ -50,7 +50,7 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
-public class buildTimer_Activity extends AppCompatActivity implements BillingProcessor.IBillingHandler{
+public class buildTimer_Activity extends AppCompatActivity implements BillingProcessor.IBillingHandler, setNameAndTimerDialogForBuildTimer.setTimerDialogListenerForBuildTimer {
 
     BillingProcessor bp;
     RecyclerView recyclerView;
@@ -66,7 +66,7 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
         setContentView(R.layout.activity_build_timer);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setTitle("   Build your timer");
+        setTitle("   Build Your Timer");
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowHomeEnabled(true);
@@ -117,6 +117,7 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
             groupSetCounts.add(2);
 
             Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(groups.size() - 1);
+            recyclerView.smoothScrollToPosition(groups.size() - 1);
         });
 
         startTimerFab = findViewById(R.id.startTimerFloatingActionButton);
@@ -125,6 +126,70 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
             public void onClick(View v) {
             }
         });
+    }
+
+    @Override
+    public void createNewTimerNameAndTimeForBuildTimer (
+            String time,
+            int hours,
+            int minutes,
+            int seconds,
+            String name,
+            boolean creatingNewTimer,
+            boolean updateExistingTimer,
+            int adapterPosition,
+            ArrayList<Timer> timers) {
+
+        long millisInput;
+        long finalSecond;
+
+        if (!time.equals("null")) {
+            long input = Long.parseLong(time);
+            long hour = input / 10000;
+            long minuteRaw = (input - (hour * 10000)) ;
+            long minuteOne = minuteRaw / 1000;
+            long minuteTwo = (minuteRaw % 1000) / 100;
+            long minute = (minuteOne * 10) + minuteTwo;
+            long second = input - ((hour * 10000) + (minute * 100));
+            finalSecond = (hour * 3600) + (minute * 60) + second;
+
+            if (time.length() == 0) {
+                Toast.makeText(this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            millisInput = finalSecond * 1000;
+            if (millisInput == 0) {
+                Toast.makeText(this, "Please enter a positive number", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else {
+            if (hours == 0 && minutes == 0 && seconds == 0){
+                Toast.makeText(this, "Time can't be zero", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                millisInput = (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
+                finalSecond = millisInput/1000;
+            }
+        }
+
+        if (creatingNewTimer) {
+            timers.add(new Timer(finalSecond * 1000, name));
+            Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
+        }
+        if (updateExistingTimer) {
+            timers.get(adapterPosition).setTimerName(name);
+            timers.get(adapterPosition).setStartTimeInMillis(finalSecond * 1000);
+            timers.get(adapterPosition).setTimeLeftInMillis(finalSecond * 1000);
+            timers.get(adapterPosition).setTimerPlaying(false);
+            timers.get(adapterPosition).setTimerPaused(false);
+            timers.get(adapterPosition).setTimerIsDone(false);
+            if (timers.get(adapterPosition).getCountDownTimer() != null) {
+                timers.get(adapterPosition).getCountDownTimer().cancel();
+                timers.get(adapterPosition).setCountDownTimer(null);
+            }
+            Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
+        }
     }
 
     public int dpToPx(int dp) {

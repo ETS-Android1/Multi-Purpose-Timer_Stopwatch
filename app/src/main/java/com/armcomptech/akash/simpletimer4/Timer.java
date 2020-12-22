@@ -155,7 +155,7 @@ public class Timer {
                     "%02d:%02d", minutes, seconds);
         } else {
             timeLeftFormatted = String.format(Locale.getDefault(),
-                    "%02d:%03d", seconds, millis);
+                    "%02d.%03d", seconds, millis);
         }
 
         return timeLeftFormatted;

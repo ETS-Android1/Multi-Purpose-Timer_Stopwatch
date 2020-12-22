@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import static android.content.Context.MODE_PRIVATE;
 import static com.App.MAIN_CHANNEL_ID;
 
-public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements setNameAndTimerDialog.setTimerDialogListener{
+public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements setNameAndTimerDialog.setTimerDialogListener {
 
     private Context context;
     private ArrayList<Timer> timers;
