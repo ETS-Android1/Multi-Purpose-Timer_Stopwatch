@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.preference.PreferenceManager;
 
 import com.armcomptech.akash.simpletimer4.R;
-import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -39,9 +38,9 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
     private boolean updateExistingTimer;
     private boolean creatingNewTimer;
     private int adapterPosition;
-    private ArrayList<Timer> timers;
+    private ArrayList<BasicTimerInfo> timers;
 
-    public setNameAndTimerDialogForBuildTimer(boolean updateExistingTimer, boolean creatingNewTimer, int adapterPosition, ArrayList<Timer> timers) {
+    public setNameAndTimerDialogForBuildTimer(boolean updateExistingTimer, boolean creatingNewTimer, int adapterPosition, ArrayList<BasicTimerInfo> timers) {
         this.updateExistingTimer = updateExistingTimer;
         this.creatingNewTimer = creatingNewTimer;
         this.adapterPosition = adapterPosition;
@@ -100,7 +99,7 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
         });
 
         if (this.updateExistingTimer) {
-            autoCompleteTimerName.setText(timers.get(adapterPosition).getTimerName());
+            autoCompleteTimerName.setText(timers.get(adapterPosition).timerName);
             autoCompleteTimerName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
             if (timePickerPreference.equals("Typing")) {
@@ -118,7 +117,7 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
                 editTextTimer.setVisibility(View.GONE);
                 timePicker = view.findViewById(R.id.scrollHmsPicker);
 
-                long startTime = timers.get(adapterPosition).getStartTimeInMillis();
+                long startTime = timers.get(adapterPosition).mStartTimeInMillis;
                 int hours = (int) (startTime / 1000) / 3600;
                 int minutes = (int) ((startTime / 1000) % 3600) / 60;
                 int seconds = (int) (startTime / 1000) % 60;
@@ -200,6 +199,6 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
     }
 
     public interface setTimerDialogListenerForBuildTimer {
-        void createNewTimerNameAndTimeForBuildTimer(String time, int hours, int minutes, int seconds, String name, boolean creatingNewTimer, boolean updateExistingTimer, int adapterPosition, ArrayList<Timer> timers);
+        void createNewTimerNameAndTimeForBuildTimer(String time, int hours, int minutes, int seconds, String name, boolean creatingNewTimer, boolean updateExistingTimer, int adapterPosition, ArrayList<BasicTimerInfo> timers);
     }
 }

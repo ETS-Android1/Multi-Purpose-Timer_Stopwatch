@@ -2,7 +2,6 @@ package com.armcomptech.akash.simpletimer4.buildTimer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.armcomptech.akash.simpletimer4.R;
-import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -27,16 +25,14 @@ import java.util.Objects;
 
 public class BuildGroupAdapter extends RecyclerView.Adapter {
 
-    private Context context;
-    private ArrayList<ArrayList<Timer>> groups;
-    private ArrayList<RecyclerView.ViewHolder> holders;
-    private ArrayList<Integer> groupSetCounts;
+    private final Context context;
+    private final ArrayList<RecyclerView.ViewHolder> holders;
+    private MasterInfo masterInfo;
 
-    BuildGroupAdapter(Context context, ArrayList<ArrayList<Timer>> groups, ArrayList<Integer> groupSetCounts, ArrayList<RecyclerView.ViewHolder> holders) {
+    BuildGroupAdapter(Context context, MasterInfo masterInfo, ArrayList<RecyclerView.ViewHolder> holders) {
         this.context = context;
-        this.groups = groups;
         this.holders = holders;
-        this.groupSetCounts = groupSetCounts;
+        this.masterInfo = masterInfo;
     }
 
     public static class Item extends RecyclerView.ViewHolder {
@@ -68,11 +64,14 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         int myPosition = holder.getAdapterPosition();
-        ArrayList<Timer> timers = groups.get(myPosition);
 
         ((Item)holder).timerRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         ((Item)holder).timerRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        ((Item)holder).timerRecyclerView.setAdapter(new BuildTimerAdapter(context, holders, groups.get(myPosition)));
+        ((Item)holder).timerRecyclerView.setAdapter(
+                new BuildTimerAdapter(
+                        context,
+                        holders,
+                        masterInfo.basicGroupInfoArrayList.get(myPosition).basicTimerInfoArrayList));
 
         ((Item)holder).addTimerButton.setOnClickListener(v -> {
             openNameAndTimerDialog((Item)holder);
@@ -84,39 +83,30 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
             addGroupCount(myPosition);
             updateUI(holder, myPosition);
 
-            if (groupSetCounts.get(myPosition) > 1) {
+            if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets > 1) {
                 ((Item)holder).subtractSetButton.setImageResource(R.drawable.ic_remove_white);
             }
         });
 
         ((Item)holder).subtractSetButton.setOnClickListener(v -> {
-            if (groupSetCounts.get(myPosition) == 1) {
+            if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets == 1) {
                 removeGroup(myPosition);
             } else {
                 subtractGroupCount(myPosition);
                 updateUI(holder, myPosition);
-                if (groupSetCounts.get(myPosition) == 1) {
+                if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets == 1) {
                     ((Item)holder).subtractSetButton.setImageResource(R.drawable.ic_baseline_delete_24);
                 }
             }
         });
 
-        ((Item)holder).groupName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateUI(holder, myPosition);
+        ((Item)holder).groupName.setOnEditorActionListener((view, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                hideKeyboard(view);
+                masterInfo.basicGroupInfoArrayList.get(myPosition).groupName = String.valueOf(((Item) holder).groupName.getText());
+                return true;
             }
-        });
-
-        ((Item)holder).groupName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView view, int actionId, KeyEvent event){
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    hideKeyboard(view);
-                    return true;
-                }
-                return false;
-            }
+            return false;
         });
 
         updateUI(holder, myPosition);
@@ -131,41 +121,46 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
     }
 
     private void subtractGroupCount(int myPosition) {
-        groupSetCounts.set(myPosition, groupSetCounts.get(myPosition) - 1);
+        masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets--;
     }
 
     private void addGroupCount(int myPosition) {
-        groupSetCounts.set(myPosition, groupSetCounts.get(myPosition) + 1);
+        masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets++;
     }
 
     @SuppressLint("SetTextI18n")
     private void updateUI(RecyclerView.ViewHolder holder, int myPosition) {
         ((Item)holder).groupName.setHint("Group: " + (myPosition + 1));
+        if (masterInfo.basicGroupInfoArrayList.get(myPosition).groupName.contains("Group: ")) {
+            ((Item)holder).groupName.setText("");
+            masterInfo.basicGroupInfoArrayList.get(myPosition).groupName = "Group: " + (myPosition + 1);
+        } else {
+            ((Item)holder).groupName.setText(masterInfo.basicGroupInfoArrayList.get(myPosition).groupName);
+        }
 
-        if (groupSetCounts.get(myPosition) > 1) {
+        if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets > 1) {
             ((Item)holder).subtractSetButton.setImageResource(R.drawable.ic_remove_white);
         } else {
             ((Item)holder).subtractSetButton.setImageResource(R.drawable.ic_baseline_delete_24);
         }
 
-        if (groupSetCounts.get(myPosition) == 1) {
+        if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets == 1) {
             ((Item)holder).group_repeat_TextView.setText("Once");
-        } else if (groupSetCounts.get(myPosition) == 2) {
+        } else if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets == 2) {
             ((Item)holder).group_repeat_TextView.setText("Twice");
         } else {
-            ((Item)holder).group_repeat_TextView.setText(groupSetCounts.get(myPosition) + " times");
+            ((Item)holder).group_repeat_TextView.setText(masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets + " times");
         }
     }
 
     private void removeGroup(int myPosition) {
-        groupSetCounts.remove(myPosition);
-        groups.remove(myPosition);
+        masterInfo.basicGroupInfoArrayList.remove(myPosition);
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return groups.size();
+        return masterInfo.basicGroupInfoArrayList.size();
     }
 
     public void openNameAndTimerDialog(@NonNull Item holder) {
@@ -173,7 +168,7 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
                 false,
                 true,
                 holder.getAdapterPosition(),
-                groups.get(holder.getAdapterPosition()));
+                masterInfo.basicGroupInfoArrayList.get(holder.getAdapterPosition()).basicTimerInfoArrayList);
         setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
     }
 }

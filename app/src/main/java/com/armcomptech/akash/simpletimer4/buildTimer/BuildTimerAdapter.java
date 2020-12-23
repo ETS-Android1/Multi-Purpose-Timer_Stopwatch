@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.armcomptech.akash.simpletimer4.R;
-import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -21,9 +20,9 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
 
     private Context context;
     private ArrayList<RecyclerView.ViewHolder> holders;
-    private ArrayList<Timer> timers;
+    private ArrayList<BasicTimerInfo> timers;
 
-    public BuildTimerAdapter(Context context, ArrayList<RecyclerView.ViewHolder> holders, ArrayList<Timer> timers) {
+    public BuildTimerAdapter(Context context, ArrayList<RecyclerView.ViewHolder> holders, ArrayList<BasicTimerInfo> timers) {
         this.context = context;
         this.holders = holders;
         this.timers = timers;
@@ -72,7 +71,7 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
             notifyItemRemoved(myPosition);
         });
 
-        String timerName = timers.get(myPosition).getTimerName();
+        String timerName = timers.get(myPosition).timerName;
         String timerTime = timers.get(myPosition).getTimeLeftFormatted();
         ((Item)holder).timer_info_textView.setText(timerName + " - " + timerTime);
     }

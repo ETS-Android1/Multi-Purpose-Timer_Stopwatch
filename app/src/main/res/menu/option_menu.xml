@@ -5,27 +5,6 @@
     >
 
     <item
-        android:id="@+id/timer_and_stopwatch"
-        app:showAsAction="ifRoom"
-        android:visible="true"
-        android:icon="@drawable/ic_timer_white"
-        android:title="Timer and Stopwatch" />
-
-    <item
-        android:id="@+id/multi_Timer_Mode"
-        app:showAsAction="ifRoom"
-        android:visible="true"
-        android:icon="@drawable/ic_video_library_white"
-        android:title="@string/multi_timer_mode" />
-
-    <item
-        android:id="@+id/build_Timer_Mode"
-        app:showAsAction="ifRoom"
-        android:visible="true"
-        android:icon="@drawable/ic_build_white"
-        android:title="@string/build_your_timer" />
-
-    <item
         android:id="@+id/check_sound"
         android:checkable="true"
         android:enabled="true"
@@ -34,6 +13,27 @@
         android:checked="true"
         app:showAsAction="never"
         tools:targetApi="o" />
+
+    <item
+        android:id="@+id/timer_and_stopwatch"
+        app:showAsAction="never"
+        android:visible="true"
+        android:icon="@drawable/ic_timer_white"
+        android:title="Timer and Stopwatch" />
+
+    <item
+        android:id="@+id/multi_Timer_Mode"
+        app:showAsAction="never"
+        android:visible="true"
+        android:icon="@drawable/ic_video_library_white"
+        android:title="@string/multi_timer_mode" />
+
+    <item
+        android:id="@+id/build_Timer_Mode"
+        app:showAsAction="never"
+        android:visible="true"
+        android:icon="@drawable/ic_build_white"
+        android:title="@string/build_your_timer" />
 
     <item
         android:id="@+id/statistics_activity"
@@ -46,7 +46,7 @@
         android:id="@+id/privacy_policy"
         android:title="@string/privacy_policy"
         android:icon="@drawable/ic_lock_white"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:visible="true" />
 
     <item

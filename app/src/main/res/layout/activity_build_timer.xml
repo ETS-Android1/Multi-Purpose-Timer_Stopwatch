@@ -7,12 +7,51 @@
     tools:context=".buildTimer.buildTimer_Activity"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:padding="5dp"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:id="@+id/name_of_built_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Name It and Save It"/>
+
+        <Button
+            android:padding="5dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:id="@+id/save_timer_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_background"/>
+
+        <Spinner
+            android:padding="5dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:id="@+id/saved_timers_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="@string/repeat"/>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/buildTimerRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="80dp" />
+        android:layout_marginBottom="80dp"
+        android:layout_marginTop="70dp"/>
 
     <LinearLayout
         android:id="@+id/linearLayout"

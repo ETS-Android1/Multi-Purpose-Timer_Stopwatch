@@ -458,6 +458,23 @@ public class singleTimerFragment extends Fragment {
         return -1;
     }
 
+    private void loadData() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+
+        String timerNameJson = sharedPreferences.getString("timerName", null);
+        Type timerNameType = new TypeToken<ArrayList<String>>(){}.getType();
+        timerName = gson.fromJson(timerNameJson, timerNameType);
+
+        String countJson = sharedPreferences.getString("timesTimerRanCounter", null);
+        Type countType = new TypeToken<ArrayList<Integer>>(){}.getType();
+        count = gson.fromJson(countJson, countType);
+
+        String timeInSecondsJson = sharedPreferences.getString("timeInSecond", null);
+        Type timeInSecondsType = new TypeToken<ArrayList<Integer>>(){}.getType();
+        timeInSeconds = gson.fromJson(timeInSecondsJson, timeInSecondsType);
+    }
+
     private void saveData() {
 //        if (getContext().getSharedPreferences("shared preferences", MODE_PRIVATE) == null) {
 //            return; //wait this might be something
@@ -908,23 +925,6 @@ public class singleTimerFragment extends Fragment {
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         }
-    }
-
-    private void loadData() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
-        Gson gson = new Gson();
-
-        String timerNameJson = sharedPreferences.getString("timerName", null);
-        Type timerNameType = new TypeToken<ArrayList<String>>(){}.getType();
-        timerName = gson.fromJson(timerNameJson, timerNameType);
-
-        String countJson = sharedPreferences.getString("timesTimerRanCounter", null);
-        Type countType = new TypeToken<ArrayList<Integer>>(){}.getType();
-        count = gson.fromJson(countJson, countType);
-
-        String timeInSecondsJson = sharedPreferences.getString("timeInSecond", null);
-        Type timeInSecondsType = new TypeToken<ArrayList<Integer>>(){}.getType();
-        timeInSeconds = gson.fromJson(timeInSecondsJson, timeInSecondsType);
     }
 
     public void showNotification(String timeLeft, String currentTimerName) {
