@@ -103,7 +103,11 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
         ((Item)holder).groupName.setOnEditorActionListener((view, actionId, event) -> {
             if(actionId == EditorInfo.IME_ACTION_DONE){
                 hideKeyboard(view);
-                masterInfo.basicGroupInfoArrayList.get(myPosition).groupName = String.valueOf(((Item) holder).groupName.getText());
+                if (String.valueOf(((Item) holder).groupName.getText()).equals("")){
+                    masterInfo.basicGroupInfoArrayList.get(myPosition).groupName = "Group: " + (myPosition + 1);
+                } else {
+                    masterInfo.basicGroupInfoArrayList.get(myPosition).groupName = String.valueOf(((Item) holder).groupName.getText());
+                }
                 return true;
             }
             return false;

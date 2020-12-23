@@ -36,15 +36,40 @@
             android:textColor="@android:color/white"
             android:background="@drawable/button_background"/>
 
-        <Spinner
-            android:padding="5dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:id="@+id/saved_timers_spinner"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="35"
-            android:prompt="@string/repeat"/>
+            android:layout_gravity="center"
+            android:foregroundGravity="center"
+            android:padding="5dp">
+
+            <Spinner
+                android:id="@+id/saved_timers_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:gravity="center"
+                android:foregroundGravity="center"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:layout_marginEnd="40dp"
+                android:text="Past Timers"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </LinearLayout>
 

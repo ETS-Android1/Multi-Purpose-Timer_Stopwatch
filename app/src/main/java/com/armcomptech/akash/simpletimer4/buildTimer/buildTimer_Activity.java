@@ -53,6 +53,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
@@ -164,30 +165,37 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
         });
 
         startTimerFab = findViewById(R.id.startTimerFloatingActionButton);
-        startTimerFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(); //add the activity where it is being sent
-                intent.putExtra("masterName", currentMaster.masterName);
+        startTimerFab.setOnClickListener(v -> {
+            String masterName = String.valueOf(save_timer_editText.getText());
+            save_group(masterName);
+            notifyChange();
 
-                ArrayList<String> timerNameArray = new ArrayList<>();
-                ArrayList<String> groupNameArray = new ArrayList<>();
-                ArrayList<Long> timerTimeArray = new ArrayList<>();
+            Intent intent = new Intent(); //add the activity where it is being sent
+            intent.putExtra("masterName", currentMaster.masterName);
 
-                for (int i = 0; i < currentMaster.basicGroupInfoArrayList.size(); i++) {
-                    for (int j = 0; j < currentMaster.basicGroupInfoArrayList.get(i).repeatSets; j++) {
-                        for (int k = 0; k < currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.size(); k++) {
-                            timerNameArray.add(currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.get(k).timerName);
-                            groupNameArray.add(currentMaster.basicGroupInfoArrayList.get(i).groupName);
-                            timerTimeArray.add(currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.get(k).mStartTimeInMillis);
-                        }
+            ArrayList<String> timerNameArray = new ArrayList<>();
+            ArrayList<String> groupNameArray = new ArrayList<>();
+            ArrayList<Long> timerTimeArray = new ArrayList<>();
+            ArrayList<String> stringOfTimerArray = new ArrayList<>();
+
+            for (int i = 0; i < currentMaster.basicGroupInfoArrayList.size(); i++) {
+                for (int j = 0; j < currentMaster.basicGroupInfoArrayList.get(i).repeatSets; j++) {
+                    for (int k = 0; k < currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.size(); k++) {
+                        String timerName = currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.get(k).timerName;
+                        String groupName = currentMaster.basicGroupInfoArrayList.get(i).groupName;
+                        long start_time = currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.get(k).mStartTimeInMillis;
+                        timerNameArray.add(timerName);
+                        groupNameArray.add(groupName);
+                        timerTimeArray.add(start_time);
+                        stringOfTimerArray.add("In " + groupName + " - " + timerName + " - " + getTimeLeftFormatted(start_time));
                     }
                 }
-
-                intent.putExtra("timerName", timerNameArray);
-                intent.putExtra("groupName", groupNameArray);
-                intent.putExtra("timerTime", timerTimeArray);
             }
+
+            intent.putExtra("timerName", timerNameArray);
+            intent.putExtra("groupName", groupNameArray);
+            intent.putExtra("timerTime", timerTimeArray);
+            intent.putExtra("stringOfTimer", stringOfTimerArray);
         });
 
         saved_timers_spinner = findViewById(R.id.saved_timers_spinner);
@@ -196,8 +204,9 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
                 saved_timers_names.add(masterInfo.masterName);
             }
         }
-        saved_timers_spinner_adapter = new ArrayAdapter<>(this, R.layout.timername_autocomplete_textview, saved_timers_names);
+        saved_timers_spinner_adapter = new ArrayAdapter<String>(this, R.layout.timername_autocomplete_textview, saved_timers_names);
         saved_timers_spinner.setAdapter(saved_timers_spinner_adapter);
+        saved_timers_spinner.setPrompt("Past Timers");
 
         saved_timers_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -231,7 +240,30 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
         });
     }
 
+    public String getTimeLeftFormatted(long mStartTimeInMillis) {
+        int hours = (int) (mStartTimeInMillis / 1000) / 3600;
+        int minutes = (int) ((mStartTimeInMillis / 1000) % 3600) / 60;
+        int seconds = (int) (mStartTimeInMillis / 1000) % 60;
+        int millis = (int) mStartTimeInMillis % 1000;
 
+        String timeLeftFormatted;
+
+        if (hours >= 10) {
+            timeLeftFormatted = String.format(Locale.getDefault(),
+                    "%02d:%02d:%02d", hours, minutes, seconds);
+        } else if (hours >= 1) {
+            timeLeftFormatted = String.format(Locale.getDefault(),
+                    "%d:%02d:%02d", hours, minutes, seconds);
+        } else if (minutes >= 1) {
+            timeLeftFormatted = String.format(Locale.getDefault(),
+                    "%02d:%02d", minutes, seconds);
+        } else {
+            timeLeftFormatted = String.format(Locale.getDefault(),
+                    "%02d.%03d", seconds, millis);
+        }
+
+        return timeLeftFormatted;
+    }
 
     private void notifyChange() {
         recyclerView.setAdapter(new BuildGroupAdapter(this, currentMaster, holders));
