@@ -167,6 +167,26 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
         startTimerFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(); //add the activity where it is being sent
+                intent.putExtra("masterName", currentMaster.masterName);
+
+                ArrayList<String> timerNameArray = new ArrayList<>();
+                ArrayList<String> groupNameArray = new ArrayList<>();
+                ArrayList<Long> timerTimeArray = new ArrayList<>();
+
+                for (int i = 0; i < currentMaster.basicGroupInfoArrayList.size(); i++) {
+                    for (int j = 0; j < currentMaster.basicGroupInfoArrayList.get(i).repeatSets; j++) {
+                        for (int k = 0; k < currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.size(); k++) {
+                            timerNameArray.add(currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.get(k).timerName);
+                            groupNameArray.add(currentMaster.basicGroupInfoArrayList.get(i).groupName);
+                            timerTimeArray.add(currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.get(k).mStartTimeInMillis);
+                        }
+                    }
+                }
+
+                intent.putExtra("timerName", timerNameArray);
+                intent.putExtra("groupName", groupNameArray);
+                intent.putExtra("timerTime", timerTimeArray);
             }
         });
 
