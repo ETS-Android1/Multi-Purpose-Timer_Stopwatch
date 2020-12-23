@@ -262,6 +262,7 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
         }
         save_timer_editText.setText(currentMaster.masterName);
 
+        Toast.makeText(this, "Selected: " + currentMaster.masterName, Toast.LENGTH_SHORT).show();
 //        String masterGroupSetCountsJson = sharedPreferences.getString("masterGroupSetCounts", null);
 //        Type masterGroupSetCountsType = new TypeToken<ArrayList<ArrayList<Integer>>>(){}.getType();
 //        masterGroupSetCounts = gson.fromJson(masterGroupSetCountsJson, masterGroupSetCountsType);

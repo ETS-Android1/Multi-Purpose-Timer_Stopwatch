@@ -10,7 +10,7 @@
     <LinearLayout
         android:padding="10dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="70dp">
 
         <EditText
             android:padding="5dp"
@@ -19,16 +19,18 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:id="@+id/name_of_built_timer"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="50"
             android:hint="Name It and Save It"/>
 
         <Button
-            android:padding="5dp"
+            android:layout_margin="10dp"
             android:layout_gravity="center"
             android:gravity="center"
             android:id="@+id/save_timer_button"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="20"
             android:layout_height="wrap_content"
             android:text="Save"
             android:textColor="@android:color/white"
@@ -39,8 +41,9 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:id="@+id/saved_timers_spinner"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="35"
             android:prompt="@string/repeat"/>
 
     </LinearLayout>
