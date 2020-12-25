@@ -171,6 +171,12 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
         startTimerFab = findViewById(R.id.startTimerFloatingActionButton);
         startTimerFab.setOnClickListener(v -> {
             String masterName = String.valueOf(save_timer_editText.getText());
+
+            if (masterName.isEmpty()) {
+                Toast.makeText(this, "Name required to start", Toast.LENGTH_LONG).show();
+                return;
+            }
+
             save_group(masterName);
             notifyChange();
 

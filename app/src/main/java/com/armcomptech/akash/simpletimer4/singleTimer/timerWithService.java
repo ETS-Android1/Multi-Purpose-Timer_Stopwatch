@@ -153,7 +153,7 @@ public class timerWithService extends Service {
         }
 
         Notification notification = new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_timer_black)
+                .setSmallIcon(R.drawable.ic_timer_white)
                 .setContentTitle(content)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
