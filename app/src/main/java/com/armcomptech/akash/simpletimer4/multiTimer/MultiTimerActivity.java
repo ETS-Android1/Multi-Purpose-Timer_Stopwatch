@@ -43,6 +43,7 @@ import com.armcomptech.akash.simpletimer4.Timer;
 import com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,7 +57,6 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.App.MAIN_CHANNEL_ID;
-import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
 public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener, BillingProcessor.IBillingHandler {
 
@@ -66,11 +66,14 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     private final ArrayList<Timer> timers = new ArrayList<>();
     private final ArrayList<RecyclerView.ViewHolder> holders = new ArrayList<>();
     final static int GROUP_NOTIFICATION_ID = 1000;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_timer);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setTitle("   Multi Timer");
         ActionBar actionBar = getSupportActionBar();
@@ -384,5 +387,15 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             timer.setShowNotification(true);
         }
         showGroupNotification();
+    }
+
+    public void logFirebaseAnalyticsEvents(String eventName) {
+        if (!TabbedActivity.disableFirebaseLogging) {
+            Bundle bundle = new Bundle();
+            bundle.putString("Event", eventName);
+            if (mFirebaseAnalytics != null) {
+                mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
+            }
+        }
     }
 }

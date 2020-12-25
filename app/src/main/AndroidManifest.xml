@@ -5,18 +5,15 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!--Auto by firebase-->
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- Auto by firebase -->
     <supports-screens
         android:largeScreens="true"
         android:normalScreens="true"
         android:smallScreens="true"
         android:xlargeScreens="true" />
 
-
     <application
-        android:name="com.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -24,36 +21,36 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".buildTimer.timerForBuilt_Activity" />
 
-        <service android:name=".singleTimer.timerWithService"/>
-        <service android:name=".stopwatch.stopwatchWithService"/>
+        <service android:name=".singleTimer.timerWithService" />
+        <service android:name=".stopwatch.stopwatchWithService" />
+
         <activity
-            android:launchMode="singleTop"
             android:name=".TabbedView.TabbedActivity"
-            android:configChanges="screenSize|screenLayout|keyboardHidden">
+            android:configChanges="screenSize|screenLayout|keyboardHidden"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:configChanges="screenLayout|orientation|screenSize"/>
-
+            android:configChanges="screenLayout|orientation|screenSize"
+            android:label="@string/title_activity_settings" />
         <activity
-            android:launchMode="singleTop"
             android:name=".multiTimer.MultiTimerActivity"
-            android:configChanges="screenLayout|orientation|screenSize" />
-
+            android:configChanges="screenLayout|orientation|screenSize"
+            android:launchMode="singleTop" />
         <activity android:name=".statistics.StatisticsActivity" />
 
-        <service android:name=".buildTimer.buildTimerWithService"/>
+        <service android:name=".buildTimer.buildTimerWithService" />
         <activity
-            android:launchMode="singleTop"
             android:name=".buildTimer.buildTimer_Activity"
-            android:configChanges="screenLayout|orientation|screenSize" />
+            android:configChanges="screenLayout|orientation|screenSize"
+            android:launchMode="singleTop" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

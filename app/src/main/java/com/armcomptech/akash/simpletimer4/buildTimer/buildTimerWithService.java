@@ -28,7 +28,7 @@ public class buildTimerWithService extends Service {
     CountDownTimer countDownTimer;
 
     long timeRemaining;
-    String timerName;
+    String timerAndGroupName;
     BroadcastReceiver broadcastReceiver2;
 
     public long getTimeRemaining() {
@@ -48,17 +48,17 @@ public class buildTimerWithService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        timeRemaining = intent.getLongExtra("SingleTimerTimeValue", 0);
-        timerName = intent.getStringExtra("SingleTimerTimerName");
+        timeRemaining = intent.getLongExtra("BuildTimerTimeValue", 0);
+        timerAndGroupName = intent.getStringExtra("BuildTimerTimerAndGroupName");
 
         startTimer(timeRemaining);
-        IntentFilter intentFilter2 = new IntentFilter("SingleTimerTimerPlayer");
+        IntentFilter intentFilter2 = new IntentFilter("BuildTimerTimerPlayer");
         broadcastReceiver2 = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String action = intent.getStringExtra("SingleTimerPlayer");
+                String action = intent.getStringExtra("BuildTimerPlayer");
                 switch (Objects.requireNonNull(action)) {
-                    case "Start":
+                    case "Resume":
                         startTimer(timeRemaining);
                         break;
 
@@ -95,26 +95,24 @@ public class buildTimerWithService extends Service {
         countDownTimer = new CountDownTimer(timeRemaining, 100) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Intent intent1local = new Intent("SingleTimerOnTick");
+                Intent intent1local = new Intent("BuildTimerOnTick");
                 intent1local.putExtra("TimeRemaining", millisUntilFinished);
                 sendBroadcast(intent1local);
 
                 setTimeRemaining(millisUntilFinished);
-                showNotification(getTimeLeftFormatted(), timerName);
+                showNotification(getTimeLeftFormatted(), timerAndGroupName);
             }
 
             @Override
             public void onFinish() {
-                Intent intent1local = new Intent("SingleTimerOnFinish");
+                Intent intent1local = new Intent("BuildTimerOnFinish");
                 sendBroadcast(intent1local);
             }
         }.start();
     }
 
     public void pauseTimer() {
-        stopSelf();
         countDownTimer.cancel();
-        NotificationManagerCompat.from(this).cancel(1);
     }
 
     public void resetTimer() {
@@ -145,15 +143,10 @@ public class buildTimerWithService extends Service {
         final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                 notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        String content;
-        if (currentTimerName.equals("General")) {
-            content = "Timer: " + timeLeft;
-        } else {
-            content = "Timer: " + currentTimerName + " - " + timeLeft;
-        }
+        String content = currentTimerName + " - " + timeLeft;
 
         Notification notification = new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_timer_black)
+                .setSmallIcon(R.drawable.ic_timer_white)
                 .setContentTitle(content)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)

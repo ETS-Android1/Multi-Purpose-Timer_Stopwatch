@@ -267,7 +267,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         return sharedPreferences.getBoolean("removed_Ads", false);
     }
 
-    public static void logFirebaseAnalyticsEvents(String eventName) {
+    public void logFirebaseAnalyticsEvents(String eventName) {
         if (!disableFirebaseLogging) {
             Bundle bundle = new Bundle();
             bundle.putString("Event", eventName);

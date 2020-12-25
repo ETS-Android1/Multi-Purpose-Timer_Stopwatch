@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -42,6 +44,7 @@ import static com.App.MAIN_CHANNEL_ID;
 
 public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements setNameAndTimerDialog.setTimerDialogListener {
 
+    private FirebaseAnalytics mFirebaseAnalytics;
     private Context context;
     private ArrayList<Timer> timers;
     private ArrayList<RecyclerView.ViewHolder> holders;
@@ -60,7 +63,11 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         showNotification = false;
 
         if (!TabbedActivity.disableFirebaseLogging) {
-            TabbedActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+        }
+
+        if (!TabbedActivity.disableFirebaseLogging) {
+            logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
 
             if (!isRemovedAds()) {
                 //ad stuff
@@ -71,6 +78,16 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mResetButtonInterstitialAd = new InterstitialAd(this.context);
                 mResetButtonInterstitialAd.setAdUnitId(this.context.getString(R.string.resetButton_interstital_ad_id));
                 mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        }
+    }
+
+    public void logFirebaseAnalyticsEvents(String eventName) {
+        if (!TabbedActivity.disableFirebaseLogging) {
+            Bundle bundle = new Bundle();
+            bundle.putString("Event", eventName);
+            if (mFirebaseAnalytics != null) {
+                mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
             }
         }
     }
@@ -151,7 +168,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).getStartTimeInMillis());
 
         ((Item)holder).startButton.setOnClickListener(v -> {
-            TabbedActivity.logFirebaseAnalyticsEvents("Start Timer in Multi-Timer");
+            logFirebaseAnalyticsEvents("Start Timer in Multi-Timer");
 
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
@@ -165,7 +182,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).pauseButton.setOnClickListener(v -> {
-            TabbedActivity.logFirebaseAnalyticsEvents("Pause Timer in Multi-Timer");
+            logFirebaseAnalyticsEvents("Pause Timer in Multi-Timer");
 
             pauseTimer(((Item)holder));
 
@@ -179,7 +196,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
-            TabbedActivity.logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
+            logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
 
             if (!isRemovedAds()) {
                 if (!TabbedActivity.disableFirebaseLogging) {
@@ -351,11 +368,11 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (updateExistingTimer) {
             timers.get(holder.getAdapterPosition()).setStartTimeInMillis(finalSecond);
             resetTimer(holder);
-            TabbedActivity.logFirebaseAnalyticsEvents("Update Existing Timer in Multi-Timer");
+            logFirebaseAnalyticsEvents("Update Existing Timer in Multi-Timer");
         }
 
         if (creatingNewTimer) {
-            TabbedActivity.logFirebaseAnalyticsEvents("Creating new timer in Multi-Timer");
+            logFirebaseAnalyticsEvents("Creating new timer in Multi-Timer");
         }
     }
 

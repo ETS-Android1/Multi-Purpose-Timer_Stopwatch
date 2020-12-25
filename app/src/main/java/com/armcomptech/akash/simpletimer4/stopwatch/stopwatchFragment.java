@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,7 +39,6 @@ import java.util.TimerTask;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
-import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
 public class stopwatchFragment extends Fragment {
 
@@ -76,6 +76,7 @@ public class stopwatchFragment extends Fragment {
     TimerTask tempTimerTask;
     private boolean watchIsReset = true;
     private boolean fragmentAttached;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public static stopwatchFragment newInstance() {
         return new stopwatchFragment();
@@ -84,11 +85,13 @@ public class stopwatchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         instance = (TabbedActivity) requireContext();
         notificationManager = NotificationManagerCompat.from(requireContext());
-
         loadData();
+
+        if (!TabbedActivity.disableFirebaseLogging) {
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(instance);
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -473,6 +476,16 @@ public class stopwatchFragment extends Fragment {
             Intent intent1local = new Intent("stopwatchPlayer");
             intent1local.putExtra("notification", "cancelNotification");
             requireContext().sendBroadcast(intent1local);
+        }
+    }
+
+    public void logFirebaseAnalyticsEvents(String eventName) {
+        if (!TabbedActivity.disableFirebaseLogging) {
+            Bundle bundle = new Bundle();
+            bundle.putString("Event", eventName);
+            if (mFirebaseAnalytics != null) {
+                mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
+            }
         }
     }
 }

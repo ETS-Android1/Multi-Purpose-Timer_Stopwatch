@@ -21,15 +21,17 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.armcomptech.akash.simpletimer4.EmailLogic.SendMailTask;
 import com.armcomptech.akash.simpletimer4.R;
+import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
-
 public class SettingsActivity extends AppCompatActivity {
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,8 @@ public class SettingsActivity extends AppCompatActivity {
         assert actionBar != null;
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_settings_white);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
@@ -95,6 +99,7 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
 
             case R.id.send_feedback:
+                logFirebaseAnalyticsEvents("Opened Feedback");
                 final EditText edittext = new EditText(this);
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
                 alert.setTitle("Send Feedback");
@@ -108,10 +113,13 @@ public class SettingsActivity extends AppCompatActivity {
                     List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
                     new SendMailTask(this).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
                     Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
+                    logFirebaseAnalyticsEvents("Sent Feedback");
                 });
 
-                alert.setNegativeButton("Cancel", (dialog, whichButton) ->
-                        Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show());
+                alert.setNegativeButton("Cancel", (dialog, whichButton) -> {
+                    Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
+                    logFirebaseAnalyticsEvents("Cancelled Feedback");
+                });
 
                 alert.show();
                 break;
@@ -120,5 +128,15 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void logFirebaseAnalyticsEvents(String eventName) {
+        if (!TabbedActivity.disableFirebaseLogging) {
+            Bundle bundle = new Bundle();
+            bundle.putString("Event", eventName);
+            if (mFirebaseAnalytics != null) {
+                mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
+            }
+        }
     }
 }

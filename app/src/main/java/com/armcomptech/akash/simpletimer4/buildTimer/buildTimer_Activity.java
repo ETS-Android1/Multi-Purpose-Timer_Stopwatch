@@ -45,6 +45,7 @@ import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -59,7 +60,6 @@ import java.util.Objects;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.logFirebaseAnalyticsEvents;
 
 public class buildTimer_Activity extends AppCompatActivity implements BillingProcessor.IBillingHandler, setNameAndTimerDialogForBuildTimer.setTimerDialogListenerForBuildTimer {
 
@@ -78,11 +78,15 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
 
     ArrayAdapter<String> saved_timers_spinner_adapter;
     final ArrayList<String> saved_timers_names = new ArrayList<>();
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_build_timer);
+        if (!TabbedActivity.disableFirebaseLogging) {
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        }
         load_data();
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -170,12 +174,12 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
             save_group(masterName);
             notifyChange();
 
-            Intent intent = new Intent(); //add the activity where it is being sent
+            Intent intent = new Intent(this, timerForBuilt_Activity.class); //add the activity where it is being sent
             intent.putExtra("masterName", currentMaster.masterName);
 
             ArrayList<String> timerNameArray = new ArrayList<>();
             ArrayList<String> groupNameArray = new ArrayList<>();
-            ArrayList<Long> timerTimeArray = new ArrayList<>();
+            ArrayList<Integer> timerTimeArray = new ArrayList<>();
             ArrayList<String> stringOfTimerArray = new ArrayList<>();
 
             for (int i = 0; i < currentMaster.basicGroupInfoArrayList.size(); i++) {
@@ -186,7 +190,7 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
                         long start_time = currentMaster.basicGroupInfoArrayList.get(i).basicTimerInfoArrayList.get(k).mStartTimeInMillis;
                         timerNameArray.add(timerName);
                         groupNameArray.add(groupName);
-                        timerTimeArray.add(start_time);
+                        timerTimeArray.add((int) start_time);
                         stringOfTimerArray.add("In " + groupName + " - " + timerName + " - " + getTimeLeftFormatted(start_time));
                     }
                 }
@@ -196,6 +200,7 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
             intent.putExtra("groupName", groupNameArray);
             intent.putExtra("timerTime", timerTimeArray);
             intent.putExtra("stringOfTimer", stringOfTimerArray);
+            startActivity(intent);
         });
 
         saved_timers_spinner = findViewById(R.id.saved_timers_spinner);
@@ -647,5 +652,15 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
     @Override
     public void onBillingInitialized() {
 
+    }
+
+    public void logFirebaseAnalyticsEvents(String eventName) {
+        if (!TabbedActivity.disableFirebaseLogging) {
+            Bundle bundle = new Bundle();
+            bundle.putString("Event", eventName);
+            if (mFirebaseAnalytics != null) {
+                mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
+            }
+        }
     }
 }
