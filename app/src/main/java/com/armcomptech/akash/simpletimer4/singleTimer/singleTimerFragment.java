@@ -311,9 +311,12 @@ public class singleTimerFragment extends Fragment {
 
     public static void logFirebaseAnalyticsEvents(String eventName) {
         if (!disableFirebaseLogging) {
+            eventName = eventName.replace(" ", "_");
+            eventName = eventName.replace(":", "");
+
             Bundle bundle = new Bundle();
             bundle.putString("Event", eventName);
-            mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
+            mFirebaseAnalytics.logEvent(eventName, bundle);
         }
     }
 

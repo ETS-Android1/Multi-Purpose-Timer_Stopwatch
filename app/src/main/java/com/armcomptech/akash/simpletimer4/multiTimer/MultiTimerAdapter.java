@@ -85,11 +85,12 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public void logFirebaseAnalyticsEvents(String eventName) {
         if (!TabbedActivity.disableFirebaseLogging) {
+            eventName = eventName.replace(" ", "_");
+            eventName = eventName.replace(":", "");
+
             Bundle bundle = new Bundle();
             bundle.putString("Event", eventName);
-            if (mFirebaseAnalytics != null) {
-                mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
-            }
+            mFirebaseAnalytics.logEvent(eventName, bundle);
         }
     }
 

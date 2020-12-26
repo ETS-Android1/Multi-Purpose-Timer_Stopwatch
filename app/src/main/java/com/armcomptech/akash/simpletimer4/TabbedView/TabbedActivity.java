@@ -281,11 +281,12 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
 
     public void logFirebaseAnalyticsEvents(String eventName) {
         if (!disableFirebaseLogging) {
+            eventName = eventName.replace(" ", "_");
+            eventName = eventName.replace(":", "");
+
             Bundle bundle = new Bundle();
             bundle.putString("Event", eventName);
-            if (mFirebaseAnalytics != null) {
-                mFirebaseAnalytics.logEvent(eventName.replace(" ", "_"), bundle);
-            }
+            mFirebaseAnalytics.logEvent(eventName, bundle);
         }
     }
 
