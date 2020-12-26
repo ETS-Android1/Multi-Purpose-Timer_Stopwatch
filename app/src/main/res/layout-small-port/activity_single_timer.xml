@@ -78,8 +78,8 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:progressBarStyleHorizontal"
-            android:layout_width="250sp"
-            android:layout_height="250sp"
+            android:layout_width="225sp"
+            android:layout_height="225sp"
             android:progress="80"
             android:progressDrawable="@drawable/circle"
             app:layout_constraintBottom_toBottomOf="parent"

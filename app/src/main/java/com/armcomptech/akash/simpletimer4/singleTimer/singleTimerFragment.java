@@ -832,11 +832,11 @@ public class singleTimerFragment extends Fragment {
                     mMillis.setTextSize(47);
                 }
             } else if (screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE) {
-                mTextViewCountDown.setTextSize(155);
-                mMillis.setTextSize(70);
+                mTextViewCountDown.setTextSize(140);
+                mMillis.setTextSize(65);
                 if (hours > 9) {
-                    mTextViewCountDown.setTextSize(145);
-                    mMillis.setTextSize(70);
+                    mTextViewCountDown.setTextSize(130);
+                    mMillis.setTextSize(65);
                 }
             } else {
                 mTextViewCountDown.setTextSize(60);
@@ -860,8 +860,8 @@ public class singleTimerFragment extends Fragment {
                 mTextViewCountDown.setTextSize(120);
                 mMillis.setTextSize(55);
             } else if (screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE) {
-                mTextViewCountDown.setTextSize(215);
-                mMillis.setTextSize(85);
+                mTextViewCountDown.setTextSize(140);
+                mMillis.setTextSize(65);
             } else {
                 mTextViewCountDown.setTextSize(70);
                 mMillis.setTextSize(30);

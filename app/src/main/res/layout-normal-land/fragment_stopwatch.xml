@@ -92,6 +92,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:backgroundTint="#31FFA7"
+                    android:elevation="0dp"
                     app:srcCompat="@drawable/ic_baseline_timelapse_24" />
 
             </LinearLayout>
@@ -109,6 +110,7 @@
                     android:layout_height="wrap_content"
                     app:backgroundTint="@color/colorPrimaryDark"
                     app:srcCompat="@drawable/ic_play"
+                    android:elevation="0dp"
                     tools:visibility="gone" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -116,6 +118,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:backgroundTint="#FF4545"
+                    android:elevation="0dp"
                     app:srcCompat="@drawable/ic_pause" />
 
             </LinearLayout>
@@ -132,6 +135,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:backgroundTint="#FFC107"
+                    android:elevation="0dp"
                     app:srcCompat="@drawable/ic_replay" />
 
             </LinearLayout>
