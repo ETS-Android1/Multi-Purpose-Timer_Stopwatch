@@ -78,7 +78,9 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         bp = new BillingProcessor(this, getString(R.string.licence_key), this);
         bp.initialize();
 
-        removeAds(); // this removes all ads for new users
+        if (disableFirebaseLogging) {
+            removeAds(); // this removes all ads for new users
+        }
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);

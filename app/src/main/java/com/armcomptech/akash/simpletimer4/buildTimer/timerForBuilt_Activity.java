@@ -5,8 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -19,12 +21,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
+
+import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.disableFirebaseLogging;
 
 public class timerForBuilt_Activity extends AppCompatActivity {
 
@@ -63,6 +70,7 @@ public class timerForBuilt_Activity extends AppCompatActivity {
 
     ArrayAdapter upNextArrayAdapter;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private InterstitialAd mResetButtonInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +145,16 @@ public class timerForBuilt_Activity extends AppCompatActivity {
             if (blinkThread != null) {
                 blinkThread.interrupt();
             }
+
+            if (!isRemovedAds()) {
+                if (mResetButtonInterstitialAd.isLoaded()) {
+                    mResetButtonInterstitialAd.show();
+                    logFirebaseAnalyticsEvents("Showed Ad");
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
+                    logFirebaseAnalyticsEvents("Ad not loaded");
+                }
+            }
         });
 
         nextButton.setOnClickListener(v -> {
@@ -163,6 +181,25 @@ public class timerForBuilt_Activity extends AppCompatActivity {
 
         registerReceiver(broadcastReceiver1, intentFilter1);
         registerReceiver(broadcastReceiver2, intentFilter2);
+
+        if (!isRemovedAds()) {
+            //ad stuff
+            //noinspection deprecation
+            MobileAds.initialize(this, getString(R.string.admob_app_id));
+
+            //reset button ad
+            mResetButtonInterstitialAd = new InterstitialAd(this);
+            mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
+
+            if (!disableFirebaseLogging) {
+                mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        }
+    }
+
+    public boolean isRemovedAds() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("removed_Ads", false);
     }
 
     @SuppressLint("SetTextI18n")

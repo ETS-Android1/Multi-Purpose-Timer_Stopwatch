@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,9 @@ import androidx.fragment.app.Fragment;
 
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
@@ -39,6 +43,7 @@ import java.util.TimerTask;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
+import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.disableFirebaseLogging;
 
 public class stopwatchFragment extends Fragment {
 
@@ -77,6 +82,7 @@ public class stopwatchFragment extends Fragment {
     private boolean watchIsReset = true;
     private boolean fragmentAttached;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private InterstitialAd mResetButtonInterstitialAd;
 
     public static stopwatchFragment newInstance() {
         return new stopwatchFragment();
@@ -172,6 +178,16 @@ public class stopwatchFragment extends Fragment {
             setWithoutLapView();
 
             logFirebaseAnalyticsEvents("Reset Stopwatch");
+
+            if (!isRemovedAds()) {
+                if (mResetButtonInterstitialAd.isLoaded()) {
+                    mResetButtonInterstitialAd.show();
+                    logFirebaseAnalyticsEvents("Showed Ad");
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
+                    logFirebaseAnalyticsEvents("Ad not loaded");
+                }
+            }
         });
 
         mButtonLap.setOnClickListener(v -> {
@@ -180,7 +196,26 @@ public class stopwatchFragment extends Fragment {
             setWithLapView();
         });
 
+        if (!isRemovedAds()) {
+            //ad stuff
+            //noinspection deprecation
+            MobileAds.initialize(getContext(),getString(R.string.admob_app_id));
+
+            //reset button ad
+            mResetButtonInterstitialAd = new InterstitialAd(requireContext());
+            mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
+
+            if (!disableFirebaseLogging) {
+                mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        }
+
         return root;
+    }
+
+    public boolean isRemovedAds() {
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("removed_Ads", false);
     }
 
     public void startWatch() {
