@@ -197,7 +197,7 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
                         timerNameArray.add(timerName);
                         groupNameArray.add(groupName);
                         timerTimeArray.add((int) start_time);
-                        stringOfTimerArray.add("In " + groupName + " - " + timerName + " - " + getTimeLeftFormatted(start_time));
+                        stringOfTimerArray.add(groupName + " - " + timerName + " - " + getTimeLeftFormatted(start_time));
                     }
                 }
             }

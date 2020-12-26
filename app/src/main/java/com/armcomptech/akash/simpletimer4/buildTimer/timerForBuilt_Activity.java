@@ -257,6 +257,7 @@ public class timerForBuilt_Activity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void resetTimer() {
         timerPlaying = false;
         timerPaused = false;
@@ -280,6 +281,7 @@ public class timerForBuilt_Activity extends AppCompatActivity {
 
         mStartTimeInMillis = timerTimeArray.get(0);
         mLeftTimeInMillis = timerTimeArray.get(0);
+        text_groupAndTimerName.setText(groupNameArray.get(0) + " - " + timerNameArray.get(0));
 
         totalElapsedTime = 0;
 
