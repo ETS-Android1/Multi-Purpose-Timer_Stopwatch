@@ -246,6 +246,10 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
             case R.id.remove_Ads:
                 bp.purchase(this, "remove_ads");
+                if (bp.isPurchased("remove_ads")) {
+                    removeAds();
+                    Toast.makeText(this, "All advertisements removed!", Toast.LENGTH_SHORT).show();
+                }
                 break;
 
             case R.id.send_feedback:
@@ -284,9 +288,10 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     @Override
     public void onProductPurchased(String productId, TransactionDetails details) {
         if (productId.equals("remove_ads")) {
+            if (!isRemovedAds()) {
+                Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
+            }
             removeAds();
-
-            Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -300,6 +305,10 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     @Override
     public void onPurchaseHistoryRestored() {
         bp.loadOwnedPurchasesFromGoogle();
+        if (bp.isPurchased("remove_ads")) {
+            removeAds();
+            Toast.makeText(this, "All advertisements removed!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

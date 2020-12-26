@@ -598,6 +598,10 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
 
             case R.id.remove_Ads:
                 bp.purchase(this, "remove_ads");
+                if (bp.isPurchased("remove_ads")) {
+                    removeAds();
+                    Toast.makeText(this, "All advertisements removed!", Toast.LENGTH_SHORT).show();
+                }
                 break;
 
             case R.id.send_feedback:
@@ -647,6 +651,12 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
     @Override
     public void onPurchaseHistoryRestored() {
         bp.loadOwnedPurchasesFromGoogle();
+        if (bp.isPurchased("remove_ads")) {
+            if (!isRemovedAds()) {
+                Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
+            }
+            removeAds();
+        }
     }
 
     @Override
