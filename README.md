@@ -7,17 +7,13 @@ Link to the application on Google Play Store: <a href="https://play.google.com/s
 
 Screenshots of the Application:
 <br>
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134502.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134532.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134546.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134704.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134716.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134741.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134741.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134741.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134907.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-134942.png" width="300">
-<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201017-135001.png" width="300">
+<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201225-180642.png" width="300">
+<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201225-180807.png" width="300">
+<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201225-180908.png" width="300">
+<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201225-180914.png" width="300">
+<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201225-181025.png" width="300">
+<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201225-181206.png" width="300">
+<img src="https://github.com/akashmagnadia/Heartbeat-Timer/blob/master/Screenshots/Screenshot_20201225-181243.png" width="300">
 
 Libraries Used in this project:
 https://github.com/DeweyReed/ScrollHmsPicker?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=6805
