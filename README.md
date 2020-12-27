@@ -1,5 +1,5 @@
 # Multi Purpose Timer
-This is an android project of a unique Multi-Purpose Timer and Stopwatch. This is a versatile app with statistics about the past timers which the user can keep track of by naming the timer. There is also stopwatch with a feature of lap that allows user to see time for each lap and at what time the lap was started. Another feature includes multiple timer view where user can set unlimitalled timer in a compact easy to read recycler view.
+This is an android project of a unique Multi-Purpose Timer and Stopwatch. This is a versatile app with statistics about the past timers which the user can keep track of by naming the timer. There is also stopwatch with a feature of lap that allows user to see time for each lap and at what time the lap was started. Another feature includes multiple timer view where users can set unlimited timers in a compact easy to read recycler view.
 
 Another important feature of this app is the ability to build a timer. A user can build a timer with group and have timers in a specific groups which can be set to repeat as many times as possible.
 
