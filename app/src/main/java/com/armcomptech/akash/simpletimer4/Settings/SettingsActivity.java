@@ -1,6 +1,7 @@
 package com.armcomptech.akash.simpletimer4.Settings;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -95,7 +96,12 @@ public class SettingsActivity extends AppCompatActivity {
                 logFirebaseAnalyticsEvents("Opened Privacy Policy");
                 Intent myWebLink = new Intent(Intent.ACTION_VIEW);
                 myWebLink.setData(Uri.parse("https://timerpolicy.blogspot.com/2019/06/privacy-policy-armcomptech-built.html"));
-                startActivity(myWebLink);
+                try {
+                    startActivity(myWebLink);
+                } catch (ActivityNotFoundException exception) {
+                    Toast.makeText(this, "Your device doesn't have a browser setup yet", Toast.LENGTH_LONG).show();
+                    logFirebaseAnalyticsEvents("Privacy policy activity not found");
+                }
                 break;
 
             case R.id.send_feedback:

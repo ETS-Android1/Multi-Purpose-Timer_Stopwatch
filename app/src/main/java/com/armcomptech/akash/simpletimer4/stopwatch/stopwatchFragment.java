@@ -490,16 +490,18 @@ public class stopwatchFragment extends Fragment {
     }
 
     public void showNotification() {
-        if (!fragmentAttached) {
+        if (!fragmentAttached || isDetached()) {
             return;
         }
-        synchronized (requireContext()) {
+        try {
             long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
             Intent intent1local = new Intent("stopwatchPlayer");
             intent1local.putExtra("notification", "updateNotification");
             intent1local.putExtra("timeLeft", String.valueOf(elapsedMillis));
             intent1local.putExtra("name", getTimerName());
             requireContext().sendBroadcast(intent1local);
+        } catch (IllegalStateException exception) {
+            logFirebaseAnalyticsEvents("Stopwatch notification failed");
         }
     }
 

@@ -2,14 +2,11 @@ package com.armcomptech.akash.simpletimer4.singleTimer;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -36,7 +33,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
@@ -59,7 +55,6 @@ import java.util.Locale;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
-import static com.App.MAIN_CHANNEL_ID;
 import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.disableFirebaseLogging;
 
 /**
@@ -432,10 +427,6 @@ public class singleTimerFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         this.fragmentAttached = false;
-    }
-
-    public static TabbedActivity getInstance() {
-        return instance;
     }
 
     private String getTimerName() {
@@ -886,12 +877,6 @@ public class singleTimerFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mProgressBar.setProgress((int)mTimeLeftInMillis,true);
         }
-
-        if (showNotification) {
-//            showNotification(timeLeftFormatted, currentTimerName);
-        } else {
-            notificationManager.cancel(notification_id);
-        }
     }
 
     private void updateWatchInterface() {
@@ -928,35 +913,5 @@ public class singleTimerFragment extends Fragment {
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         }
-    }
-
-    public void showNotification(String timeLeft, String currentTimerName) {
-
-        PackageManager client = getContext().getPackageManager();
-        final Intent notificationIntent = client.getLaunchIntentForPackage("com.armcomptech.akash.simpletimer4");
-
-        final PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0,
-                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        String content;
-        if (currentTimerName.equals("General")) {
-            content = "Timer: " + timeLeft;
-        } else {
-            content = "Timer: " + currentTimerName + " - " + timeLeft;
-        }
-
-        Notification notification = new NotificationCompat.Builder(getContext(), MAIN_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_timer_black)
-                .setContentTitle(content)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setCategory(NotificationCompat.CATEGORY_STATUS)
-                .setAutoCancel(true)
-                .setOngoing(false)
-                .setOnlyAlertOnce(true)
-                .setSound(null)
-                .setFullScreenIntent(pendingIntent, false)
-                .build();
-
-        notificationManager.notify(1, notification);
     }
 }
