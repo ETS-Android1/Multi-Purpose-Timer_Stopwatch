@@ -143,6 +143,13 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         editor.apply();
     }
 
+    private void showAds() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("removed_Ads", false);
+        editor.apply();
+    }
+
     @Override
     public void onPurchaseHistoryRestored() {
         bp.loadOwnedPurchasesFromGoogle();

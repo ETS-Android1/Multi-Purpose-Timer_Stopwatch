@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,7 @@ import androidx.fragment.app.Fragment;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -43,7 +42,6 @@ import java.util.TimerTask;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
-import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.disableFirebaseLogging;
 
 public class stopwatchFragment extends Fragment {
 
@@ -82,7 +80,9 @@ public class stopwatchFragment extends Fragment {
     private boolean watchIsReset = true;
     private boolean fragmentAttached;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private InterstitialAd mResetButtonInterstitialAd;
+
+    private AdView banner_adView;
+    AdRequest banner_adRequest;
 
     public static stopwatchFragment newInstance() {
         return new stopwatchFragment();
@@ -107,6 +107,15 @@ public class stopwatchFragment extends Fragment {
 
         setRetainInstance(true);
         View root = inflater.inflate(R.layout.fragment_stopwatch, container, false);
+
+        banner_adView = (AdView) root.findViewById(R.id.banner_ad);
+        if (isRemovedAds()) {
+            banner_adView.setVisibility(View.GONE);
+        } else {
+            banner_adRequest = new AdRequest.Builder().build();
+            banner_adView.loadAd(banner_adRequest);
+        }
+
         lapListAdapter = new ArrayAdapter<>(requireContext(), R.layout.listview_adapter, lapTimeInfo);
 
         lapListViewConstraintLayout = root.findViewById(R.id.lapListParentView);
@@ -178,16 +187,6 @@ public class stopwatchFragment extends Fragment {
             setWithoutLapView();
 
             logFirebaseAnalyticsEvents("Reset Stopwatch");
-
-            if (!isRemovedAds()) {
-                if (mResetButtonInterstitialAd.isLoaded()) {
-                    mResetButtonInterstitialAd.show();
-                    logFirebaseAnalyticsEvents("Showed Ad");
-                } else {
-                    Log.d("TAG", "The interstitial wasn't loaded yet.");
-                    logFirebaseAnalyticsEvents("Ad not loaded");
-                }
-            }
         });
 
         mButtonLap.setOnClickListener(v -> {
@@ -200,14 +199,6 @@ public class stopwatchFragment extends Fragment {
             //ad stuff
             //noinspection deprecation
             MobileAds.initialize(getContext(),getString(R.string.admob_app_id));
-
-            //reset button ad
-            mResetButtonInterstitialAd = new InterstitialAd(requireContext());
-            mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstital_ad_id));
-
-            if (!disableFirebaseLogging) {
-                mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
-            }
         }
 
         return root;

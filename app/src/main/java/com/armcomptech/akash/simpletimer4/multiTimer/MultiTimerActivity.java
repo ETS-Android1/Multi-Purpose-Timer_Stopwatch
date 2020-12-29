@@ -42,6 +42,8 @@ import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
 import com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -68,10 +70,21 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     final static int GROUP_NOTIFICATION_ID = 1000;
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    private AdView banner_adView;
+    AdRequest banner_adRequest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_multi_timer);
+
+        if (isRemovedAds()) {
+            setContentView(R.layout.activity_multi_timer);
+        } else {
+            setContentView(R.layout.activity_multi_timer_withad);
+            banner_adView = (AdView) findViewById(R.id.banner_ad);
+            banner_adRequest = new AdRequest.Builder().build();
+            banner_adView.loadAd(banner_adRequest);
+        }
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

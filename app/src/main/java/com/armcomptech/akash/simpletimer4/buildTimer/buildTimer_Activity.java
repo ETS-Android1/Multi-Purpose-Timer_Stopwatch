@@ -44,6 +44,8 @@ import com.armcomptech.akash.simpletimer4.Settings.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
@@ -80,10 +82,22 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
     final ArrayList<String> saved_timers_names = new ArrayList<>();
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    private AdView banner_adView;
+    AdRequest banner_adRequest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_build_timer);
+
+        if (isRemovedAds()) {
+            setContentView(R.layout.activity_build_timer);
+        } else {
+            setContentView(R.layout.activity_build_timer_withad);
+            banner_adView = (AdView) findViewById(R.id.banner_ad);
+            banner_adRequest = new AdRequest.Builder().build();
+            banner_adView.loadAd(banner_adRequest);
+        }
+
         if (!TabbedActivity.disableFirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         }

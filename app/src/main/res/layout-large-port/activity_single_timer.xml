@@ -188,7 +188,13 @@
                 app:srcCompat="@drawable/ic_replay" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </LinearLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/banner_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:adSize="BANNER"
+        app:adUnitId="@string/banner_ad_id"  />
 
 </LinearLayout>
