@@ -44,8 +44,10 @@ import com.armcomptech.akash.simpletimer4.Settings.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
@@ -96,6 +98,17 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
             banner_adView = (AdView) findViewById(R.id.banner_ad);
             banner_adRequest = new AdRequest.Builder().build();
             banner_adView.loadAd(banner_adRequest);
+            banner_adView.setAdListener(new AdListener(){
+                @Override
+                public void onAdLoaded() {
+                    logFirebaseAnalyticsEvents("Loaded banner ad");
+                }
+
+                @Override
+                public void onAdFailedToLoad(LoadAdError loadAdError) {
+                    logFirebaseAnalyticsEvents("Failed to load banner ad");
+                }
+            });
         }
 
         if (!TabbedActivity.disableFirebaseLogging) {

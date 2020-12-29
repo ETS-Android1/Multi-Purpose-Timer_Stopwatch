@@ -27,8 +27,10 @@ import androidx.fragment.app.Fragment;
 
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -114,6 +116,17 @@ public class stopwatchFragment extends Fragment {
         } else {
             banner_adRequest = new AdRequest.Builder().build();
             banner_adView.loadAd(banner_adRequest);
+            banner_adView.setAdListener(new AdListener(){
+                @Override
+                public void onAdLoaded() {
+                    logFirebaseAnalyticsEvents("Loaded banner ad");
+                }
+
+                @Override
+                public void onAdFailedToLoad(LoadAdError loadAdError) {
+                    logFirebaseAnalyticsEvents("Failed to load banner ad");
+                }
+            });
         }
 
         lapListAdapter = new ArrayAdapter<>(requireContext(), R.layout.listview_adapter, lapTimeInfo);

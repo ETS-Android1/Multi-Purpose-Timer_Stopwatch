@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +28,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -50,7 +47,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private ArrayList<Timer> timers;
     private ArrayList<RecyclerView.ViewHolder> holders;
     private int ticksToPass = 0;
-    InterstitialAd mResetButtonInterstitialAd;
 
     private boolean showNotification;
     private NotificationManagerCompat notificationManager;
@@ -74,11 +70,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 //ad stuff
                 //noinspection deprecation
                 MobileAds.initialize(this.context, this.context.getString(R.string.admob_app_id));
-
-                //reset button ad
-                mResetButtonInterstitialAd = new InterstitialAd(this.context);
-                mResetButtonInterstitialAd.setAdUnitId(this.context.getString(R.string.resetButton_interstital_ad_id));
-                mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
         }
     }
@@ -199,16 +190,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
             logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
-
-            if (!isRemovedAds()) {
-                if (mResetButtonInterstitialAd.isLoaded()) {
-                    mResetButtonInterstitialAd.show();
-                    logFirebaseAnalyticsEvents("Showed Ad");
-                } else {
-                    Log.d("TAG", "The interstitial wasn't loaded yet.");
-                    logFirebaseAnalyticsEvents("Ad not loaded");
-                }
-            }
 
             resetTimer((Item) holder);
             int myPosition = holder.getAdapterPosition();
