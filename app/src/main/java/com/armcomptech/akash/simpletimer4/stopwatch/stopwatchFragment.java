@@ -111,19 +111,20 @@ public class stopwatchFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_stopwatch, container, false);
 
         banner_adView = (AdView) root.findViewById(R.id.banner_ad);
-        if (isRemovedAds()) {
-            banner_adView.setVisibility(View.GONE);
-        } else {
+        banner_adView.setVisibility(View.GONE);
+        if (!isRemovedAds()) {
             banner_adRequest = new AdRequest.Builder().build();
             banner_adView.loadAd(banner_adRequest);
-            banner_adView.setAdListener(new AdListener(){
+            banner_adView.setAdListener(new AdListener() {
                 @Override
                 public void onAdLoaded() {
+                    banner_adView.setVisibility(View.VISIBLE);
                     logFirebaseAnalyticsEvents("Loaded banner ad");
                 }
 
                 @Override
                 public void onAdFailedToLoad(LoadAdError loadAdError) {
+                    banner_adView.setVisibility(View.GONE);
                     logFirebaseAnalyticsEvents("Failed to load banner ad");
                 }
             });

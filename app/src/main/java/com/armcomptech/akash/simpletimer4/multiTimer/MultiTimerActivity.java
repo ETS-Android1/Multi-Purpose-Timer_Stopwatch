@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -78,27 +80,28 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_multi_timer);
 
-        if (isRemovedAds()) {
-            setContentView(R.layout.activity_multi_timer);
-        } else {
-            setContentView(R.layout.activity_multi_timer_withad);
+        if (!isRemovedAds()) {
             banner_adView = (AdView) findViewById(R.id.banner_ad);
             banner_adRequest = new AdRequest.Builder().build();
             banner_adView.loadAd(banner_adRequest);
             banner_adView.setAdListener(new AdListener(){
                 @Override
                 public void onAdLoaded() {
+                    banner_adView.setVisibility(View.VISIBLE);
                     logFirebaseAnalyticsEvents("Loaded banner ad");
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
                 }
 
                 @Override
                 public void onAdFailedToLoad(LoadAdError loadAdError) {
+                    banner_adView.setVisibility(View.GONE);
                     logFirebaseAnalyticsEvents("Failed to load banner ad");
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
                 }
             });
         }
-
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setTitle("   Multi Timer");

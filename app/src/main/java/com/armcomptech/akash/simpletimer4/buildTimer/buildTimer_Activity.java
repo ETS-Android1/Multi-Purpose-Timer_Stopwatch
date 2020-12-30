@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -90,23 +91,25 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_build_timer);
 
-        if (isRemovedAds()) {
-            setContentView(R.layout.activity_build_timer);
-        } else {
-            setContentView(R.layout.activity_build_timer_withad);
+        if (!isRemovedAds()) {
             banner_adView = (AdView) findViewById(R.id.banner_ad);
             banner_adRequest = new AdRequest.Builder().build();
             banner_adView.loadAd(banner_adRequest);
             banner_adView.setAdListener(new AdListener(){
                 @Override
                 public void onAdLoaded() {
+                    banner_adView.setVisibility(View.VISIBLE);
                     logFirebaseAnalyticsEvents("Loaded banner ad");
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
                 }
 
                 @Override
                 public void onAdFailedToLoad(LoadAdError loadAdError) {
+                    banner_adView.setVisibility(View.GONE);
                     logFirebaseAnalyticsEvents("Failed to load banner ad");
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
                 }
             });
         }

@@ -76,22 +76,22 @@ public class timerForBuilt_Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_timer_for_built);
 
-        if (isRemovedAds()) {
-            setContentView(R.layout.activity_timer_for_built);
-        } else {
-            setContentView(R.layout.activity_timer_for_built_withad);
+        if (!isRemovedAds()) {
             banner_adView = (AdView) findViewById(R.id.banner_ad);
             banner_adRequest = new AdRequest.Builder().build();
             banner_adView.loadAd(banner_adRequest);
             banner_adView.setAdListener(new AdListener(){
                 @Override
                 public void onAdLoaded() {
+                    banner_adView.setVisibility(View.VISIBLE);
                     logFirebaseAnalyticsEvents("Loaded banner ad");
                 }
 
                 @Override
                 public void onAdFailedToLoad(LoadAdError loadAdError) {
+                    banner_adView.setVisibility(View.GONE);
                     logFirebaseAnalyticsEvents("Failed to load banner ad");
                 }
             });

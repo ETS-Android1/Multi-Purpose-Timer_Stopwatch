@@ -23,7 +23,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".buildTimer.timerForBuilt_Activity" />
+        <activity
+            android:name=".buildTimer.timerForBuilt_Activity"
+            android:screenOrientation="userPortrait"/>
 
         <service android:name=".singleTimer.timerWithService" />
         <service android:name=".stopwatch.stopwatchWithService" />
@@ -44,14 +46,13 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".multiTimer.MultiTimerActivity"
-            android:configChanges="screenLayout|orientation|screenSize"
             android:launchMode="singleTop" />
+
         <activity android:name=".statistics.StatisticsActivity" />
 
         <service android:name=".buildTimer.buildTimerWithService" />
         <activity
             android:name=".buildTimer.buildTimer_Activity"
-            android:configChanges="screenLayout|orientation|screenSize"
             android:launchMode="singleTop" />
 
         <meta-data
