@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -50,6 +53,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private boolean showNotification;
     private NotificationManagerCompat notificationManager;
+    InterstitialAd mResetButtonInterstitialAd;
 
     MultiTimerAdapter(Context context, ArrayList<Timer> timers, ArrayList<RecyclerView.ViewHolder> holders) {
         this.context = context;
@@ -65,12 +69,16 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         if (!TabbedActivity.disableFirebaseLogging) {
             logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
+        }
 
-            if (!isRemovedAds()) {
-                //ad stuff
-                //noinspection deprecation
-                MobileAds.initialize(this.context, this.context.getString(R.string.admob_app_id));
-            }
+        if (!isRemovedAds()) {
+            //noinspection deprecation
+            MobileAds.initialize(this.context,this.context.getString(R.string.admob_app_id));
+
+            //reset button ad
+            mResetButtonInterstitialAd = new InterstitialAd(this.context);
+            mResetButtonInterstitialAd.setAdUnitId(this.context.getString(R.string.resetButton_interstitial_ad_id));
+            mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
         }
     }
 
@@ -205,6 +213,17 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             timers.get(myPosition).setTimerPlaying(false);
             timers.get(myPosition).setTimerPaused(false);
             timers.get(myPosition).setTimerIsDone(true);
+
+
+            if (!isRemovedAds()) {
+                if (mResetButtonInterstitialAd.isLoaded()) {
+                    mResetButtonInterstitialAd.show();
+                    logFirebaseAnalyticsEvents("Showed Ad");
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
+                    logFirebaseAnalyticsEvents("Ad not loaded");
+                }
+            }
         });
 
         ((Item)holder).invisibleTimeButton.setBackgroundColor(Color.TRANSPARENT); //make button invisible

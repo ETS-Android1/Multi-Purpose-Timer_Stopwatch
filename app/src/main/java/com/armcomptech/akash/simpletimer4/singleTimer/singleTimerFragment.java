@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -93,6 +95,7 @@ public class singleTimerFragment extends Fragment {
 
     private AdView banner_adView;
     AdRequest banner_adRequest;
+    InterstitialAd mResetButtonInterstitialAd;
 
     ArrayList<String> timerName = new ArrayList<>();
     ArrayList<Integer> count = new ArrayList<>();
@@ -161,9 +164,13 @@ public class singleTimerFragment extends Fragment {
         }
 
         if (!isRemovedAds()) {
-            //ad stuff
             //noinspection deprecation
             MobileAds.initialize(getContext(),getString(R.string.admob_app_id));
+
+            //reset button ad
+            mResetButtonInterstitialAd = new InterstitialAd(requireContext());
+            mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstitial_ad_id));
+            mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
         }
     }
 
@@ -301,6 +308,16 @@ public class singleTimerFragment extends Fragment {
 
             mTimerNameTextView.setVisibility(View.INVISIBLE);
             mTimerNameAutoComplete.setVisibility(View.VISIBLE);
+
+            if (!isRemovedAds()) {
+                if (mResetButtonInterstitialAd.isLoaded()) {
+                    mResetButtonInterstitialAd.show();
+                    logFirebaseAnalyticsEvents("Showed Ad");
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
+                    logFirebaseAnalyticsEvents("Ad not loaded");
+                }
+            }
         });
 
         showNotification = false;
