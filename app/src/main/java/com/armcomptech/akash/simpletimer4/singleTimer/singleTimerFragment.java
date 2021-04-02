@@ -803,10 +803,11 @@ public class singleTimerFragment extends Fragment {
         }
         notificationManager.cancel(notification_id);
 
-        Intent intent1local = new Intent();
-        intent1local.setAction("SingleTimerTimerPlayer");
-        intent1local.putExtra("SingleTimerPlayer", "Reset");
-        instance.sendBroadcast(intent1local);
+//        Intent intent1local = new Intent();
+//        intent1local.setAction("SingleTimerTimerPlayer");
+//        intent1local.putExtra("SingleTimerPlayer", "Reset");
+//        instance.sendBroadcast(intent1local);
+        instance.stopService(new Intent(instance, timerWithService.class));
     }
 
     public String getTimeLeftFormatted() {
