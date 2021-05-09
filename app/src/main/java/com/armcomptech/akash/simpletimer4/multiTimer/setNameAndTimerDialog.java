@@ -95,7 +95,7 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
         });
 
         if (this.updateExistingTimer) {
-            autoCompleteTimerName.setText(timers.get(holder.getAdapterPosition()).getTimerName());
+            autoCompleteTimerName.setText(timers.get(holder.getBindingAdapterPosition()).getTimerName());
             autoCompleteTimerName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
             if (timePickerPreference.equals("Typing")) {
@@ -113,7 +113,7 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
                 editTextTimer.setVisibility(View.GONE);
                 timePicker = view.findViewById(R.id.scrollHmsPicker);
 
-                long startTime = timers.get(holder.getAdapterPosition()).getStartTimeInMillis();
+                long startTime = timers.get(holder.getBindingAdapterPosition()).getStartTimeInMillis();
                 int hours = (int) (startTime / 1000) / 3600;
                 int minutes = (int) ((startTime / 1000) % 3600) / 60;
                 int seconds = (int) (startTime / 1000) % 60;

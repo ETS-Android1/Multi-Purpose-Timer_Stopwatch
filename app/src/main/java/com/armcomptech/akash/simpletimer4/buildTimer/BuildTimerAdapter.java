@@ -59,7 +59,7 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        int myPosition = holder.getAdapterPosition();
+        int myPosition = holder.getBindingAdapterPosition();
 
         ((Item)holder).edit_timer_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +67,7 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
                 setNameAndTimerDialogForBuildTimer setNameAndTimerDialogForBuildTimer = new setNameAndTimerDialogForBuildTimer(
                         true,
                         false,
-                        holder.getAdapterPosition(),
+                        holder.getBindingAdapterPosition(),
                         timers);
                 setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
                 notifyDataSetChanged();

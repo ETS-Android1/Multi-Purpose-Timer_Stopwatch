@@ -63,7 +63,7 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        int myPosition = holder.getAdapterPosition();
+        int myPosition = holder.getBindingAdapterPosition();
 
         ((Item)holder).timerRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         ((Item)holder).timerRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -171,8 +171,8 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
         setNameAndTimerDialogForBuildTimer setNameAndTimerDialogForBuildTimer = new setNameAndTimerDialogForBuildTimer(
                 false,
                 true,
-                holder.getAdapterPosition(),
-                masterInfo.basicGroupInfoArrayList.get(holder.getAdapterPosition()).basicTimerInfoArrayList);
+                holder.getBindingAdapterPosition(),
+                masterInfo.basicGroupInfoArrayList.get(holder.getBindingAdapterPosition()).basicTimerInfoArrayList);
         setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
     }
 }

@@ -130,11 +130,11 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                timers.get(viewHolder.getAdapterPosition()).clean();
-                timers.remove(viewHolder.getAdapterPosition());
-                holders.remove(viewHolder.getAdapterPosition());
-                Objects.requireNonNull(recyclerView.getAdapter()).notifyItemRemoved(viewHolder.getAdapterPosition());
-                NotificationManagerCompat.from(getApplicationContext()).cancel(viewHolder.getAdapterPosition() + 2); //cancel notification
+                timers.get(viewHolder.getBindingAdapterPosition()).clean();
+                timers.remove(viewHolder.getBindingAdapterPosition());
+                holders.remove(viewHolder.getBindingAdapterPosition());
+                Objects.requireNonNull(recyclerView.getAdapter()).notifyItemRemoved(viewHolder.getBindingAdapterPosition());
+                NotificationManagerCompat.from(getApplicationContext()).cancel(viewHolder.getBindingAdapterPosition() + 2); //cancel notification
             }
 
             @Override
@@ -202,14 +202,14 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(recyclerView.getAdapter().getItemCount() + 1);
         }
         if (updateExistingTimer) {
-            timers.get(holder.getAdapterPosition()).setStartTimeInMillis(finalSecond * 1000);
-            timers.get(holder.getAdapterPosition()).setTimeLeftInMillis(finalSecond * 1000);
-            timers.get(holder.getAdapterPosition()).setTimerPlaying(false);
-            timers.get(holder.getAdapterPosition()).setTimerPaused(false);
-            timers.get(holder.getAdapterPosition()).setTimerIsDone(false);
-            if (timers.get(holder.getAdapterPosition()).getCountDownTimer() != null) {
-                timers.get(holder.getAdapterPosition()).getCountDownTimer().cancel();
-                timers.get(holder.getAdapterPosition()).setCountDownTimer(null);
+            timers.get(holder.getBindingAdapterPosition()).setStartTimeInMillis(finalSecond * 1000);
+            timers.get(holder.getBindingAdapterPosition()).setTimeLeftInMillis(finalSecond * 1000);
+            timers.get(holder.getBindingAdapterPosition()).setTimerPlaying(false);
+            timers.get(holder.getBindingAdapterPosition()).setTimerPaused(false);
+            timers.get(holder.getBindingAdapterPosition()).setTimerIsDone(false);
+            if (timers.get(holder.getBindingAdapterPosition()).getCountDownTimer() != null) {
+                timers.get(holder.getBindingAdapterPosition()).getCountDownTimer().cancel();
+                timers.get(holder.getBindingAdapterPosition()).setCountDownTimer(null);
             }
             Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
         }

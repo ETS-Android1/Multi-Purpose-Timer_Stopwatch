@@ -120,7 +120,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
-        int myPosition = holder.getAdapterPosition();
+        int myPosition = holder.getBindingAdapterPosition();
         if (myPosition != -1) {
             timers.get(myPosition).setShowNotification(true);
         }
@@ -129,7 +129,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewAttachedToWindow(holder);
-        int myPosition = holder.getAdapterPosition();
+        int myPosition = holder.getBindingAdapterPosition();
         if (myPosition != -1) {
             timers.get(myPosition).setShowNotification(false);
         }
@@ -162,19 +162,19 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             holders.add(holder);
         }
 
-        ((Item)holder).timerName.setText(String.format("Timer Name: %s", timers.get(holder.getAdapterPosition()).getTimerName()));
-        ((Item)holder).timerTime.setText(timers.get(holder.getAdapterPosition()).getTimeLeftFormatted());
-        if (timers.get(holder.getAdapterPosition()).getTimerPlaying()) {
+        ((Item)holder).timerName.setText(String.format("Timer Name: %s", timers.get(holder.getBindingAdapterPosition()).getTimerName()));
+        ((Item)holder).timerTime.setText(timers.get(holder.getBindingAdapterPosition()).getTimeLeftFormatted());
+        if (timers.get(holder.getBindingAdapterPosition()).getTimerPlaying()) {
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
-            startTimer(((Item)holder), holder.getAdapterPosition());
-        } else if (timers.get(holder.getAdapterPosition()).getTimerPaused()) {
+            startTimer(((Item)holder), holder.getBindingAdapterPosition());
+        } else if (timers.get(holder.getBindingAdapterPosition()).getTimerPaused()) {
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
             resetTimer(((Item)holder));
-        } else if (timers.get(holder.getAdapterPosition()).getTimerIsDone()) {
+        } else if (timers.get(holder.getBindingAdapterPosition()).getTimerIsDone()) {
             ((Item)holder).startButton.setVisibility(View.INVISIBLE);
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
@@ -185,12 +185,12 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
 
             ((Item) holder).timerTime.setTextColor(Color.BLACK);
-            ((Item)holder).timerTime.setText(timers.get(holder.getAdapterPosition()).getTimeLeftFormatted());
+            ((Item)holder).timerTime.setText(timers.get(holder.getBindingAdapterPosition()).getTimeLeftFormatted());
 
             resetTimer((Item) holder);
         }
 
-        ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getAdapterPosition()).getStartTimeInMillis());
+        ((Item)holder).progressBarTimeHorizontal.setMax((int) timers.get(holder.getBindingAdapterPosition()).getStartTimeInMillis());
 
         ((Item)holder).startButton.setOnClickListener(v -> {
             logFirebaseAnalyticsEvents("Start Timer in Multi-Timer");
@@ -199,11 +199,11 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).pauseButton.setVisibility(View.VISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
 
-            timers.get(holder.getAdapterPosition()).setTimerPlaying(true);
-            timers.get(holder.getAdapterPosition()).setTimerPaused(false);
-            timers.get(holder.getAdapterPosition()).setTimerIsDone(false);
+            timers.get(holder.getBindingAdapterPosition()).setTimerPlaying(true);
+            timers.get(holder.getBindingAdapterPosition()).setTimerPaused(false);
+            timers.get(holder.getBindingAdapterPosition()).setTimerIsDone(false);
 
-            startTimer((Item) holder, holder.getAdapterPosition());
+            startTimer((Item) holder, holder.getBindingAdapterPosition());
         });
 
         ((Item)holder).pauseButton.setOnClickListener(v -> {
@@ -215,16 +215,16 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.VISIBLE);
 
-            timers.get(holder.getAdapterPosition()).setTimerPlaying(false);
-            timers.get(holder.getAdapterPosition()).setTimerPaused(true);
-            timers.get(holder.getAdapterPosition()).setTimerIsDone(false);
+            timers.get(holder.getBindingAdapterPosition()).setTimerPlaying(false);
+            timers.get(holder.getBindingAdapterPosition()).setTimerPaused(true);
+            timers.get(holder.getBindingAdapterPosition()).setTimerIsDone(false);
         });
 
         ((Item)holder).resetButton.setOnClickListener(v -> {
             logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
 
             resetTimer((Item) holder);
-            int myPosition = holder.getAdapterPosition();
+            int myPosition = holder.getBindingAdapterPosition();
             cancelNotification(myPosition + 2);
 
             ((Item)holder).startButton.setVisibility(View.VISIBLE);
@@ -260,7 +260,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void resetTimer(@NonNull Item holder) {
-        int myPosition = holder.getAdapterPosition();
+        int myPosition = holder.getBindingAdapterPosition();
 
         timers.get(myPosition).setTimeLeftInMillis(timers.get(myPosition).getStartTimeInMillis());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -277,17 +277,17 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void pauseTimer(@NonNull Item holder) {
-        int myPosition = holder.getAdapterPosition();
+        int myPosition = holder.getBindingAdapterPosition();
         timers.get(myPosition).getCountDownTimer().cancel();
         timers.get(myPosition).setTimerPlaying(false);
         timers.get(myPosition).setTimerPaused(true);
     }
 
     private void startTimer(@NonNull Item holder, int position) {
-        if (!timers.get(holder.getAdapterPosition()).getTimerPlaying() &&
-                !timers.get(holder.getAdapterPosition()).getTimerPaused() &&
-                !timers.get(holder.getAdapterPosition()).getTimerIsDone()) {
-            saveData(timers.get(holder.getAdapterPosition()).getTimerName(), 1, 0);
+        if (!timers.get(holder.getBindingAdapterPosition()).getTimerPlaying() &&
+                !timers.get(holder.getBindingAdapterPosition()).getTimerPaused() &&
+                !timers.get(holder.getBindingAdapterPosition()).getTimerIsDone()) {
+            saveData(timers.get(holder.getBindingAdapterPosition()).getTimerName(), 1, 0);
         }
 
         int countDownInterval = 100;
@@ -299,7 +299,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         timers.get(position).setCountDownTimer(new CountDownTimer(timers.get(position).getTimeLeftInMillis(), countDownInterval) {
             @Override
             public void onTick(long millisUntilFinished) {
-                int myPosition = holder.getAdapterPosition();
+                int myPosition = holder.getBindingAdapterPosition();
 
                 if (timers.get(myPosition).isShowNotification()) {
                     showNotification(timers.get(myPosition).getTimeLeftFormatted(), timers.get(myPosition).getTimerName(), myPosition + 2);
@@ -343,7 +343,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             public void onFinish() {
                 if (((Item)holder).repeatSwitch.isChecked()) {
                     resetTimer(((Item)holder));
-                    startTimer(((Item)holder), holder.getAdapterPosition());
+                    startTimer(((Item)holder), holder.getBindingAdapterPosition());
                 } else {
                     ((Item)holder).startButton.setVisibility(View.INVISIBLE);
                     ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
@@ -396,7 +396,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         if (updateExistingTimer) {
-            timers.get(holder.getAdapterPosition()).setStartTimeInMillis(finalSecond);
+            timers.get(holder.getBindingAdapterPosition()).setStartTimeInMillis(finalSecond);
             resetTimer(holder);
             logFirebaseAnalyticsEvents("Update Existing Timer in Multi-Timer");
         }

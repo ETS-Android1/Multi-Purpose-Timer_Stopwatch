@@ -27,8 +27,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -86,7 +84,7 @@ public class timerForBuilt_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_timer_for_built);
 
         if (!isRemovedAds()) {
-            banner_adView = (AdView) findViewById(R.id.banner_ad);
+            banner_adView = findViewById(R.id.banner_ad);
             banner_adRequest = new AdRequest.Builder().build();
             banner_adView.loadAd(banner_adRequest);
             banner_adView.setAdListener(new AdListener(){
@@ -97,7 +95,7 @@ public class timerForBuilt_Activity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onAdFailedToLoad(LoadAdError loadAdError) {
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     banner_adView.setVisibility(View.GONE);
                     logFirebaseAnalyticsEvents("Failed to load banner ad");
                 }
@@ -212,11 +210,8 @@ public class timerForBuilt_Activity extends AppCompatActivity {
 
         if (!isRemovedAds()) {
             MobileAds.initialize(this,
-                    new OnInitializationCompleteListener() {
-                        @Override
-                        public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+                    initializationStatus -> {
 
-                        }
                     });
 
             //reset button ad
