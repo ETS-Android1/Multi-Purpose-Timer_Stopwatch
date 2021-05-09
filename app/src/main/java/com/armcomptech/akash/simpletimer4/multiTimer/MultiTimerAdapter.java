@@ -1,5 +1,6 @@
 package com.armcomptech.akash.simpletimer4.multiTimer;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -30,8 +31,12 @@ import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
@@ -72,13 +77,32 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         if (!isRemovedAds()) {
-            //noinspection deprecation
-            MobileAds.initialize(this.context,this.context.getString(R.string.admob_app_id));
+            MobileAds.initialize(context,
+                    new OnInitializationCompleteListener() {
+                        @Override
+                        public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+
+                        }
+                    });
 
             //reset button ad
-            mResetButtonInterstitialAd = new InterstitialAd(this.context);
-            mResetButtonInterstitialAd.setAdUnitId(this.context.getString(R.string.resetButton_interstitial_ad_id));
-            mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            AdRequest adRequest = new AdRequest.Builder().build();
+            InterstitialAd.load(
+                    context,
+                    context.getString(R.string.resetButton_interstitial_ad_id),
+                    adRequest,
+                    new InterstitialAdLoadCallback() {
+                        @Override
+                        public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                            mResetButtonInterstitialAd = interstitialAd;
+                        }
+
+                        @Override
+                        public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                            mResetButtonInterstitialAd = null;
+                        }
+                    }
+            );
         }
     }
 
@@ -216,8 +240,8 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
 
             if (!isRemovedAds()) {
-                if (mResetButtonInterstitialAd.isLoaded()) {
-                    mResetButtonInterstitialAd.show();
+                if (mResetButtonInterstitialAd != null) {
+                    mResetButtonInterstitialAd.show((Activity) context);
                     logFirebaseAnalyticsEvents("Showed Ad");
                 } else {
                     Log.d("TAG", "The interstitial wasn't loaded yet.");

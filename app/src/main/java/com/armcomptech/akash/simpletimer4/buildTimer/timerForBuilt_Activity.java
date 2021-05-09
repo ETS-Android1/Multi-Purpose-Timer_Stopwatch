@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,9 +25,12 @@ import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -171,8 +175,8 @@ public class timerForBuilt_Activity extends AppCompatActivity {
             }
 
             if (!isRemovedAds()) {
-                if (mResetButtonInterstitialAd.isLoaded()) {
-                    mResetButtonInterstitialAd.show();
+                if (mResetButtonInterstitialAd != null) {
+                    mResetButtonInterstitialAd.show(timerForBuilt_Activity.this);
                     logFirebaseAnalyticsEvents("Showed Ad");
                 } else {
                     Log.d("TAG", "The interstitial wasn't loaded yet.");
@@ -207,13 +211,32 @@ public class timerForBuilt_Activity extends AppCompatActivity {
         registerReceiver(broadcastReceiver2, intentFilter2);
 
         if (!isRemovedAds()) {
-            //noinspection deprecation
-            MobileAds.initialize(this,getString(R.string.admob_app_id));
+            MobileAds.initialize(this,
+                    new OnInitializationCompleteListener() {
+                        @Override
+                        public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+
+                        }
+                    });
 
             //reset button ad
-            mResetButtonInterstitialAd = new InterstitialAd(this);
-            mResetButtonInterstitialAd.setAdUnitId(getString(R.string.resetButton_interstitial_ad_id));
-            mResetButtonInterstitialAd.loadAd(new AdRequest.Builder().build());
+            AdRequest adRequest = new AdRequest.Builder().build();
+            InterstitialAd.load(
+                    this,
+                    getString(R.string.resetButton_interstitial_ad_id),
+                    adRequest,
+                    new InterstitialAdLoadCallback() {
+                        @Override
+                        public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                            mResetButtonInterstitialAd = interstitialAd;
+                        }
+
+                        @Override
+                        public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                            mResetButtonInterstitialAd = null;
+                        }
+                    }
+            );
         }
     }
 

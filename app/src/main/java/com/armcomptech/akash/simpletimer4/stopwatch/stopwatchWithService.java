@@ -94,7 +94,7 @@ public class stopwatchWithService extends Service {
         PackageManager client = this.getPackageManager();
         final Intent notificationIntent = client.getLaunchIntentForPackage("com.armcomptech.akash.simpletimer4");
 
-        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(), 0,
                 notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         String content;
@@ -110,7 +110,7 @@ public class stopwatchWithService extends Service {
         Notification notification = new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_baseline_timelapse_24)
                 .setContentTitle(content)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setAutoCancel(true)
                 .setOngoing(false)
