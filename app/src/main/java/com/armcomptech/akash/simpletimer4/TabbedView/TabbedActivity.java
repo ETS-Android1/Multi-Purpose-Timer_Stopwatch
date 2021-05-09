@@ -82,7 +82,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
             removeAds(); // this removes all ads for new users
         }
         //TODO: comment out when releasing
-        alwaysShowAds(); // when testing
+//        alwaysShowAds(); // when testing
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);

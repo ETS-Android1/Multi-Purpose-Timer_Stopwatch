@@ -134,7 +134,9 @@ public class timerWithService extends Service {
         }
         NotificationManagerCompat.from(this).cancel(1);
         stopSelf();
-        countDownTimer.cancel();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
     }
 
     public void showNotification(String timeLeft, String currentTimerName) {

@@ -249,6 +249,12 @@ public class timerForBuilt_Activity extends AppCompatActivity {
     private void onCreatePrepareUI() {
         resetButton.setVisibility(View.INVISIBLE);
         pauseButton.setVisibility(View.INVISIBLE);
+
+        if (groupNameArray.size() == 0 || timerNameArray.size() == 0) {
+            finish();
+            return;
+        }
+
         text_groupAndTimerName.setText(groupNameArray.get(0) + " - " + timerNameArray.get(0));
 
         mStartTimeInMillis = timerTimeArray.get(0);

@@ -2,6 +2,7 @@ package com.armcomptech.akash.simpletimer4.buildTimer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.armcomptech.akash.simpletimer4.R;
+import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 
@@ -21,11 +24,16 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
     private Context context;
     private ArrayList<RecyclerView.ViewHolder> holders;
     private ArrayList<BasicTimerInfo> timers;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public BuildTimerAdapter(Context context, ArrayList<RecyclerView.ViewHolder> holders, ArrayList<BasicTimerInfo> timers) {
         this.context = context;
         this.holders = holders;
         this.timers = timers;
+
+        if (!TabbedActivity.disableFirebaseLogging) {
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+        }
     }
 
     public static class Item extends RecyclerView.ViewHolder {
@@ -67,8 +75,21 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
         });
 
         ((Item)holder).delete_timer_button.setOnClickListener(v -> {
-            timers.remove(myPosition);
-            notifyItemRemoved(myPosition);
+            try {
+                timers.remove(myPosition);
+                notifyItemRemoved(myPosition);
+            } catch (IndexOutOfBoundsException e) {
+                Bundle bundle = new Bundle();
+                bundle.putString("Event", "Error");
+                bundle.putString("Timer_Size", String.valueOf(timers.size()));
+                bundle.putString("myPosition", String.valueOf(myPosition));
+                bundle.putString("position", String.valueOf(position));
+                bundle.putString("Location", "delete_timer_button");
+                bundle.putString("Error_Type", "Index out of bound");
+
+                mFirebaseAnalytics.logEvent("Error", bundle);
+            }
+
         });
 
         String timerName = timers.get(myPosition).timerName;
