@@ -62,7 +62,7 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.App.MAIN_CHANNEL_ID;
+import static com.App.MULTI_TIMER_ID;
 
 public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener, BillingProcessor.IBillingHandler {
 
@@ -398,7 +398,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                 notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification summaryNotification =
-                new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
+                new NotificationCompat.Builder(this, MULTI_TIMER_ID)
                         .setSmallIcon(R.drawable.ic_video_library_black)
                         .setGroup("multiTimer")
                         .setGroupSummary(true)

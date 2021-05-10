@@ -19,7 +19,7 @@ import com.armcomptech.akash.simpletimer4.R;
 
 import java.util.Objects;
 
-import static com.App.MAIN_CHANNEL_ID;
+import static com.App.TIMER_STOPWATCH_ID;
 
 public class stopwatchWithService extends Service {
 
@@ -107,7 +107,7 @@ public class stopwatchWithService extends Service {
             content = "Stopwatch: " + currentTimerName + " - " + timeLeftFormatted;
         }
 
-        Notification notification = new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, TIMER_STOPWATCH_ID)
                 .setSmallIcon(R.drawable.ic_baseline_timelapse_24)
                 .setContentTitle(content)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)

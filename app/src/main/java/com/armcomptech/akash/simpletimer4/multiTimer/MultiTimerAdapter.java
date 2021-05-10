@@ -32,10 +32,10 @@ import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -46,7 +46,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.App.MAIN_CHANNEL_ID;
+import static com.App.MULTI_TIMER_ID;
 
 public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements setNameAndTimerDialog.setTimerDialogListener {
 
@@ -531,10 +531,10 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             content = "Timer: " + currentTimerName + " - " + timeLeft;
         }
 
-        Notification notification = new NotificationCompat.Builder(this.context, MAIN_CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this.context, MULTI_TIMER_ID)
                 .setSmallIcon(R.drawable.ic_timer_black)
                 .setContentTitle(content)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setAutoCancel(true)
                 .setOngoing(false)

@@ -46,6 +46,7 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".multiTimer.MultiTimerActivity"
+            android:configChanges="screenLayout|orientation|screenSize"
             android:launchMode="singleTop" />
 
         <activity android:name=".statistics.StatisticsActivity" />
@@ -53,6 +54,7 @@
         <service android:name=".buildTimer.buildTimerWithService" />
         <activity
             android:name=".buildTimer.buildTimer_Activity"
+            android:configChanges="screenLayout|orientation|screenSize"
             android:launchMode="singleTop" />
 
         <meta-data

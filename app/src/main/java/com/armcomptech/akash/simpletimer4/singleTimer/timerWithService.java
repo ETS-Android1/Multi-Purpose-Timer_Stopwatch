@@ -21,7 +21,7 @@ import com.armcomptech.akash.simpletimer4.R;
 import java.util.Locale;
 import java.util.Objects;
 
-import static com.App.MAIN_CHANNEL_ID;
+import static com.App.TIMER_STOPWATCH_ID;
 
 public class timerWithService extends Service {
 
@@ -154,10 +154,10 @@ public class timerWithService extends Service {
             content = "Timer: " + currentTimerName + " - " + timeLeft;
         }
 
-        Notification notification = new NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, TIMER_STOPWATCH_ID)
                 .setSmallIcon(R.drawable.ic_timer_white)
                 .setContentTitle(content)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setAutoCancel(true)
                 .setOngoing(false)
