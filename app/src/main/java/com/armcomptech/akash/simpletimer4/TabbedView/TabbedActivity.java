@@ -49,7 +49,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 public class TabbedActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler{
 
     //TODO: Change disableFirebaseLogging to false when releasing
-    public static Boolean disableFirebaseLogging = false;
+    public static Boolean disableFirebaseLogging = true;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
     BillingProcessor bp;
