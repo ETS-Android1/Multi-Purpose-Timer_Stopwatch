@@ -525,4 +525,89 @@ public class timerForBuilt_Activity extends AppCompatActivity {
             mFirebaseAnalytics.logEvent(eventName, bundle);
         }
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        //convert from long to integer so that it can be sent
+        ArrayList<Integer> timerTimeArrayToSend = new ArrayList<>();
+        for (long item: timerTimeArray) {
+            timerTimeArrayToSend.add((int) item);
+        }
+
+        outState.putStringArrayList("timerNameArray", timerNameArray);
+        outState.putStringArrayList("groupNameArray", groupNameArray);
+        outState.putIntegerArrayList("timerTimeArray", timerTimeArrayToSend);
+        outState.putStringArrayList("stringOfTimerArray", stringOfTimerArray);
+
+        outState.putBoolean("timerPlaying", timerPlaying);
+        outState.putBoolean("timerPaused", timerPaused);
+        outState.putBoolean("timerReset", timerReset);
+
+        outState.putLong("mStartTimeInMillis", mStartTimeInMillis);
+        outState.putLong("mLeftTimeInMillis", mLeftTimeInMillis);
+        outState.putLong("totalStartTime", totalStartTime);
+        outState.putLong("totalElapsedTime", totalElapsedTime);
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // convert from integer to long so that it can be used
+        ArrayList<Integer> timerTimeArrayToReceive = savedInstanceState.getIntegerArrayList("timerTimeArray");
+        timerTimeArray.clear();
+        for (int item: Objects.requireNonNull(timerTimeArrayToReceive)) {
+            timerTimeArray.add((long) item);
+        }
+
+        timerNameArray = savedInstanceState.getStringArrayList("timerNameArray");
+        groupNameArray = savedInstanceState.getStringArrayList("groupNameArray");
+        stringOfTimerArray = savedInstanceState.getStringArrayList("stringOfTimerArray");
+
+        timerPlaying = savedInstanceState.getBoolean("timerPlaying");
+        timerPaused = savedInstanceState.getBoolean("timerPaused");
+        timerReset = savedInstanceState.getBoolean("timerReset");
+
+        mStartTimeInMillis = savedInstanceState.getLong("mStartTimeInMillis");
+        mLeftTimeInMillis = savedInstanceState.getLong("mLeftTimeInMillis");
+        totalStartTime = savedInstanceState.getLong("totalStartTime");
+        totalElapsedTime = savedInstanceState.getLong("totalElapsedTime");
+
+        if (timerPlaying) {
+            startButton.setVisibility(View.INVISIBLE);
+            pauseButton.setVisibility(View.VISIBLE);
+            resetButton.setVisibility(View.INVISIBLE);
+        }
+        if (timerPaused) {
+            startButton.setVisibility(View.VISIBLE);
+            pauseButton.setVisibility(View.INVISIBLE);
+            resetButton.setVisibility(View.VISIBLE);
+            updateProgressBar();
+        }
+        if (timerReset) {
+            pauseButton.setVisibility(View.INVISIBLE);
+            startButton.setVisibility(View.VISIBLE);
+            if (totalStartTime != totalElapsedTime) {
+                resetButton.setVisibility(View.VISIBLE);
+            } else {
+                resetButton.setVisibility(View.INVISIBLE);
+            }
+            updateProgressBar();
+        }
+        if (timerTimeArray.size() <= 1) {
+            nextButton.setVisibility(View.INVISIBLE);
+            upNextListView.setVisibility(View.GONE);
+        }
+
+        upNextArrayAdapter = new ArrayAdapter<>(this, R.layout.timername_autocomplete_textview, R.id.autoComplete_name_textView, stringOfTimerArray);
+        upNextListView.setAdapter(upNextArrayAdapter);
+        upNextArrayAdapter.notifyDataSetChanged();
+
+        text_groupAndTimerName.setText(groupNameArray.get(0) + " - " + timerNameArray.get(0));
+        updateProgressBar();
+        setUITimerTime();
+    }
 }

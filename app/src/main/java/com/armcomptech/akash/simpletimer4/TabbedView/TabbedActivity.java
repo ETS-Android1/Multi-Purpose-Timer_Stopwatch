@@ -85,6 +85,8 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         //TODO: comment out when releasing
         if (alwaysShowAd) {
             alwaysShowAds();
+        } else {
+            removeAds();
         }
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
