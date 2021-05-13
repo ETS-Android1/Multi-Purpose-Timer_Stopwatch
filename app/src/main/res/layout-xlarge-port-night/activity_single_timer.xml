@@ -4,56 +4,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".buildTimer.timerForBuilt_Activity"
+    android:background="@color/background_material_dark"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/currentGroupAndTimerName"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="7"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:textAlignment="center"
-        android:text="Group Name"
-        android:textSize="20sp"
-        android:layout_margin="10dp"
-        android:textColor="@android:color/black"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="60">
+        android:layout_weight="20">
+
+        <AutoCompleteTextView
+            android:textColor="@android:color/white"
+            android:textColorHint="#AFAFAF"
+            android:id="@+id/timerNameAutoComplete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_timer_name_optional"
+            android:inputType="text"
+            android:text=""
+            android:textAlignment="center"
+            android:textSize="50sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+        <TextView
+            android:textColor="@android:color/white"
+            android:id="@+id/timerNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/timer_name"
+            android:text="General"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textSize="80sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="70">
 
         <TextView
             android:id="@+id/text_view_countdown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_00_00_00"
-            android:textColor="@android:color/black"
-            android:textSize="54sp"
-            app:layout_constraintBottom_toBottomOf="@+id/currentTimerProgress"
-            app:layout_constraintEnd_toEndOf="@+id/currentTimerProgress"
-            app:layout_constraintStart_toStartOf="@+id/currentTimerProgress"
-            app:layout_constraintTop_toTopOf="@+id/currentTimerProgress"
+            android:textColor="@android:color/white"
+            android:textSize="120sp"
+            app:layout_constraintBottom_toBottomOf="@+id/progressBar"
+            app:layout_constraintEnd_toEndOf="@+id/progressBar"
+            app:layout_constraintStart_toStartOf="@+id/progressBar"
+            app:layout_constraintTop_toTopOf="@+id/progressBar"
             tools:visibility="visible"/>
 
         <TextView
+            android:textColor="#AFAFAF"
             android:id="@+id/millis"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_000"
-            android:textSize="25sp"
+            android:textSize="55sp"
             app:layout_constraintEnd_toEndOf="@+id/text_view_countdown"
             app:layout_constraintHorizontal_bias="0.82"
             app:layout_constraintStart_toStartOf="@+id/text_view_countdown"
             app:layout_constraintTop_toBottomOf="@+id/text_view_countdown" />
 
         <ProgressBar
-            android:id="@+id/currentTimerProgress"
+            android:id="@+id/progressBar"
             style="?android:progressBarStyleHorizontal"
-            android:layout_width="350dp"
-            android:layout_height="350dp"
+            android:layout_width="700sp"
+            android:layout_height="700sp"
             android:progress="80"
             android:progressDrawable="@drawable/circle"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -62,25 +92,24 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:targetApi="24" />
 
-        <ProgressBar
-            android:id="@+id/totalProgress"
-            style="?android:progressBarStyleHorizontal"
-            android:layout_width="400dp"
-            android:layout_height="400dp"
-            android:progress="80"
-            android:progressDrawable="@drawable/circle"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:targetApi="24" />
-
+        <Button
+            android:id="@+id/setTimer"
+            android:layout_width="600dp"
+            android:layout_height="190dp"
+            android:layout_marginStart="8dp"
+            android:text=""
+            app:layout_constraintBottom_toBottomOf="@+id/progressBar"
+            app:layout_constraintEnd_toEndOf="@+id/progressBar"
+            app:layout_constraintStart_toStartOf="@+id/progressBar"
+            app:layout_constraintTop_toTopOf="@+id/progressBar"
+            tools:visibility="gone" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="15"
+        android:layout_weight="20"
         android:orientation="horizontal">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -88,17 +117,19 @@
             android:layout_height="match_parent"
             android:layout_weight="33">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_next"
+            <Switch
+                android:id="@+id/repeat_SwitchInMultiTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:backgroundTint="#9C27B0"
+                android:textColor="#000000"
+                android:textSize="30sp"
+                android:text="@string/repeat"
+                android:layout_marginBottom="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_skip_next_white"
-                tools:visibility="visible"/>
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -112,6 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:backgroundTint="@color/colorPrimaryDark"
+                app:fabCustomSize="100dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -123,6 +155,7 @@
                 android:id="@+id/button_pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:fabCustomSize="100dp"
                 app:backgroundTint="#FF4545"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -141,6 +174,7 @@
                 android:id="@+id/button_reset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:fabCustomSize="100dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -151,17 +185,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
-
-    <ListView
-        android:id="@+id/upNext_Info"
-        android:requiresFadingEdge="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="30"
-        android:textAlignment="center"
-        android:layout_gravity="center"
-        android:foregroundGravity="center"
-        android:divider="@null"/>
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/banner_ad"

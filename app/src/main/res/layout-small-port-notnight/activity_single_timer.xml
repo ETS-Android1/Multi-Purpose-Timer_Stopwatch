@@ -187,7 +187,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:backgroundTint="#FFC107"
-                app:srcCompat="@drawable/ic_replay" />
+                app:srcCompat="@drawable/ic_replay_black" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

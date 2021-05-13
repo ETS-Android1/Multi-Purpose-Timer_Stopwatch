@@ -154,7 +154,7 @@
                 app:backgroundTint="#FFC107"
                 android:elevation="0dp"
                 app:fabCustomSize="70dp"
-                app:srcCompat="@drawable/ic_replay" />
+                app:srcCompat="@drawable/ic_replay_black" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

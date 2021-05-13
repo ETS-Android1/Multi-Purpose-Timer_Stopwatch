@@ -148,7 +148,7 @@
                     android:layout_height="wrap_content"
                     app:backgroundTint="#FFC107"
                     app:fabCustomSize="60dp"
-                    app:srcCompat="@drawable/ic_replay" />
+                    app:srcCompat="@drawable/ic_replay_black" />
 
             </LinearLayout>
         </LinearLayout>

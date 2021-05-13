@@ -140,7 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:backgroundTint="#FFC107"
-                app:srcCompat="@drawable/ic_replay" />
+                app:srcCompat="@drawable/ic_replay_black" />
 
         </LinearLayout>
     </LinearLayout>

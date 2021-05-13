@@ -83,7 +83,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_centerVertical="true"
-            app:srcCompat="@drawable/ic_replay" />
+            app:srcCompat="@drawable/ic_replay_black" />
 
         <Switch
             android:text="Repeat"
