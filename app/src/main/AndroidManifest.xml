@@ -25,7 +25,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".buildTimer.timerForBuilt_Activity"
-            android:screenOrientation="userPortrait"/>
+            android:configChanges="screenSize|screenLayout|keyboardHidden"/>
 
         <service android:name=".singleTimer.timerWithService" />
         <service android:name=".stopwatch.stopwatchWithService" />

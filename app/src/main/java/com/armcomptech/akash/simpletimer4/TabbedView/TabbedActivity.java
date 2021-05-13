@@ -50,6 +50,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
 
     //TODO: Change FirebaseLogging to true when releasing
     public static Boolean FirebaseLogging = false;
+
     public static Boolean alwaysShowAd = false;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
