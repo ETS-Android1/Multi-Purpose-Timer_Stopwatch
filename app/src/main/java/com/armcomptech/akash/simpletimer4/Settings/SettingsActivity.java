@@ -137,7 +137,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (!TabbedActivity.disableFirebaseLogging) {
+        if (TabbedActivity.FirebaseLogging) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

@@ -17,7 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Chronometer;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,17 +24,17 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -45,11 +44,12 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimerTask;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
-import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.disableFirebaseLogging;
+import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.FirebaseLogging;
 
 public class stopwatchFragment extends Fragment {
 
@@ -58,11 +58,11 @@ public class stopwatchFragment extends Fragment {
     private FloatingActionButton mButtonPause;
     private FloatingActionButton mButtonReset;
     private FloatingActionButton mButtonLap;
+    private FloatingActionButton mButtonShare;
     private TextView mMillis;
     private AutoCompleteTextView mTimerNameAutoComplete;
     private TextView mTimerNameTextView;
-    private TextView mTextViewCountDown;
-    private ListView lapListView;
+    private RecyclerView lapRecyclerView;
     ConstraintLayout lapListViewConstraintLayout;
     LinearLayout buttonLinearLayout;
 
@@ -75,10 +75,11 @@ public class stopwatchFragment extends Fragment {
     boolean stopWatchRunning = false;
 
     long pauseOffset = 0;
+    ArrayList<String> lapTimeName = new ArrayList<>();
     ArrayList<String> lapTimeInfo = new ArrayList<>();
     ArrayList<Integer> lapTimeStamp = new ArrayList<>();
     ArrayList<String> timerName = new ArrayList<>();
-    ArrayAdapter<String> lapListAdapter;
+    String lastTimeLeftFormatted;
 
     @SuppressLint("StaticFieldLeak")
     private static TabbedActivity instance;
@@ -104,20 +105,9 @@ public class stopwatchFragment extends Fragment {
         notificationManager = NotificationManagerCompat.from(requireContext());
         loadData();
 
-        if (!disableFirebaseLogging) {
+        if (FirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(instance);
         }
-
-//        if (stopWatchRunning) {
-//            tempTimer = new java.util.Timer();
-//            tempTimerTask = new TimerTask() {
-//                @Override
-//                public void run() {
-//                    showNotification();
-//                }
-//            };
-//            tempTimer.scheduleAtFixedRate(tempTimerTask, 0, 1000); //show notification every second
-//        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -128,7 +118,7 @@ public class stopwatchFragment extends Fragment {
         setRetainInstance(true);
         View root = inflater.inflate(R.layout.fragment_stopwatch, container, false);
 
-        banner_adView = (AdView) root.findViewById(R.id.banner_ad);
+        banner_adView = root.findViewById(R.id.banner_ad);
         banner_adView.setVisibility(View.GONE);
         if (!isRemovedAds()) {
             banner_adRequest = new AdRequest.Builder().build();
@@ -141,21 +131,21 @@ public class stopwatchFragment extends Fragment {
                 }
 
                 @Override
-                public void onAdFailedToLoad(LoadAdError loadAdError) {
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     banner_adView.setVisibility(View.GONE);
                     logFirebaseAnalyticsEvents("Failed to load banner ad");
                 }
             });
         }
 
-        lapListAdapter = new ArrayAdapter<>(requireContext(), R.layout.listview_adapter, lapTimeInfo);
-
         lapListViewConstraintLayout = root.findViewById(R.id.lapListParentView);
         lapListViewConstraintLayout.setVisibility(View.GONE);
         buttonLinearLayout = root.findViewById(R.id.stopwatchButtonView);
 
-        lapListView = root.findViewById(R.id.lapListView);
-        lapListView.setAdapter(lapListAdapter);
+        lapRecyclerView = root.findViewById(R.id.lapListView);
+        lapRecyclerView.setAdapter(new stopwatchLapAdapter(requireContext(), lapTimeInfo, lapTimeName));
+        lapRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
         chronometer = root.findViewById(R.id.stopWatchText_view_countdown);
         mButtonStart = root.findViewById(R.id.stopWatchButton_start);
         mButtonStart.setVisibility(View.VISIBLE);
@@ -165,6 +155,9 @@ public class stopwatchFragment extends Fragment {
         mButtonReset.setVisibility(View.INVISIBLE);
         mButtonLap = root.findViewById(R.id.stopWatchLapFloatingActionButton);
         mButtonLap.setVisibility(View.INVISIBLE);
+        mButtonShare = root.findViewById(R.id.stopWatchShareFloatingActionButton);
+        mButtonShare.setVisibility(View.GONE);
+
         mTimerNameAutoComplete = root.findViewById(R.id.stopWatchAutoComplete);
         mTimerNameAutoComplete.setAdapter(new ArrayAdapter<>(
                 requireActivity(), R.layout.timername_autocomplete_textview, timerName));
@@ -184,40 +177,47 @@ public class stopwatchFragment extends Fragment {
         setWithoutLapView();
 
         mButtonStart.setOnClickListener(v -> {
-            startWatch();
+            startWatch(true);
+
             mButtonStart.setVisibility(View.GONE);
             mButtonPause.setVisibility(View.VISIBLE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.VISIBLE);
+            mButtonShare.setVisibility(View.GONE);
+
             mTimerNameTextView.setVisibility(View.VISIBLE);
-            mTimerNameTextView.setText(getTimerName());
             mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
-            mButtonLap.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setText(getTimerName());
 
             logFirebaseAnalyticsEvents("Started Stopwatch");
         });
 
         mButtonPause.setOnClickListener(v -> {
             pauseWatch();
+
             mButtonStart.setVisibility(View.VISIBLE);
             mButtonPause.setVisibility(View.GONE);
             mButtonReset.setVisibility(View.VISIBLE);
-            mButtonLap.setVisibility(View.INVISIBLE);
+            mButtonLap.setVisibility(View.GONE);
+            mButtonShare.setVisibility(View.VISIBLE);
 
             logFirebaseAnalyticsEvents("Paused Stopwatch");
         });
 
         mButtonReset.setOnClickListener(v -> {
             resetWatch();
+
             mButtonStart.setVisibility(View.VISIBLE);
             mButtonPause.setVisibility(View.GONE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.INVISIBLE);
+            mButtonShare.setVisibility(View.GONE);
+
             mTimerNameTextView.setVisibility(View.INVISIBLE);
             mTimerNameAutoComplete.setVisibility(View.VISIBLE);
             mMillis.setText("000");
-            setWithoutLapView();
 
+            setWithoutLapView();
             logFirebaseAnalyticsEvents("Reset Stopwatch");
 
             if (!isRemovedAds()) {
@@ -233,17 +233,16 @@ public class stopwatchFragment extends Fragment {
 
         mButtonLap.setOnClickListener(v -> {
             lapWatch();
-            mButtonLap.setExpanded(true);
             setWithLapView();
+        });
+
+        mButtonShare.setOnClickListener(v -> {
+            shareStopwatchTime();
         });
 
         if (!isRemovedAds()) {
             MobileAds.initialize(requireContext(),
-                    new OnInitializationCompleteListener() {
-                        @Override
-                        public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
-
-                        }
+                    initializationStatus -> {
                     });
 
             //reset button ad
@@ -269,13 +268,39 @@ public class stopwatchFragment extends Fragment {
         return root;
     }
 
+    private void shareStopwatchTime() {
+        String toShare = "Here is the share content body";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(getTimerName());
+        stringBuilder.append(" stopwatch time is ");
+        stringBuilder.append(lastTimeLeftFormatted);
+
+        if (!lapTimeStamp.isEmpty()) {
+            for (int i = 0; i < lapTimeStamp.size(); i++) {
+                stringBuilder.append("\n");
+                stringBuilder.append(lapTimeInfo.get(i));
+                stringBuilder.append("    ");
+                stringBuilder.append(lapTimeName.get(i));
+            }
+        }
+        toShare = stringBuilder.toString();
+
+        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Stopwatch Time");
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, toShare);
+        startActivity(Intent.createChooser(intent, "Stopwatch Time"));
+    }
+
     public boolean isRemovedAds() {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         return sharedPreferences.getBoolean("removed_Ads", false);
     }
 
-    public void startWatch() {
-        instance.startService(new Intent(instance, stopwatchWithService.class));
+    public void startWatch(boolean startService) {
+        if (startService) {
+            instance.startService(new Intent(instance, stopwatchWithService.class));
+        }
 
         stopWatchRunning = true;
         watchIsReset = false;
@@ -295,11 +320,12 @@ public class stopwatchFragment extends Fragment {
             if (countDownTimer != null) {
                 countDownTimer.cancel();
             }
-            countDownTimer = new CountDownTimer(1000, 1) {
+            countDownTimer = new CountDownTimer(1000, 10) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     if (stopWatchRunning) {
-                        mMillis.setText(String.valueOf((SystemClock.elapsedRealtime() - chronometer.getBase()) % 1000));
+                        mMillis.setText(String.valueOf(((SystemClock.elapsedRealtime() - chronometer.getBase()) % 1000) / 10));
+//                        mMillis.setText(String.valueOf(millisUntilFinished));
                     }
                 }
 
@@ -312,6 +338,8 @@ public class stopwatchFragment extends Fragment {
     }
 
     public void pauseWatch() {
+        lastTimeLeftFormatted = getTimeFormatted(SystemClock.elapsedRealtime() - chronometer.getBase()); //save time for sharing
+
         stopWatchRunning = false;
         chronometer.stop();
         pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
@@ -322,6 +350,7 @@ public class stopwatchFragment extends Fragment {
         chronometer.setBase(SystemClock.elapsedRealtime());
         pauseOffset = 0;
         watchIsReset = true;
+        lapTimeName.clear();
         lapTimeInfo.clear();
         lapTimeStamp.clear();
         lapListViewConstraintLayout.setVisibility(View.GONE);
@@ -329,16 +358,9 @@ public class stopwatchFragment extends Fragment {
     }
 
     public void lapWatch() {
-        int lap;
-        if (lapTimeInfo.isEmpty()) {
-            lap = 1;
-            lapListViewConstraintLayout.setVisibility(View.VISIBLE);
-        } else {
-            lap = lapTimeInfo.size() + 1;
-        }
+        lapListViewConstraintLayout.setVisibility(View.VISIBLE);
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Lap ").append(lap).append(" : ");
         stringBuilder.append(getTimeFormatted(SystemClock.elapsedRealtime() - chronometer.getBase()));
         stringBuilder.append("    ");
         if (lapTimeStamp.isEmpty()) {
@@ -348,8 +370,9 @@ public class stopwatchFragment extends Fragment {
         }
         lapTimeStamp.add((int) (SystemClock.elapsedRealtime() - chronometer.getBase()));
         lapTimeInfo.add(stringBuilder.toString());
-        lapListAdapter.notifyDataSetChanged();
-        lapListView.smoothScrollToPosition(lapTimeInfo.size());
+        lapTimeName.add("Lap: " + (lapTimeName.size() + 1));
+        Objects.requireNonNull(lapRecyclerView.getAdapter()).notifyDataSetChanged();
+        lapRecyclerView.smoothScrollToPosition(lapTimeInfo.size());
     }
 
     private String getTimerName() {
@@ -361,26 +384,11 @@ public class stopwatchFragment extends Fragment {
     }
 
     public void setWithoutLapView() {
-//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(MATCH_PARENT, dpToPx(150));
-////        layoutParams.height = 200;
-//        buttonLinearLayout.setLayoutParams(layoutParams);
-//        chronometer.setTextSize(dpToPx(30));
         lapListViewConstraintLayout.setVisibility(View.GONE);
     }
 
     public void setWithLapView() {
-//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(MATCH_PARENT, dpToPx(70));
-////        layoutParams.height = 70;
-//        buttonLinearLayout.setLayoutParams(layoutParams);
-//        chronometer.setTextSize(dpToPx(25));
         lapListViewConstraintLayout.setVisibility(View.VISIBLE);
-    }
-
-    public int dpToPx(int dp) {
-        float density = requireContext().getResources()
-                .getDisplayMetrics()
-                .density;
-        return Math.round((float) dp * density);
     }
 
     public String getTimeFormatted(long milliseconds) {
@@ -464,6 +472,7 @@ public class stopwatchFragment extends Fragment {
         outState.putBoolean("watchIsReset", watchIsReset);
         outState.putBoolean("stopWatchRunning", stopWatchRunning);
         outState.putLong("pauseOffset", SystemClock.elapsedRealtime() - chronometer.getBase());
+        outState.putStringArrayList("lapTimeName", lapTimeName);
         outState.putStringArrayList("lapTimeInfo", lapTimeInfo);
         outState.putIntegerArrayList("lapTimeStamp", lapTimeStamp);
     }
@@ -477,57 +486,59 @@ public class stopwatchFragment extends Fragment {
             return;
         }
 
-        lapListView.setAdapter(lapListAdapter);
+        lapRecyclerView.setAdapter(new stopwatchLapAdapter(requireContext(), lapTimeInfo, lapTimeName));
+        lapRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         watchIsReset = savedInstanceState.getBoolean("watchIsReset");
         stopWatchRunning = savedInstanceState.getBoolean("stopWatchRunning");
+        lapTimeName = savedInstanceState.getStringArrayList("lapTimeName");
         lapTimeInfo = savedInstanceState.getStringArrayList("lapTimeInfo");
         lapTimeStamp = savedInstanceState.getIntegerArrayList("lapTimeStamp");
+
+        Objects.requireNonNull(lapRecyclerView.getAdapter()).notifyDataSetChanged();
 
         if (watchIsReset) {
             mButtonStart.setVisibility(View.VISIBLE);
             mButtonPause.setVisibility(View.GONE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.INVISIBLE);
+            mButtonShare.setVisibility(View.GONE);
+
             mTimerNameTextView.setVisibility(View.INVISIBLE);
             mTimerNameAutoComplete.setVisibility(View.VISIBLE);
             mMillis.setText("000");
             setWithoutLapView();
         } else if (stopWatchRunning) {
             pauseOffset = savedInstanceState.getLong("pauseOffset");
-            startWatch();
+            startWatch(false);
 
             //setup UI
             mButtonStart.setVisibility(View.GONE);
             mButtonPause.setVisibility(View.VISIBLE);
             mButtonReset.setVisibility(View.INVISIBLE);
             mButtonLap.setVisibility(View.VISIBLE);
-            mTimerNameTextView.setVisibility(View.VISIBLE);
-            mTimerNameTextView.setText(getTimerName());
-            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
-
-            if (lapTimeInfo.isEmpty()) {
-                setWithoutLapView();
-            } else {
-                setWithLapView();
-            }
+            mButtonShare.setVisibility(View.GONE);
         } else {
             mButtonStart.setVisibility(View.VISIBLE);
             mButtonPause.setVisibility(View.GONE);
             mButtonReset.setVisibility(View.VISIBLE);
-            mButtonLap.setVisibility(View.INVISIBLE);
-            mTimerNameTextView.setVisibility(View.VISIBLE);
-            mTimerNameTextView.setText(getTimerName());
-            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
-            startWatch();
-            pauseWatch();
-            cancelNotification();
+            mButtonLap.setVisibility(View.GONE);
+            mButtonShare.setVisibility(View.VISIBLE);
 
+            startWatch(false);
+            pauseWatch();
+        }
+
+        if (!watchIsReset) {
             if (lapTimeInfo.isEmpty()) {
                 setWithoutLapView();
             } else {
                 setWithLapView();
             }
+
+            mTimerNameTextView.setVisibility(View.VISIBLE);
+            mTimerNameTextView.setText(getTimerName());
+            mTimerNameAutoComplete.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -571,7 +582,7 @@ public class stopwatchFragment extends Fragment {
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (!disableFirebaseLogging) {
+        if (FirebaseLogging) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

@@ -31,7 +31,7 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
         this.holders = holders;
         this.timers = timers;
 
-        if (!TabbedActivity.disableFirebaseLogging) {
+        if (TabbedActivity.FirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
         }
     }

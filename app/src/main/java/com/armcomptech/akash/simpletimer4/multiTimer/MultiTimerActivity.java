@@ -428,7 +428,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (!TabbedActivity.disableFirebaseLogging) {
+        if (TabbedActivity.FirebaseLogging) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

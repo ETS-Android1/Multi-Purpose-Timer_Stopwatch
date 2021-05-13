@@ -61,7 +61,7 @@ import java.util.Locale;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
-import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.disableFirebaseLogging;
+import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.FirebaseLogging;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -153,7 +153,7 @@ public class singleTimerFragment extends Fragment {
         instance.registerReceiver(broadcastReceiver1, intentFilter1);
         instance.registerReceiver(broadcastReceiver2, intentFilter2);
 
-        if (!disableFirebaseLogging) {
+        if (FirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "App Opened");
@@ -265,7 +265,7 @@ public class singleTimerFragment extends Fragment {
 
         mButtonStart.setOnClickListener( v -> {
 
-            if (!disableFirebaseLogging) {
+            if (FirebaseLogging) {
                 Bundle bundle = new Bundle();
                 bundle.putString("Event", "Start Timer");
                 bundle.putString("Time", String.valueOf(mTimeLeftInMillis/1000));
@@ -350,7 +350,7 @@ public class singleTimerFragment extends Fragment {
     }
 
     public static void logFirebaseAnalyticsEvents(String eventName) {
-        if (!disableFirebaseLogging) {
+        if (FirebaseLogging) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

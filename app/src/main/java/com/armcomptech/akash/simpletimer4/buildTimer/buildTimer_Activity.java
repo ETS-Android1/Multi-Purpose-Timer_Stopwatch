@@ -114,7 +114,7 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
             });
         }
 
-        if (!TabbedActivity.disableFirebaseLogging) {
+        if (TabbedActivity.FirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         }
         load_data();
@@ -700,7 +700,7 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (!TabbedActivity.disableFirebaseLogging) {
+        if (TabbedActivity.FirebaseLogging) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

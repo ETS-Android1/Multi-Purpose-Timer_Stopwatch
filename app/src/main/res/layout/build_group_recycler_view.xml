@@ -97,6 +97,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/build_timer_add_timer_recyclerView"
+        android:requiresFadingEdge="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

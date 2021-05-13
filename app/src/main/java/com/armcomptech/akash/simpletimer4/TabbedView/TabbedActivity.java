@@ -48,8 +48,9 @@ import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 
 public class TabbedActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler{
 
-    //TODO: Change disableFirebaseLogging to false when releasing
-    public static Boolean disableFirebaseLogging = true;
+    //TODO: Change FirebaseLogging to true when releasing
+    public static Boolean FirebaseLogging = false;
+    public static Boolean alwaysShowAd = false;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
     BillingProcessor bp;
@@ -57,7 +58,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (!disableFirebaseLogging) {
+        if (FirebaseLogging) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "App Opened");
@@ -67,7 +68,6 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbled);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-//        notificationManager = NotificationManagerCompat.from(this);
         setTitle("   Timer and Stopwatch");
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -78,11 +78,13 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         bp = new BillingProcessor(this, getString(R.string.licence_key), this);
         bp.initialize();
 
-        if (disableFirebaseLogging) {
+        if (FirebaseLogging) {
             removeAds(); // this removes all ads for new users
         }
         //TODO: comment out when releasing
-//        alwaysShowAds(); // when testing
+        if (alwaysShowAd) {
+            alwaysShowAds();
+        }
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -120,7 +122,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         }
 
 
-        if (disableFirebaseLogging) {
+        if (FirebaseLogging) {
             FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
             FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false);
         } else {
@@ -289,7 +291,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (!disableFirebaseLogging) {
+        if (FirebaseLogging) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

@@ -87,11 +87,20 @@
             android:gravity="center">
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:visibility="gone"
                 android:id="@+id/stopWatchLapFloatingActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:backgroundTint="#31FFA7"
                 app:srcCompat="@drawable/ic_baseline_timelapse_24" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:visibility="visible"
+                android:id="@+id/stopWatchShareFloatingActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="#31FFA7"
+                app:srcCompat="@drawable/ic_baseline_share_24_black" />
 
         </LinearLayout>
 
@@ -142,14 +151,17 @@
         android:layout_height="0dp"
         android:layout_weight="50">
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/lapListView"
+            android:requiresFadingEdge="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:divider="@null"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:divider="@null" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
