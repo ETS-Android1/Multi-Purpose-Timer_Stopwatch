@@ -52,4 +52,17 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Application theme">
+
+        <ListPreference
+            app:defaultValue="Follow System Theme"
+            app:entries="@array/theme_entries"
+            app:entryValues="@array/theme_values"
+            app:key="theme"
+            app:title="Theme (Restart application to apply)"
+            app:summary="Pick a Light or Dark theme"
+            />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
