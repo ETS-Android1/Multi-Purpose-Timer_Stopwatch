@@ -3,37 +3,21 @@
 
     <string name="enter_timer_name_optional">Enter Timer Name (Optional)</string>
     <string name="repeat">Repeat</string>
-    <string name="title_activity_main2">MainActivity2</string>
     <string name="_00_00_00">00:00:00</string>
     <string name="_000">000</string>
     <string name="timer_name">Timer Name</string>
-    <string name="smiley_face">Smiley Face</string>
-    <string name="heartbeat">Heartbeat</string>
     <string name="sound">Sound</string>
     <string name="statistics">Statistics</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="setting">Settings</string>
-    <string name="custom_timer">Custom Timer</string>
-    <string name="Notification">Notification</string>
     <string name="multi_timer_mode">Multi Timer Mode</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="title_activity_tabbed">TabbedActivity</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="enter_stopwatch_name_optional">Enter Stopwatch Name (Optional)</string>
     <string name="build_your_timer">Build your timer</string>
 </resources>

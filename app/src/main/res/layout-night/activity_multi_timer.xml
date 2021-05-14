@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".multiTimer.MultiTimerActivity"
+    android:background="@color/background_material_dark"
+    android:orientation="vertical">
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/banner_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:adSize="SMART_BANNER"
+        app:adUnitId="@string/banner_ad_id"
+        tools:visibility="visible"
+        android:visibility="gone"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/multiTimerRecyclerView"
+            android:requiresFadingEdge="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="80dp" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/addTimerFloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="@dimen/fab_margin"
+            android:text="Add Timer"
+            android:theme="@style/Theme.MaterialComponents.NoActionBar"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:textColor="@color/cardview_light_background"
+            app:iconTint="@color/cardview_light_background"
+            app:icon="@drawable/ic_add_black" />
+    </RelativeLayout>
+</LinearLayout>

@@ -1,6 +1,7 @@
 package com.armcomptech.akash.simpletimer4.buildTimer;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -634,23 +636,36 @@ public class buildTimer_Activity extends AppCompatActivity implements BillingPro
                 break;
 
             case R.id.send_feedback:
-                final EditText edittext = new EditText(this);
-                AlertDialog.Builder alert = new AlertDialog.Builder(this);
-                alert.setTitle("Send Feedback");
-                alert.setMessage("How can this app be improved?");
+                logFirebaseAnalyticsEvents("Opened Feedback");
 
-                alert.setView(edittext);
+                AlertDialog alert = new AlertDialog.Builder(this).create();
 
-                alert.setPositiveButton("Send", (dialog, whichButton) -> {
-                    String feedback = String.valueOf(edittext.getText());
+                LayoutInflater inflater = getLayoutInflater();
+                View dialoglayout = inflater.inflate(R.layout.feedback_layout, (ViewGroup) getCurrentFocus());
+
+                Button cancelButton = dialoglayout.findViewById(R.id.cancel_feedback);
+                Button sendButton = dialoglayout.findViewById(R.id.send_feedback);
+                EditText editText = dialoglayout.findViewById(R.id.feedback_editText);
+
+                alert.setView(dialoglayout);
+
+                Activity activity = this;
+
+                sendButton.setOnClickListener(view_ -> {
+                    String feedback = String.valueOf(editText.getText());
                     String subject = "Feedback for Timer Application";
                     List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
-                    new SendMailTask(this).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
+                    new SendMailTask(activity).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
                     Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
+                    logFirebaseAnalyticsEvents("Sent Feedback");
+                    alert.dismiss();
                 });
 
-                alert.setNegativeButton("Cancel", (dialog, whichButton) ->
-                        Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show());
+                cancelButton.setOnClickListener(view_ -> {
+                    Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
+                    logFirebaseAnalyticsEvents("Cancelled Feedback");
+                    alert.dismiss();
+                });
 
                 alert.show();
                 break;

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/background_material_dark"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="50"
+            android:padding="5dp"
+            android:layout_gravity="center"
+            android:gravity="center">
+
+            <EditText
+                android:textColor="@android:color/white"
+                android:textColorHint="#AFAFAF"
+                android:id="@+id/editText_group_name_build_timer"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:hint="Enter Group Name (Optional)"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:visibility="visible"
+                tools:visibility="visible"
+                android:padding="10dp"
+                android:autofillHints="Enter Group Name (Optional)" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="50"
+            android:padding="5dp"
+            android:gravity="center"
+            android:layout_gravity="center">
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/subtract_repeat_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:backgroundTint="#FF9800"
+                android:src="@drawable/ic_remove_black"
+                android:contentDescription="Decrease Set"
+                app:elevation="3dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="33"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:gravity="center">
+
+                <TextView
+                    android:textColor="@android:color/white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Repeat"
+                    android:autoSizeTextType="uniform"/>
+
+                <TextView
+                    android:textColor="@android:color/white"
+                    android:id="@+id/group_repeat_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Twice"
+                    android:autoSizeTextType="uniform"/>
+
+            </LinearLayout>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/add_repeat_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:backgroundTint="#FF9800"
+                android:src="@drawable/ic_add_black"
+                android:contentDescription="Increase Set"
+                app:elevation="3dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/build_timer_add_timer_recyclerView"
+        android:requiresFadingEdge="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/addTimer_BuildTimer_FloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="15dp"
+        android:text="Add Timer"
+        android:theme="@style/Theme.MaterialComponents.NoActionBar"
+        android:backgroundTint="#CDDC39"
+        android:textColor="@color/notification_ColorPrimary"
+        app:iconTint="@color/notification_ColorPrimary"
+        app:icon="@drawable/ic_timer_white"
+        app:elevation="3dp" />
+
+</LinearLayout>

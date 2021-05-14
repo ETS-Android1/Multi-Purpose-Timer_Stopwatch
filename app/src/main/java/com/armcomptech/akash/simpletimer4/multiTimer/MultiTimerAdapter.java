@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -162,6 +163,18 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             holders.add(holder);
         }
 
+        int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        switch (currentNightMode) {
+            case Configuration.UI_MODE_NIGHT_NO:
+                // Night mode is not active, we're using the light theme
+                break;
+            case Configuration.UI_MODE_NIGHT_YES:
+                // Night mode is active, we're using dark theme
+                ((Item)holder).timerTime.setTextColor(Color.WHITE);
+                ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.BLACK);
+                break;
+        }
+
         ((Item)holder).timerName.setText(String.format("Timer Name: %s", timers.get(holder.getBindingAdapterPosition()).getTimerName()));
         ((Item)holder).timerTime.setText(timers.get(holder.getBindingAdapterPosition()).getTimeLeftFormatted());
         if (timers.get(holder.getBindingAdapterPosition()).getTimerPlaying()) {
@@ -184,7 +197,12 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
 
-            ((Item) holder).timerTime.setTextColor(Color.BLACK);
+            if (currentNightMode == Configuration.UI_MODE_NIGHT_NO) {
+                ((Item) holder).timerTime.setTextColor(Color.BLACK);
+            } else {
+                ((Item) holder).timerTime.setTextColor(Color.WHITE);
+            }
+
             ((Item)holder).timerTime.setText(timers.get(holder.getBindingAdapterPosition()).getTimeLeftFormatted());
 
             resetTimer((Item) holder);
@@ -231,7 +249,12 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
             ((Item)holder).resetButton.setVisibility(View.INVISIBLE);
 
-            ((Item) holder).timerTime.setTextColor(Color.BLACK);
+            if (currentNightMode == Configuration.UI_MODE_NIGHT_NO) {
+                ((Item) holder).timerTime.setTextColor(Color.BLACK);
+            } else {
+                ((Item) holder).timerTime.setTextColor(Color.WHITE);
+            }
+
             ((Item)holder).timerTime.setText(timers.get(myPosition).getTimeLeftFormatted());
 
             timers.get(myPosition).setTimerPlaying(false);
@@ -268,8 +291,16 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else {
             ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getStartTimeInMillis());
         }
-        ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.WHITE);
-        ((Item)holder).timerTime.setTextColor(Color.BLACK);
+
+        int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_NO) {
+            ((Item) holder).timerTime.setTextColor(Color.BLACK);
+            ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.WHITE);
+        } else {
+            ((Item) holder).timerTime.setTextColor(Color.WHITE);
+            ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.BLACK);
+        }
+
         timers.get(myPosition).setCountDownTimer(null);
         timers.get(myPosition).setTimeElapsedInMillis(0);
         timers.get(myPosition).setTimeToStoreInMillis(0);

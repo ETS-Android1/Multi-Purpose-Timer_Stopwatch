@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item
+        android:id="@+id/check_sound"
+        android:checkable="true"
+        android:enabled="true"
+        android:title="@string/sound"
+        android:tooltipText="@string/app_name"
+        android:checked="true"
+        app:showAsAction="never"
+        tools:targetApi="o" />
+
+    <item
+        android:id="@+id/timer_and_stopwatch"
+        app:showAsAction="never"
+        android:visible="true"
+        android:icon="@drawable/ic_timer_white"
+        android:title="Timer and Stopwatch" />
+
+    <item
+        android:id="@+id/multi_Timer_Mode"
+        app:showAsAction="never"
+        android:visible="true"
+        android:icon="@drawable/ic_video_library_white"
+        android:title="@string/multi_timer_mode" />
+
+    <item
+        android:id="@+id/build_Timer_Mode"
+        app:showAsAction="never"
+        android:visible="true"
+        android:icon="@drawable/ic_build_white"
+        android:title="@string/build_your_timer" />
+
+    <item
+        android:id="@+id/statistics_activity"
+        android:title="@string/statistics"
+        android:icon="@drawable/ic_data_usage_white"
+        app:showAsAction="ifRoom"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/privacy_policy"
+        android:title="@string/privacy_policy"
+        android:icon="@drawable/ic_lock_white"
+        app:showAsAction="never"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/setting_activity"
+        android:title="@string/setting"
+        android:icon="@drawable/ic_settings_white"
+        app:showAsAction="ifRoom"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/remove_Ads"
+        android:title="Remove Ads"
+        android:icon="@drawable/ic_baseline_remove_circle_outline_black"
+        app:showAsAction="never"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/send_feedback"
+        android:title="Send Feedback"
+        android:icon="@drawable/ic_feedback_white"
+        app:showAsAction="ifRoom"
+        android:visible="true"/>
+
+</menu>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  Single List Item Design -->
+
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/background_material_dark"
+
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditText
+        android:textColor="@android:color/white"
+        android:textColorHint="#AFAFAF"
+        android:layout_weight="30"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:id="@+id/stopwatchLapName"
+        android:hint="Lap #"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:padding="7dp"
+        android:textSize="22sp"/>
+
+    <TextView
+        android:layout_weight="70"
+        android:id="@+id/stopwatchLapTime"
+        android:text="111.111   111.111"
+        android:textColor="@android:color/white"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:padding="7dp"
+        android:textSize="22sp"/>
+
+
+</LinearLayout>

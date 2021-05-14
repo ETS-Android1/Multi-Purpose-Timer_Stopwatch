@@ -112,6 +112,8 @@ public class singleTimerFragment extends Fragment {
     public int counter;
 
     private EditText editTextTimer;
+    Button cancelButton;
+    Button updateTimerButton;
     private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
 
     private static FirebaseAnalytics mFirebaseAnalytics;
@@ -631,57 +633,67 @@ public class singleTimerFragment extends Fragment {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.requireContext());
         String timePickerPreference = sharedPreferences.getString("singleTimerTimePicker", "Typing");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
 
-        LayoutInflater inflater = requireActivity().getLayoutInflater();
-        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.layout_dialog_timerset, null);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogLayout = inflater.inflate(R.layout.layout_dialog_timerset, (ViewGroup) instance.getCurrentFocus());
 
-        builder.setView(view)
-                .setTitle("Once Timer Is Updated, It Will Reset")
-                .setNegativeButton("Cancel", (dialog, which) -> {
+        TextView title = dialogLayout.findViewById(R.id.title);
+        cancelButton = dialogLayout.findViewById(R.id.cancel);
+        updateTimerButton = dialogLayout.findViewById(R.id.update_timer);
+        editTextTimer = dialogLayout.findViewById(R.id.timer);
+        timePicker = dialogLayout.findViewById(R.id.scrollHmsPicker);
 
-                })
-                .setPositiveButton("Set Timer", (dialog, which) -> {
+        alertDialog.setView(dialogLayout);
 
-                    if (timePickerPreference.equals("Typing")) {
-                        String time = editTextTimer.getText().toString();
-                        if (!(time.matches(""))) {
-                            applyTimerTime(time, 0, 0, 0);
-                        }
-                    } else {
-                        applyTimerTime("null", timePicker.getHours(), timePicker.getMinutes(), timePicker.getSeconds());
+        title.setText("Once Timer Is Updated, It Will Reset");
+
+        cancelButton.setOnClickListener(view -> alertDialog.dismiss());
+
+        updateTimerButton.setOnClickListener(view -> {
+            if (timePickerPreference != null) {
+                if (timePickerPreference.equals("Typing")) {
+                    String time = editTextTimer.getText().toString();
+                    if (!(time.matches(""))) {
+                        applyTimerTime(time, 0, 0, 0);
                     }
-                });
-
-        editTextTimer = view.findViewById(R.id.timer);
-        timePicker = view.findViewById(R.id.scrollHmsPicker);
-        if (timePickerPreference.equals("Typing")) {
-            timePicker.setEnabled(false);
-            timePicker.setVisibility(View.GONE);
-            editTextTimer.setFilters(new InputFilter[] { new InputFilter.LengthFilter(6)});
-
-            editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
-                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null) {
-                    imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
+                } else {
+                    applyTimerTime("null", timePicker.getHours(), timePicker.getMinutes(), timePicker.getSeconds());
                 }
-            }));
-            editTextTimer.requestFocus();
-        } else {
-            editTextTimer.setEnabled(false);
-            editTextTimer.setVisibility(View.GONE);
-            timePicker = view.findViewById(R.id.scrollHmsPicker);
+            }
 
-            int hours = (int) (mStartTimeInMillis / 1000) / 3600;
-            int minutes = (int) ((mStartTimeInMillis / 1000) % 3600) / 60;
-            int seconds = (int) (mStartTimeInMillis / 1000) % 60;
+            alertDialog.dismiss();
+        });
 
-            timePicker.setHours(hours);
-            timePicker.setMinutes(minutes);
-            timePicker.setSeconds(seconds);
+        if (timePickerPreference != null) {
+            if (timePickerPreference.equals("Typing")) {
+                timePicker.setEnabled(false);
+                timePicker.setVisibility(View.GONE);
+                editTextTimer.setFilters(new InputFilter[] { new InputFilter.LengthFilter(6)});
+
+                editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
+                    InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.showSoftInput(editTextTimer, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                }));
+                editTextTimer.requestFocus();
+            } else {
+                editTextTimer.setEnabled(false);
+                editTextTimer.setVisibility(View.GONE);
+                timePicker = dialogLayout.findViewById(R.id.scrollHmsPicker);
+
+                int hours = (int) (mStartTimeInMillis / 1000) / 3600;
+                int minutes = (int) ((mStartTimeInMillis / 1000) % 3600) / 60;
+                int seconds = (int) (mStartTimeInMillis / 1000) % 60;
+
+                timePicker.setHours(hours);
+                timePicker.setMinutes(minutes);
+                timePicker.setSeconds(seconds);
+            }
         }
 
-        builder.create().show();
+        alertDialog.show();
     }
 
     public void applyTimerTime(String time, int hours, int minutes, int seconds){

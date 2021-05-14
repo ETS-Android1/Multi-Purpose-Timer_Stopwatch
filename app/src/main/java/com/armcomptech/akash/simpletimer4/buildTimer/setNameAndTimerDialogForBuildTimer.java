@@ -9,11 +9,14 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
@@ -54,23 +57,27 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
         SharedPreferences sharedPreferencesSettings = PreferenceManager.getDefaultSharedPreferences(this.requireContext());
         String timePickerPreference = sharedPreferencesSettings.getString("buildTimerTimePicker", "Scrolling Wheel");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
 
-        LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.layout_dialog_nameandtimerset, null);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogLayout = inflater.inflate(R.layout.layout_dialog_nameandtimerset, (ViewGroup) requireActivity().getCurrentFocus());
 
-        builder.setView(view)
-                .setTitle("Update the timer")
-                .setNegativeButton("Cancel", (dialog, which) -> {
-                });
+        alertDialog.setView(dialogLayout);
 
-        editTextTimer = view.findViewById(R.id.timerTimeDialog);
+        TextView title = dialogLayout.findViewById(R.id.title);
+        title.setText("Update the timer");
+
+        Button updateTimerButton = dialogLayout.findViewById(R.id.update_timer);
+        Button cancelButton = dialogLayout.findViewById(R.id.cancel);
+        cancelButton.setOnClickListener(view -> alertDialog.dismiss());
+
+        editTextTimer = dialogLayout.findViewById(R.id.timerTimeDialog);
         editTextTimer.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        autoCompleteTimerName = view.findViewById(R.id.timerNameDialog);
+        autoCompleteTimerName = dialogLayout.findViewById(R.id.timerNameDialog);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             autoCompleteTimerName.setImeOptions(EditorInfo.IME_ACTION_DONE);
         }
-        timePicker = view.findViewById(R.id.scrollHmsPicker);
+        timePicker = dialogLayout.findViewById(R.id.scrollHmsPicker);
 
         editTextTimer.setFilters(new InputFilter[] { new InputFilter.LengthFilter(6)});
 
@@ -98,6 +105,8 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
             return false;
         });
 
+        setNameAndTimerDialogForBuildTimer activity = this;
+
         if (this.updateExistingTimer) {
             autoCompleteTimerName.setText(timers.get(adapterPosition).timerName);
             autoCompleteTimerName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
@@ -115,7 +124,7 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
             } else {
                 editTextTimer.setEnabled(false);
                 editTextTimer.setVisibility(View.GONE);
-                timePicker = view.findViewById(R.id.scrollHmsPicker);
+                timePicker = dialogLayout.findViewById(R.id.scrollHmsPicker);
 
                 long startTime = timers.get(adapterPosition).mStartTimeInMillis;
                 int hours = (int) (startTime / 1000) / 3600;
@@ -128,8 +137,8 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
             }
 
 //            builder.setMessage("Once timer is updated, it will reset");
-            builder.setPositiveButton("Update Timer", (dialog, which) -> {
-
+            updateTimerButton.setText("Update Timer");
+            updateTimerButton.setOnClickListener(view -> {
                 String name;
                 if (!autoCompleteTimerName.getText().toString().matches("")) {
                     name = autoCompleteTimerName.getText().toString();
@@ -141,11 +150,12 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
                 if (timePickerPreference.equals("Typing")) {
                     time = editTextTimer.getText().toString();
                     if (!(time.matches(""))) {
-                        listener.createNewTimerNameAndTimeForBuildTimer(time, 0, 0, 0, name, this.creatingNewTimer, this.updateExistingTimer, this.adapterPosition, this.timers);
+                        listener.createNewTimerNameAndTimeForBuildTimer(time, 0, 0, 0, name, activity.creatingNewTimer, activity.updateExistingTimer, activity.adapterPosition, activity.timers);
                     }
                 } else {
-                    listener.createNewTimerNameAndTimeForBuildTimer("null", timePicker.getHours(), timePicker.getMinutes(), timePicker.getSeconds(), name, this.creatingNewTimer, this.updateExistingTimer, this.adapterPosition, this.timers);
+                    listener.createNewTimerNameAndTimeForBuildTimer("null", timePicker.getHours(), timePicker.getMinutes(), timePicker.getSeconds(), name, activity.creatingNewTimer, activity.updateExistingTimer, activity.adapterPosition, activity.timers);
                 }
+                alertDialog.dismiss();
             });
         } else if (this.creatingNewTimer) {
             autoCompleteTimerName.setOnFocusChangeListener((v, hasFocus) -> autoCompleteTimerName.post(() -> {
@@ -162,10 +172,11 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
             } else {
                 editTextTimer.setEnabled(false);
                 editTextTimer.setVisibility(View.GONE);
-                timePicker = view.findViewById(R.id.scrollHmsPicker);
+                timePicker = dialogLayout.findViewById(R.id.scrollHmsPicker);
             }
 
-            builder.setPositiveButton("Set Timer", (dialog, which) -> {
+            updateTimerButton.setText("Set Timer");
+            updateTimerButton.setOnClickListener(view -> {
                 String name;
                 if (!autoCompleteTimerName.getText().toString().matches("")) {
                     name = autoCompleteTimerName.getText().toString();
@@ -177,15 +188,16 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
                 if (timePickerPreference.equals("Typing")) {
                     time = editTextTimer.getText().toString();
                     if (!(time.matches(""))) {
-                        listener.createNewTimerNameAndTimeForBuildTimer(time, 0, 0, 0, name, this.creatingNewTimer, this.updateExistingTimer, this.adapterPosition, this.timers);
+                        listener.createNewTimerNameAndTimeForBuildTimer(time, 0, 0, 0, name, activity.creatingNewTimer, activity.updateExistingTimer, activity.adapterPosition, activity.timers);
                     }
                 } else {
-                    listener.createNewTimerNameAndTimeForBuildTimer("null", timePicker.getHours(), timePicker.getMinutes(), timePicker.getSeconds(), name, this.creatingNewTimer, this.updateExistingTimer, this.adapterPosition, this.timers);
+                    listener.createNewTimerNameAndTimeForBuildTimer("null", timePicker.getHours(), timePicker.getMinutes(), timePicker.getSeconds(), name, activity.creatingNewTimer, activity.updateExistingTimer, activity.adapterPosition, activity.timers);
                 }
+                alertDialog.dismiss();
             });
         }
 
-        return builder.create();
+        return alertDialog;
     }
 
     @Override

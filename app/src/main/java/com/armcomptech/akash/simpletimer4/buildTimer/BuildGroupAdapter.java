@@ -84,7 +84,7 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
             updateUI(holder, myPosition);
 
             if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets > 1) {
-                ((Item)holder).subtractSetButton.setImageResource(R.drawable.ic_remove_white);
+                ((Item)holder).subtractSetButton.setImageResource(R.drawable.ic_remove_black);
             }
         });
 
@@ -143,7 +143,7 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
         }
 
         if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets > 1) {
-            ((Item)holder).subtractSetButton.setImageResource(R.drawable.ic_remove_white);
+            ((Item)holder).subtractSetButton.setImageResource(R.drawable.ic_remove_black);
         } else {
             ((Item)holder).subtractSetButton.setImageResource(R.drawable.ic_baseline_delete_24);
         }

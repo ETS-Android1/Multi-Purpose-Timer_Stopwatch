@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/background_material_dark"
+    tools:context=".stopwatch.stopwatchFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="60">
+
+        <AutoCompleteTextView
+            android:textColor="@android:color/white"
+            android:textColorHint="#AFAFAF"
+            android:id="@+id/stopWatchAutoComplete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:textSize="45sp"
+            android:hint="@string/enter_stopwatch_name_optional"
+            android:inputType="text"
+            android:text=""
+            android:textAlignment="center"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/stopWatchText_view_countdown"
+            app:layout_constraintEnd_toEndOf="@+id/stopWatchText_view_countdown"
+            app:layout_constraintStart_toStartOf="@+id/stopWatchText_view_countdown"
+            android:layout_marginBottom="10dp"
+            tools:visibility="visible" />
+
+        <TextView
+            android:textColor="@android:color/white"
+            android:id="@+id/stopWatchTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_margin="20dp"
+            android:hint="Stopwatch Name"
+            android:text="General"
+            android:textAlignment="center"
+            android:textSize="55sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/stopWatchText_view_countdown"
+            app:layout_constraintEnd_toEndOf="@+id/stopWatchText_view_countdown"
+            app:layout_constraintStart_toStartOf="@+id/stopWatchText_view_countdown"
+            android:layout_marginBottom="10dp"
+            tools:visibility="visible" />
+
+        <Chronometer
+            android:id="@+id/stopWatchText_view_countdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="175sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.41000003"
+            tools:visibility="visible" />
+
+        <TextView
+            android:textColor="#AFAFAF"
+            android:id="@+id/stopWatchMillis"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/_000"
+            android:textSize="60sp"
+            app:layout_constraintEnd_toEndOf="@+id/stopWatchText_view_countdown"
+            app:layout_constraintHorizontal_bias="0.90"
+            app:layout_constraintStart_toStartOf="@+id/stopWatchText_view_countdown"
+            app:layout_constraintTop_toBottomOf="@+id/stopWatchText_view_countdown" />
+
+        <LinearLayout
+            android:id="@+id/stopwatchButtonView"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/stopWatchMillis"
+            tools:layout_editor_absoluteX="-5dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="33"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:visibility="gone"
+                    android:id="@+id/stopWatchLapFloatingActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#31FFA7"
+                    app:fabCustomSize="80dp"
+                    android:elevation="0dp"
+                    app:srcCompat="@drawable/ic_baseline_timelapse_24" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:visibility="visible"
+                    android:id="@+id/stopWatchShareFloatingActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#31FFA7"
+                    app:fabCustomSize="80dp"
+                    android:elevation="0dp"
+                    app:srcCompat="@drawable/ic_baseline_share_24_black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="33"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/stopWatchButton_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="@color/colorPrimaryDark"
+                    app:srcCompat="@drawable/ic_play"
+                    app:fabCustomSize="80dp"
+                    android:elevation="0dp"
+                    tools:visibility="gone" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/stopWatchButton_pause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#FF4545"
+                    app:fabCustomSize="80dp"
+                    android:elevation="0dp"
+                    app:srcCompat="@drawable/ic_pause" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="33"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/stopWatchButton_reset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#FFC107"
+                    app:fabCustomSize="80dp"
+                    android:elevation="0dp"
+                    app:srcCompat="@drawable/ic_replay_black" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/lapListParentView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="40"
+        tools:visibility="gone">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/lapListView"
+            android:requiresFadingEdge="vertical"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:divider="@null" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/banner_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:adSize="SMART_BANNER"
+        app:adUnitId="@string/banner_ad_id"
+        tools:visibility="visible"
+        android:visibility="gone"/>
+
+</LinearLayout>
