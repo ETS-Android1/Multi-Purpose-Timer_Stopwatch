@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +28,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,13 +41,22 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.TransactionDetails;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ConsumeParams;
+import com.android.billingclient.api.ConsumeResponseListener;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
 import com.armcomptech.akash.simpletimer4.EmailLogic.SendMailTask;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Settings.SettingsActivity;
 import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.armcomptech.akash.simpletimer4.Timer;
+import com.armcomptech.akash.simpletimer4.billing.BillingClientSetup;
 import com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity;
 import com.armcomptech.akash.simpletimer4.statistics.StatisticsActivity;
 import com.google.android.gms.ads.AdListener;
@@ -68,9 +79,8 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.App.MULTI_TIMER_ID;
 
-public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener, BillingProcessor.IBillingHandler {
+public class MultiTimerActivity extends AppCompatActivity implements setNameAndTimerDialog.setTimerDialogListener, PurchasesUpdatedListener {
 
-    BillingProcessor bp;
     RecyclerView recyclerView;
     ExtendedFloatingActionButton addTimerFab;
     private final ArrayList<Timer> timers = new ArrayList<>();
@@ -81,13 +91,16 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     private AdView banner_adView;
     AdRequest banner_adRequest;
 
+    BillingClient billingClient;
+    ConsumeResponseListener consumeResponseListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_timer);
 
         if (!isRemovedAds()) {
-            banner_adView = (AdView) findViewById(R.id.banner_ad);
+            banner_adView = findViewById(R.id.banner_ad);
             banner_adRequest = new AdRequest.Builder().build();
             banner_adView.loadAd(banner_adRequest);
             banner_adView.setAdListener(new AdListener(){
@@ -95,11 +108,10 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                 public void onAdLoaded() {
                     banner_adView.setVisibility(View.VISIBLE);
                     logFirebaseAnalyticsEvents("Loaded banner ad");
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
                 }
 
                 @Override
-                public void onAdFailedToLoad(LoadAdError loadAdError) {
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     banner_adView.setVisibility(View.GONE);
                     logFirebaseAnalyticsEvents("Failed to load banner ad");
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
@@ -114,8 +126,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_video_library_white);
 
-        bp = new BillingProcessor(this, getString(R.string.licence_key), this);
-        bp.initialize();
+        initializeBillingProcess();
 
         Timer tempTimer = new Timer(60 * 1000 , "one minute");
         timers.add(tempTimer);
@@ -159,6 +170,133 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         addTimerFab.setOnClickListener(v -> openNameAndTimerDialog());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             addTimerFab.setTooltipText("Add Timer");
+        }
+    }
+
+    public void initializeBillingProcess() {
+        consumeResponseListener = (billingResult, purchaseToken) -> {
+            if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK) {
+                Log.d("Billing", "Consume OK");
+            }
+        };
+
+        billingClient = BillingClientSetup.getInstance(this, this);
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+                if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK) {
+                    Log.d("Billing", "Success to connect billing");
+
+                    // Query
+                    List<Purchase> purchases = billingClient.queryPurchases(BillingClient.SkuType.INAPP)
+                            .getPurchasesList();
+                    if (purchases != null) {
+                        handleItemAlreadyPurchase(purchases);
+                    } else {
+                        Log.d("Billing", "Purchases is null");
+                    }
+                } else {
+                    Log.d("Billing", "Error code: " + billingResult.getResponseCode());
+                }
+            }
+
+            @Override
+            public void onBillingServiceDisconnected() {
+                Log.d("Billing", "Disconnected from billing service");
+            }
+        });
+    }
+
+    private void handleItemAlreadyPurchase(List<Purchase> purchases) {
+        for (Purchase purchase : purchases) {
+            handlePurchase(purchase);
+        }
+    }
+
+    private void handlePurchase(Purchase purchase) {
+        if (purchase.getSku().equals("remove_ads")) {
+            ConsumeParams consumeParams = ConsumeParams.newBuilder()
+                    .setPurchaseToken(purchase.getPurchaseToken())
+                    .build();
+            billingClient.consumeAsync(consumeParams, consumeResponseListener);
+
+            removeAds();
+            Log.d("Billing", "Removed Ads");
+            Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void purchaseProduct(String sku) {
+        if (billingClient.isReady()) {
+            // all the products to be purchased
+            SkuDetailsParams params = SkuDetailsParams.newBuilder()
+                    .setSkusList(Collections.singletonList("remove_ads"))
+                    .setType(BillingClient.SkuType.INAPP)
+                    .build();
+            billingClient.querySkuDetailsAsync(params, (billingResult, skuDetailsList) -> {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+
+                    SkuDetails tempSkuDetails = null;
+
+                    assert skuDetailsList != null;
+                    for (SkuDetails skuDetail : skuDetailsList) {
+                        if (skuDetail.getSku().matches(sku)) {
+                            tempSkuDetails = skuDetail;
+                            break;
+                        }
+                    }
+
+                    assert tempSkuDetails != null;
+                    BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                            .setSkuDetails(tempSkuDetails)
+                            .build();
+                    int response = billingClient.launchBillingFlow(MultiTimerActivity.this, billingFlowParams)
+                            .getResponseCode();
+
+                    switch (response) {
+                        case BillingClient.BillingResponseCode.BILLING_UNAVAILABLE:
+                            Log.d("Billing", "BILLING_UNAVAILABLE");
+                            break;
+                        case BillingClient.BillingResponseCode.DEVELOPER_ERROR:
+                            Log.d("Billing", "DEVELOPER_ERROR");
+                            break;
+                        case BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED:
+                            Log.d("Billing", "FEATURE_NOT_SUPPORTED");
+                            break;
+                        case BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED:
+                            Log.d("Billing", "ITEM_ALREADY_OWNED");
+                            break;
+                        case BillingClient.BillingResponseCode.SERVICE_DISCONNECTED:
+                            Log.d("Billing", "SERVICE_DISCONNECTED");
+                            break;
+                        case BillingClient.BillingResponseCode.SERVICE_TIMEOUT:
+                            Log.d("Billing", "SERVICE_TIMEOUT");
+                            break;
+                        case BillingClient.BillingResponseCode.ITEM_UNAVAILABLE:
+                            Log.d("Billing", "ITEM_UNAVAILABLE");
+                            break;
+                        case BillingClient.BillingResponseCode.ERROR:
+                            Log.d("Billing", "ERROR");
+                            break;
+                        case BillingClient.BillingResponseCode.ITEM_NOT_OWNED:
+                            Log.d("Billing", "ITEM_NOT_OWNED");
+                            break;
+                        case BillingClient.BillingResponseCode.OK:
+                            Log.d("Billing", "OK");
+                            break;
+                        case BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE:
+                            Log.d("Billing", "SERVICE_UNAVAILABLE");
+                            break;
+                        case BillingClient.BillingResponseCode.USER_CANCELED:
+                            Log.d("Billing", "USER_CANCELED");
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    Log.d("Billing", "Error code: " + billingResult.getResponseCode());
+                }
+            });
         }
     }
 
@@ -278,11 +416,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                 break;
 
             case R.id.remove_Ads:
-                bp.purchase(this, "remove_ads");
-                if (bp.isPurchased("remove_ads")) {
-                    removeAds();
-                    Toast.makeText(this, "All advertisements removed!", Toast.LENGTH_SHORT).show();
-                }
+                purchaseProduct("remove_ads");
                 break;
 
             case R.id.send_feedback:
@@ -331,40 +465,11 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         return sharedPreferences.getBoolean("removed_Ads", false);
     }
 
-    @Override
-    public void onProductPurchased(String productId, TransactionDetails details) {
-        if (productId.equals("remove_ads")) {
-            if (!isRemovedAds()) {
-                Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
-            }
-            removeAds();
-        }
-    }
-
     private void removeAds() {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("removed_Ads", true);
         editor.apply();
-    }
-
-    @Override
-    public void onPurchaseHistoryRestored() {
-        bp.loadOwnedPurchasesFromGoogle();
-        if (bp.isPurchased("remove_ads")) {
-            removeAds();
-            Toast.makeText(this, "All advertisements removed!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onBillingError(int errorCode, Throwable error) {
-        Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onBillingInitialized() {
-
     }
 
     @Override
@@ -452,6 +557,15 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
             Bundle bundle = new Bundle();
             bundle.putString("Event", eventName);
             mFirebaseAnalytics.logEvent(eventName, bundle);
+        }
+    }
+
+    @Override
+    public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
+        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
+            for (Purchase purchase : purchases) {
+                handlePurchase(purchase);
+            }
         }
     }
 }

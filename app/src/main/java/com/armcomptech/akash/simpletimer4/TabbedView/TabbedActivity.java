@@ -22,6 +22,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,11 +31,20 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.TransactionDetails;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ConsumeParams;
+import com.android.billingclient.api.ConsumeResponseListener;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
 import com.armcomptech.akash.simpletimer4.EmailLogic.SendMailTask;
 import com.armcomptech.akash.simpletimer4.R;
 import com.armcomptech.akash.simpletimer4.Settings.SettingsActivity;
+import com.armcomptech.akash.simpletimer4.billing.BillingClientSetup;
 import com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity;
 import com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity;
 import com.armcomptech.akash.simpletimer4.singleTimer.timerWithService;
@@ -54,7 +65,7 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 
-public class TabbedActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler{
+public class TabbedActivity extends AppCompatActivity implements PurchasesUpdatedListener {
 
     //TODO: Change FirebaseLogging to true when releasing
     public static Boolean FirebaseLogging = false;
@@ -62,8 +73,10 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
     public static Boolean alwaysShowAd = false;
     private static FirebaseAnalytics mFirebaseAnalytics;
 
-    BillingProcessor bp;
     String activityToOpen;
+
+    BillingClient billingClient;
+    ConsumeResponseListener consumeResponseListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +111,6 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
                 break;
         }
 
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbled);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -110,17 +121,14 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
             actionBar.setIcon(R.drawable.ic_timer_white);
         }
 
-        bp = new BillingProcessor(this, getString(R.string.licence_key), this);
-        bp.initialize();
+        initializeBillingProcess();
 
-        if (FirebaseLogging) {
+        if (!FirebaseLogging) {
             removeAds(); // this removes all ads for new users
         }
-        //TODO: comment out when releasing
+
         if (alwaysShowAd) {
             alwaysShowAds();
-        } else {
-            removeAds();
         }
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
@@ -135,7 +143,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
 
             activityToOpen = sharedPreferences.getString("firstOpenActivity", "Timer and Stopwatch");
 
-            switch (activityToOpen) {
+            switch (Objects.requireNonNull(activityToOpen)) {
                 case "Timer and Stopwatch":
                     //do nothing
                     break;
@@ -168,12 +176,130 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         }
     }
 
-    @Override
-    public void onProductPurchased(String productId, TransactionDetails details) {
-        if (productId.equals("remove_ads")) {
-            removeAds();
+    public void initializeBillingProcess() {
+        consumeResponseListener = (billingResult, purchaseToken) -> {
+            if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK) {
+                Log.d("Billing", "Consume OK");
+            }
+        };
 
+        billingClient = BillingClientSetup.getInstance(this, this);
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+                if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK) {
+                    Log.d("Billing", "Success to connect billing");
+
+                    // Query
+                    List<Purchase> purchases = billingClient.queryPurchases(BillingClient.SkuType.INAPP)
+                            .getPurchasesList();
+                    if (purchases != null) {
+                        handleItemAlreadyPurchase(purchases);
+                    } else {
+                        Log.d("Billing", "Purchases is null");
+                    }
+                } else {
+                    Log.d("Billing", "Error code: " + billingResult.getResponseCode());
+                }
+            }
+
+            @Override
+            public void onBillingServiceDisconnected() {
+                Log.d("Billing", "Disconnected from billing service");
+            }
+        });
+    }
+
+    private void handleItemAlreadyPurchase(List<Purchase> purchases) {
+        for (Purchase purchase : purchases) {
+            handlePurchase(purchase);
+        }
+    }
+
+    private void handlePurchase(Purchase purchase) {
+        if (purchase.getSku().equals("remove_ads")) {
+            ConsumeParams consumeParams = ConsumeParams.newBuilder()
+                    .setPurchaseToken(purchase.getPurchaseToken())
+                    .build();
+            billingClient.consumeAsync(consumeParams, consumeResponseListener);
+
+            removeAds();
+            Log.d("Billing", "Removed Ads");
             Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void purchaseProduct(String sku) {
+        if (billingClient.isReady()) {
+            // all the products to be purchased
+            SkuDetailsParams params = SkuDetailsParams.newBuilder()
+                    .setSkusList(Collections.singletonList("remove_ads"))
+                    .setType(BillingClient.SkuType.INAPP)
+                    .build();
+            billingClient.querySkuDetailsAsync(params, (billingResult, skuDetailsList) -> {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+
+                    SkuDetails tempSkuDetails = null;
+
+                    assert skuDetailsList != null;
+                    for (SkuDetails skuDetail : skuDetailsList) {
+                        if (skuDetail.getSku().matches(sku)) {
+                            tempSkuDetails = skuDetail;
+                            break;
+                        }
+                    }
+
+                    assert tempSkuDetails != null;
+                    BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                            .setSkuDetails(tempSkuDetails)
+                            .build();
+                    int response = billingClient.launchBillingFlow(TabbedActivity.this, billingFlowParams)
+                            .getResponseCode();
+
+                    switch (response) {
+                        case BillingClient.BillingResponseCode.BILLING_UNAVAILABLE:
+                            Log.d("Billing", "BILLING_UNAVAILABLE");
+                            break;
+                        case BillingClient.BillingResponseCode.DEVELOPER_ERROR:
+                            Log.d("Billing", "DEVELOPER_ERROR");
+                            break;
+                        case BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED:
+                            Log.d("Billing", "FEATURE_NOT_SUPPORTED");
+                            break;
+                        case BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED:
+                            Log.d("Billing", "ITEM_ALREADY_OWNED");
+                            break;
+                        case BillingClient.BillingResponseCode.SERVICE_DISCONNECTED:
+                            Log.d("Billing", "SERVICE_DISCONNECTED");
+                            break;
+                        case BillingClient.BillingResponseCode.SERVICE_TIMEOUT:
+                            Log.d("Billing", "SERVICE_TIMEOUT");
+                            break;
+                        case BillingClient.BillingResponseCode.ITEM_UNAVAILABLE:
+                            Log.d("Billing", "ITEM_UNAVAILABLE");
+                            break;
+                        case BillingClient.BillingResponseCode.ERROR:
+                            Log.d("Billing", "ERROR");
+                            break;
+                        case BillingClient.BillingResponseCode.ITEM_NOT_OWNED:
+                            Log.d("Billing", "ITEM_NOT_OWNED");
+                            break;
+                        case BillingClient.BillingResponseCode.OK:
+                            Log.d("Billing", "OK");
+                            break;
+                        case BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE:
+                            Log.d("Billing", "SERVICE_UNAVAILABLE");
+                            break;
+                        case BillingClient.BillingResponseCode.USER_CANCELED:
+                            Log.d("Billing", "USER_CANCELED");
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    Log.d("Billing", "Error code: " + billingResult.getResponseCode());
+                }
+            });
         }
     }
 
@@ -189,28 +315,6 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("removed_Ads", false);
         editor.apply();
-    }
-
-    @Override
-    public void onPurchaseHistoryRestored() {
-        bp.loadOwnedPurchasesFromGoogle();
-        if (bp.isPurchased("remove_ads")) {
-            if (!isRemovedAds()) {
-                Toast.makeText(this, "Removed Ads", Toast.LENGTH_SHORT).show();
-            }
-            removeAds();
-        }
-    }
-
-    @Override
-    public void onBillingError(int errorCode, Throwable error) {
-        Log.d("Billing", "Something went wrong in billing. Errorcode : " + errorCode);
-//        Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onBillingInitialized() {
-
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -287,11 +391,7 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
                 break;
 
             case R.id.remove_Ads:
-                bp.purchase(this, "remove_ads");
-                if (bp.isPurchased("remove_ads")) {
-                    removeAds();
-                    Toast.makeText(this, "All advertisements removed!", Toast.LENGTH_SHORT).show();
-                }
+                purchaseProduct("remove_ads");
                 break;
 
             case R.id.send_feedback:
@@ -354,5 +454,14 @@ public class TabbedActivity extends AppCompatActivity implements BillingProcesso
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
+        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
+            for (Purchase purchase : purchases) {
+                handlePurchase(purchase);
+            }
+        }
     }
 }
