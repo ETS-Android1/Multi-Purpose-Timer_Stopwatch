@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,11 +44,11 @@ import com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -254,7 +255,20 @@ public class singleTimerFragment extends Fragment {
         mButtonSetTimer = root.findViewById(R.id.setTimer);
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
 
-        mButtonSetTimer.setOnClickListener(v -> openTimerDialog());
+        mButtonSetTimer.setOnClickListener(v -> {
+            if (mTimerNameAutoComplete.hasFocus()) {
+                mTimerNameAutoComplete.clearFocus();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        openTimerDialog();
+                    }
+                }, 1000);
+            } else {
+                openTimerDialog();
+            }
+            });
 
         mButtonPause.hide();
 

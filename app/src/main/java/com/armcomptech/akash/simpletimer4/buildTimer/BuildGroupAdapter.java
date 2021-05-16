@@ -2,6 +2,7 @@ package com.armcomptech.akash.simpletimer4.buildTimer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,12 +75,26 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
                         masterInfo.basicGroupInfoArrayList.get(myPosition).basicTimerInfoArrayList));
 
         ((Item)holder).addTimerButton.setOnClickListener(v -> {
-            openNameAndTimerDialog((Item)holder);
+            if (((Item)holder).groupName.hasFocus()) {
+                ((Item)holder).groupName.clearFocus();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        openNameAndTimerDialog((Item)holder);
+                    }
+                }, 1000);
+            } else {
+                openNameAndTimerDialog((Item)holder);
+            }
+
             Objects.requireNonNull(((Item)holder).timerRecyclerView.getAdapter()).notifyDataSetChanged();
             updateUI(holder, myPosition);
         });
 
         ((Item)holder).addSetButton.setOnClickListener(v -> {
+            ((Item)holder).groupName.clearFocus();
+
             addGroupCount(myPosition);
             updateUI(holder, myPosition);
 
@@ -89,6 +104,8 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
         });
 
         ((Item)holder).subtractSetButton.setOnClickListener(v -> {
+            ((Item)holder).groupName.clearFocus();
+
             if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets == 1) {
                 removeGroup(myPosition);
             } else {
@@ -108,6 +125,7 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
                 } else {
                     masterInfo.basicGroupInfoArrayList.get(myPosition).groupName = String.valueOf(((Item) holder).groupName.getText());
                 }
+                ((Item)holder).groupName.clearFocus();
                 return true;
             }
             return false;

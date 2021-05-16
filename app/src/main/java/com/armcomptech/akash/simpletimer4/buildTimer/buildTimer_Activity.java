@@ -194,6 +194,7 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
 
         addGroupFab = findViewById(R.id.addGroupFloatingActionButton);
         addGroupFab.setOnClickListener(v -> {
+            save_timer_editText.clearFocus();
 
             //create timer
             BasicTimerInfo tempTimer2 = new BasicTimerInfo(60 * 1000 , "one minute");
@@ -266,10 +267,13 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
                 load_group(position);
                 Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
                 notifyChange();
+
+                save_timer_editText.clearFocus();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                save_timer_editText.clearFocus();
             }
         });
 
@@ -277,6 +281,7 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
         save_timer_editText.setOnEditorActionListener((view, actionId, event) -> {
             if(actionId == EditorInfo.IME_ACTION_DONE){
                 hideKeyboard(view);
+                save_timer_editText.clearFocus();
                 return true;
             }
             return false;
@@ -289,6 +294,8 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
             hideKeyboard(save_timer_editText);
             saved_timers_spinner_adapter.notifyDataSetChanged();
             notifyChange();
+
+            save_timer_editText.clearFocus();
         });
     }
 

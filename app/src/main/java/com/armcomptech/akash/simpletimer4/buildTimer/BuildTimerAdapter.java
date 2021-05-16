@@ -61,17 +61,14 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         int myPosition = holder.getBindingAdapterPosition();
 
-        ((Item)holder).edit_timer_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setNameAndTimerDialogForBuildTimer setNameAndTimerDialogForBuildTimer = new setNameAndTimerDialogForBuildTimer(
-                        true,
-                        false,
-                        holder.getBindingAdapterPosition(),
-                        timers);
-                setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
-                notifyDataSetChanged();
-            }
+        ((Item)holder).edit_timer_button.setOnClickListener(v -> {
+            setNameAndTimerDialogForBuildTimer setNameAndTimerDialogForBuildTimer = new setNameAndTimerDialogForBuildTimer(
+                    true,
+                    false,
+                    holder.getBindingAdapterPosition(),
+                    timers);
+            setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
+            notifyDataSetChanged();
         });
 
         ((Item)holder).delete_timer_button.setOnClickListener(v -> {
