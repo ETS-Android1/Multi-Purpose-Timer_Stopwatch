@@ -24,15 +24,17 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.clearFocus1;
+
 public class BuildGroupAdapter extends RecyclerView.Adapter {
 
     private final Context context;
-    private final ArrayList<RecyclerView.ViewHolder> holders;
+    private static ArrayList<RecyclerView.ViewHolder> holders = null;
     private MasterInfo masterInfo;
 
     BuildGroupAdapter(Context context, MasterInfo masterInfo, ArrayList<RecyclerView.ViewHolder> holders) {
         this.context = context;
-        this.holders = holders;
+        BuildGroupAdapter.holders = holders;
         this.masterInfo = masterInfo;
     }
 
@@ -63,7 +65,14 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
     }
 
     @Override
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        holders.remove(holder);
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        holders.add(holder);
+
         int myPosition = holder.getBindingAdapterPosition();
 
         ((Item)holder).timerRecyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -75,26 +84,20 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
                         masterInfo.basicGroupInfoArrayList.get(myPosition).basicTimerInfoArrayList));
 
         ((Item)holder).addTimerButton.setOnClickListener(v -> {
-            if (((Item)holder).groupName.hasFocus()) {
-                ((Item)holder).groupName.clearFocus();
+            clearFocus1();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        openNameAndTimerDialog((Item)holder);
-                    }
-                }, 1000);
-            } else {
-                openNameAndTimerDialog((Item)holder);
-            }
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    openNameAndTimerDialog((Item)holder);
+                }
+            }, 1000);
 
             Objects.requireNonNull(((Item)holder).timerRecyclerView.getAdapter()).notifyDataSetChanged();
             updateUI(holder, myPosition);
         });
 
         ((Item)holder).addSetButton.setOnClickListener(v -> {
-            ((Item)holder).groupName.clearFocus();
-
             addGroupCount(myPosition);
             updateUI(holder, myPosition);
 
@@ -104,8 +107,6 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
         });
 
         ((Item)holder).subtractSetButton.setOnClickListener(v -> {
-            ((Item)holder).groupName.clearFocus();
-
             if (masterInfo.basicGroupInfoArrayList.get(myPosition).repeatSets == 1) {
                 removeGroup(myPosition);
             } else {
@@ -132,6 +133,12 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
         });
 
         updateUI(holder, myPosition);
+    }
+
+    public static void clearFocus2() {
+        for (RecyclerView.ViewHolder holder : holders) {
+            ((Item)holder).groupName.clearFocus();
+        }
     }
 
     public void hideKeyboard(TextView view) {

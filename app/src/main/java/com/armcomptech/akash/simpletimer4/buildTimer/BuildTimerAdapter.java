@@ -3,6 +3,7 @@ package com.armcomptech.akash.simpletimer4.buildTimer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
+
+import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.clearFocus1;
 
 public class BuildTimerAdapter extends RecyclerView.Adapter {
 
@@ -62,13 +65,20 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
         int myPosition = holder.getBindingAdapterPosition();
 
         ((Item)holder).edit_timer_button.setOnClickListener(v -> {
-            setNameAndTimerDialogForBuildTimer setNameAndTimerDialogForBuildTimer = new setNameAndTimerDialogForBuildTimer(
-                    true,
-                    false,
-                    holder.getBindingAdapterPosition(),
-                    timers);
-            setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
-            notifyDataSetChanged();
+            clearFocus1();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setNameAndTimerDialogForBuildTimer setNameAndTimerDialogForBuildTimer = new setNameAndTimerDialogForBuildTimer(
+                            true,
+                            false,
+                            holder.getBindingAdapterPosition(),
+                            timers);
+                    setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
+                    notifyDataSetChanged();
+                }
+            }, 1000);
         });
 
         ((Item)holder).delete_timer_button.setOnClickListener(v -> {

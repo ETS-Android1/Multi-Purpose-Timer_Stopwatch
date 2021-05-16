@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
@@ -77,6 +78,7 @@ import java.util.Objects;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static com.armcomptech.akash.simpletimer4.buildTimer.BuildGroupAdapter.clearFocus2;
 
 public class buildTimer_Activity extends AppCompatActivity implements setNameAndTimerDialogForBuildTimer.setTimerDialogListenerForBuildTimer, PurchasesUpdatedListener {
 
@@ -86,7 +88,7 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
     private final ArrayList<RecyclerView.ViewHolder> holders = new ArrayList<>();
 
     Spinner saved_timers_spinner;
-    EditText save_timer_editText;
+    static EditText save_timer_editText;
     Button save_timer_button;
 
     ArrayList<MasterInfo> masterList = new ArrayList<>();
@@ -194,8 +196,6 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
 
         addGroupFab = findViewById(R.id.addGroupFloatingActionButton);
         addGroupFab.setOnClickListener(v -> {
-            save_timer_editText.clearFocus();
-
             //create timer
             BasicTimerInfo tempTimer2 = new BasicTimerInfo(60 * 1000 , "one minute");
             ArrayList<BasicTimerInfo> tempTimerArray2 = new ArrayList<>();
@@ -267,13 +267,10 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
                 load_group(position);
                 Objects.requireNonNull(recyclerView.getAdapter()).notifyDataSetChanged();
                 notifyChange();
-
-                save_timer_editText.clearFocus();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                save_timer_editText.clearFocus();
             }
         });
 
@@ -297,6 +294,11 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
 
             save_timer_editText.clearFocus();
         });
+    }
+
+    public static void clearFocus1() {
+        save_timer_editText.clearFocus();
+        clearFocus2();
     }
 
     public void initializeBillingProcess() {
@@ -779,35 +781,46 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
                 logFirebaseAnalyticsEvents("Opened Feedback");
 
                 AlertDialog alert = new AlertDialog.Builder(this).create();
-
-                LayoutInflater inflater = getLayoutInflater();
-                View dialoglayout = inflater.inflate(R.layout.feedback_layout, (ViewGroup) getCurrentFocus());
-
-                Button cancelButton = dialoglayout.findViewById(R.id.cancel_feedback);
-                Button sendButton = dialoglayout.findViewById(R.id.send_feedback);
-                EditText editText = dialoglayout.findViewById(R.id.feedback_editText);
-
-                alert.setView(dialoglayout);
-
                 Activity activity = this;
 
-                sendButton.setOnClickListener(view_ -> {
-                    String feedback = String.valueOf(editText.getText());
-                    String subject = "Feedback for Timer Application";
-                    List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
-                    new SendMailTask(activity).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
-                    Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
-                    logFirebaseAnalyticsEvents("Sent Feedback");
-                    alert.dismiss();
-                });
+                LayoutInflater inflater = getLayoutInflater();
+                final View[] dialogLayout = new View[1];
+                try {
+                    clearFocus1();
 
-                cancelButton.setOnClickListener(view_ -> {
-                    Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
-                    logFirebaseAnalyticsEvents("Cancelled Feedback");
-                    alert.dismiss();
-                });
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialogLayout[0] = inflater.inflate(R.layout.feedback_layout, (ViewGroup) getCurrentFocus());
 
-                alert.show();
+                            Button cancelButton = dialogLayout[0].findViewById(R.id.cancel_feedback);
+                            Button sendButton = dialogLayout[0].findViewById(R.id.send_feedback);
+                            EditText editText = dialogLayout[0].findViewById(R.id.feedback_editText);
+
+                            alert.setView(dialogLayout[0]);
+
+                            sendButton.setOnClickListener(view_ -> {
+                                String feedback = String.valueOf(editText.getText());
+                                String subject = "Feedback for Timer Application";
+                                List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
+                                new SendMailTask(activity).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
+                                Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
+                                logFirebaseAnalyticsEvents("Sent Feedback");
+                                alert.dismiss();
+                            });
+
+                            cancelButton.setOnClickListener(view_ -> {
+                                Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
+                                logFirebaseAnalyticsEvents("Cancelled Feedback");
+                                alert.dismiss();
+                            });
+
+                            alert.show();
+                        }
+                    }, 1000);
+                } catch (ClassCastException classCastException) {
+                    clearFocus1();
+                }
                 break;
 
             default:

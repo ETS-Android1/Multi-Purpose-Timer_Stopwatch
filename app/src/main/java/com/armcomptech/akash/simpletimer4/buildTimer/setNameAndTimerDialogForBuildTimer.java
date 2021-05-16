@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
+import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.clearFocus1;
 
 public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment {
     private AutoCompleteTextView autoCompleteTimerName;
@@ -60,24 +62,37 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
         AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
 
         LayoutInflater inflater = getLayoutInflater();
-        View dialogLayout = inflater.inflate(R.layout.layout_dialog_nameandtimerset, (ViewGroup) requireActivity().getCurrentFocus());
+        final View[] dialogLayout = new View[1];
+        try {
+            dialogLayout[0] = inflater.inflate(R.layout.layout_dialog_nameandtimerset, (ViewGroup) requireActivity().getCurrentFocus());
+        } catch (ClassCastException classCastException) {
+            clearFocus1();
 
-        alertDialog.setView(dialogLayout);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dialogLayout[0] = inflater.inflate(R.layout.layout_dialog_nameandtimerset, (ViewGroup) requireActivity().getCurrentFocus());
+                }
+            }, 3000);
+        }
 
-        TextView title = dialogLayout.findViewById(R.id.title);
+
+        alertDialog.setView(dialogLayout[0]);
+
+        TextView title = dialogLayout[0].findViewById(R.id.title);
         title.setText("Update the timer");
 
-        Button updateTimerButton = dialogLayout.findViewById(R.id.update_timer);
-        Button cancelButton = dialogLayout.findViewById(R.id.cancel);
+        Button updateTimerButton = dialogLayout[0].findViewById(R.id.update_timer);
+        Button cancelButton = dialogLayout[0].findViewById(R.id.cancel);
         cancelButton.setOnClickListener(view -> alertDialog.dismiss());
 
-        editTextTimer = dialogLayout.findViewById(R.id.timerTimeDialog);
+        editTextTimer = dialogLayout[0].findViewById(R.id.timerTimeDialog);
         editTextTimer.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        autoCompleteTimerName = dialogLayout.findViewById(R.id.timerNameDialog);
+        autoCompleteTimerName = dialogLayout[0].findViewById(R.id.timerNameDialog);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             autoCompleteTimerName.setImeOptions(EditorInfo.IME_ACTION_DONE);
         }
-        timePicker = dialogLayout.findViewById(R.id.scrollHmsPicker);
+        timePicker = dialogLayout[0].findViewById(R.id.scrollHmsPicker);
 
         editTextTimer.setFilters(new InputFilter[] { new InputFilter.LengthFilter(6)});
 
@@ -124,7 +139,7 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
             } else {
                 editTextTimer.setEnabled(false);
                 editTextTimer.setVisibility(View.GONE);
-                timePicker = dialogLayout.findViewById(R.id.scrollHmsPicker);
+                timePicker = dialogLayout[0].findViewById(R.id.scrollHmsPicker);
 
                 long startTime = timers.get(adapterPosition).mStartTimeInMillis;
                 int hours = (int) (startTime / 1000) / 3600;
@@ -172,7 +187,7 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
             } else {
                 editTextTimer.setEnabled(false);
                 editTextTimer.setVisibility(View.GONE);
-                timePicker = dialogLayout.findViewById(R.id.scrollHmsPicker);
+                timePicker = dialogLayout[0].findViewById(R.id.scrollHmsPicker);
             }
 
             updateTimerButton.setText("Set Timer");
