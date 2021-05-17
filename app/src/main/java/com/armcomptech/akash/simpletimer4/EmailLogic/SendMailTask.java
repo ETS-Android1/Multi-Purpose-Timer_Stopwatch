@@ -8,7 +8,7 @@ import java.util.List;
 
 public class SendMailTask extends AsyncTask {
 
-    private Activity sendMailActivity;
+    private final Activity sendMailActivity;
 
     public SendMailTask(Activity activity) {
         sendMailActivity = activity;

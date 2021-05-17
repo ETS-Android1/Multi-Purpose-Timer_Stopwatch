@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -12,7 +13,6 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -37,10 +37,6 @@ public class GMail {
     Session mailSession;
     MimeMessage emailMessage;
 
-    public GMail() {
-
-    }
-
     public GMail(String fromEmail, String fromPassword,
                  List<String> toEmailList, String emailSubject,
                  String emailBody, List<File> fileNameList) {
@@ -58,7 +54,7 @@ public class GMail {
         Log.i("GMail", "Mail server properties set.");
     }
 
-    public MimeMessage createEmailMessage() throws AddressException,
+    public MimeMessage createEmailMessage() throws
             MessagingException, IOException {
 
         mailSession = Session.getDefaultInstance(emailProperties, null);
@@ -92,11 +88,11 @@ public class GMail {
         return emailMessage;
     }
 
-    public void sendEmail() throws AddressException, MessagingException {
+    public void sendEmail() throws MessagingException {
 
         Transport transport = mailSession.getTransport("smtp");
         transport.connect(emailHost, fromEmail, fromPassword);
-        Log.i("GMail", "allrecipients: " + emailMessage.getAllRecipients());
+        Log.i("GMail", "allrecipients: " + Arrays.toString(emailMessage.getAllRecipients()));
         transport.sendMessage(emailMessage, emailMessage.getAllRecipients());
         transport.close();
         Log.i("GMail", "Email sent successfully.");

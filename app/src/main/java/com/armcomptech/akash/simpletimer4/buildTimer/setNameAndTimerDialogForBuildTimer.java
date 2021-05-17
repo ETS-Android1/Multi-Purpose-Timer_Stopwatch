@@ -28,6 +28,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
@@ -38,10 +39,10 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
     private setTimerDialogListenerForBuildTimer listener;
     private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
 
-    private boolean updateExistingTimer;
-    private boolean creatingNewTimer;
-    private int adapterPosition;
-    private ArrayList<BasicTimerInfo> timers;
+    private final boolean updateExistingTimer;
+    private final boolean creatingNewTimer;
+    private final int adapterPosition;
+    private final ArrayList<BasicTimerInfo> timers;
 
     public setNameAndTimerDialogForBuildTimer(boolean updateExistingTimer, boolean creatingNewTimer, int adapterPosition, ArrayList<BasicTimerInfo> timers) {
         this.updateExistingTimer = updateExistingTimer;
@@ -112,7 +113,7 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
             autoCompleteTimerName.setText(timers.get(adapterPosition).timerName);
             autoCompleteTimerName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
-            if (timePickerPreference.equals("Typing")) {
+            if (Objects.equals(timePickerPreference, "Typing")) {
                 timePicker.setEnabled(false);
                 timePicker.setVisibility(View.GONE);
                 editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {
@@ -148,7 +149,7 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
                 }
 
                 String time;
-                if (timePickerPreference.equals("Typing")) {
+                if (Objects.equals(timePickerPreference, "Typing")) {
                     time = editTextTimer.getText().toString();
                     if (!(time.matches(""))) {
                         listener.createNewTimerNameAndTimeForBuildTimer(time, 0, 0, 0, name, activity.creatingNewTimer, activity.updateExistingTimer, activity.adapterPosition, activity.timers);
@@ -167,7 +168,7 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
             }));
             autoCompleteTimerName.requestFocus();
 
-            if (timePickerPreference.equals("Typing")) {
+            if (Objects.equals(timePickerPreference, "Typing")) {
                 timePicker.setEnabled(false);
                 timePicker.setVisibility(View.GONE);
             } else {
@@ -186,7 +187,7 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
                 }
 
                 String time;
-                if (timePickerPreference.equals("Typing")) {
+                if (Objects.equals(timePickerPreference, "Typing")) {
                     time = editTextTimer.getText().toString();
                     if (!(time.matches(""))) {
                         listener.createNewTimerNameAndTimeForBuildTimer(time, 0, 0, 0, name, activity.creatingNewTimer, activity.updateExistingTimer, activity.adapterPosition, activity.timers);

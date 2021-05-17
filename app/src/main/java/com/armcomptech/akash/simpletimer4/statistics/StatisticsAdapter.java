@@ -15,10 +15,10 @@ import com.armcomptech.akash.simpletimer4.R;
 import java.util.ArrayList;
 
 public class StatisticsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private Context context;
-    private ArrayList<String> timerName;
-    private ArrayList<Integer> count;
-    private ArrayList<Integer> timeInSeconds;
+    private final Context context;
+    private final ArrayList<String> timerName;
+    private final ArrayList<Integer> count;
+    private final ArrayList<Integer> timeInSeconds;
 
     StatisticsAdapter(Context context, ArrayList<String> timerName, ArrayList<Integer> count, ArrayList<Integer> timeInSeconds) {
         this.context = context;

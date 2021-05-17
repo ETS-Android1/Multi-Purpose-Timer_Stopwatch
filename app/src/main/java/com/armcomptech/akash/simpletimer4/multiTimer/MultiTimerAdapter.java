@@ -1,5 +1,6 @@
 package com.armcomptech.akash.simpletimer4.multiTimer;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -34,8 +35,6 @@ import com.armcomptech.akash.simpletimer4.Timer;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -52,13 +51,12 @@ import static com.App.MULTI_TIMER_ID;
 public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements setNameAndTimerDialog.setTimerDialogListener {
 
     private FirebaseAnalytics mFirebaseAnalytics;
-    private Context context;
-    private ArrayList<Timer> timers;
-    private ArrayList<RecyclerView.ViewHolder> holders;
+    private final Context context;
+    private final ArrayList<Timer> timers;
+    private final ArrayList<RecyclerView.ViewHolder> holders;
     private int ticksToPass = 0;
 
-    private boolean showNotification;
-    private NotificationManagerCompat notificationManager;
+    private final NotificationManagerCompat notificationManager;
     InterstitialAd mResetButtonInterstitialAd;
 
     MultiTimerAdapter(Context context, ArrayList<Timer> timers, ArrayList<RecyclerView.ViewHolder> holders) {
@@ -67,7 +65,6 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.holders = holders;
 
         notificationManager = NotificationManagerCompat.from(this.context);
-        showNotification = false;
 
         if (TabbedActivity.isInProduction) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
@@ -79,11 +76,8 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         if (!isRemovedAds()) {
             MobileAds.initialize(context,
-                    new OnInitializationCompleteListener() {
-                        @Override
-                        public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+                    initializationStatus -> {
 
-                        }
                     });
 
             //reset button ad
@@ -287,18 +281,18 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         timers.get(myPosition).setTimeLeftInMillis(timers.get(myPosition).getStartTimeInMillis());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getStartTimeInMillis(), true);
+            holder.progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getStartTimeInMillis(), true);
         } else {
-            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getStartTimeInMillis());
+            holder.progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getStartTimeInMillis());
         }
 
         int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         if (currentNightMode == Configuration.UI_MODE_NIGHT_NO) {
-            ((Item) holder).timerTime.setTextColor(Color.BLACK);
-            ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.WHITE);
+            holder.timerTime.setTextColor(Color.BLACK);
+            holder.progressBarTimeHorizontal.setBackgroundColor(Color.WHITE);
         } else {
-            ((Item) holder).timerTime.setTextColor(Color.WHITE);
-            ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.BLACK);
+            holder.timerTime.setTextColor(Color.WHITE);
+            holder.progressBarTimeHorizontal.setBackgroundColor(Color.BLACK);
         }
 
         timers.get(myPosition).setCountDownTimer(null);
@@ -341,15 +335,15 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 //to prevent new timers from continuing from other timer threads
                 if (myPosition != -1) {
                     if (!timers.get(myPosition).getTimerPlaying() && !timers.get(myPosition).getTimerPaused() && !timers.get(myPosition).getTimerIsDone()) {
-                        resetTimer((Item)holder);
+                        resetTimer(holder);
                     } else {
                         timers.get(myPosition).setTimeLeftInMillis(millisUntilFinished);
-                        ((Item)holder).timerTime.setText(timers.get(myPosition).getTimeLeftFormatted());
+                        holder.timerTime.setText(timers.get(myPosition).getTimeLeftFormatted());
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getTimeLeftInMillis(), true);
+                            holder.progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getTimeLeftInMillis(), true);
                         } else {
-                            ((Item)holder).progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getTimeLeftInMillis());
+                            holder.progressBarTimeHorizontal.setProgress((int) timers.get(myPosition).getTimeLeftInMillis());
                         }
 
                         Timer tempTimer = timers.get(myPosition);
@@ -372,15 +366,15 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             @Override
             public void onFinish() {
-                if (((Item)holder).repeatSwitch.isChecked()) {
-                    resetTimer(((Item)holder));
-                    startTimer(((Item)holder), holder.getBindingAdapterPosition());
+                if (holder.repeatSwitch.isChecked()) {
+                    resetTimer(holder);
+                    startTimer(holder, holder.getBindingAdapterPosition());
                 } else {
-                    ((Item)holder).startButton.setVisibility(View.INVISIBLE);
-                    ((Item)holder).pauseButton.setVisibility(View.INVISIBLE);
-                    ((Item)holder).resetButton.setVisibility(View.VISIBLE);
-                    ((Item)holder).timerTime.setTextColor(Color.RED);
-                    ((Item)holder).progressBarTimeHorizontal.setBackgroundColor(Color.RED);
+                    holder.startButton.setVisibility(View.INVISIBLE);
+                    holder.pauseButton.setVisibility(View.INVISIBLE);
+                    holder.resetButton.setVisibility(View.VISIBLE);
+                    holder.timerTime.setTextColor(Color.RED);
+                    holder.progressBarTimeHorizontal.setBackgroundColor(Color.RED);
                 }
             }
         }.start());
@@ -527,6 +521,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         FloatingActionButton startButton;
         FloatingActionButton pauseButton;
         FloatingActionButton resetButton;
+        @SuppressLint("UseSwitchCompatOrMaterialCode")
         Switch repeatSwitch;
         ProgressBar progressBarTimeHorizontal;
         Button invisibleTimeButton;

@@ -81,7 +81,6 @@ public class stopwatchFragment extends Fragment {
     ArrayList<String> timerName = new ArrayList<>();
     String lastTimeLeftFormatted;
 
-    @SuppressLint("StaticFieldLeak")
     private static TabbedActivity instance;
 
     java.util.Timer tempTimer;
@@ -261,9 +260,7 @@ public class stopwatchFragment extends Fragment {
             setWithLapView();
         });
 
-        mButtonShare.setOnClickListener(v -> {
-            shareStopwatchTime();
-        });
+        mButtonShare.setOnClickListener(v -> shareStopwatchTime());
 
         mTimerNameAutoComplete.setOnEditorActionListener((view, actionId, event) -> {
             if(actionId == EditorInfo.IME_ACTION_DONE){
@@ -299,7 +296,7 @@ public class stopwatchFragment extends Fragment {
     }
 
     private void shareStopwatchTime() {
-        String toShare = "Here is the share content body";
+        String toShare;
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(getTimerName());
         stringBuilder.append(" stopwatch time is ");

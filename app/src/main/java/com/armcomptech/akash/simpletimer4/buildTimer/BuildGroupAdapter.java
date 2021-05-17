@@ -31,7 +31,7 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
 
     private final Context context;
     private static ArrayList<RecyclerView.ViewHolder> holders = null;
-    private MasterInfo masterInfo;
+    private final MasterInfo masterInfo;
 
     BuildGroupAdapter(Context context, MasterInfo masterInfo, ArrayList<RecyclerView.ViewHolder> holders) {
         this.context = context;
@@ -81,19 +81,13 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
         ((Item)holder).timerRecyclerView.setAdapter(
                 new BuildTimerAdapter(
                         context,
-                        holders,
                         masterInfo.basicGroupInfoArrayList.get(myPosition).basicTimerInfoArrayList));
 
         ((Item)holder).addTimerButton.setOnClickListener(v -> {
             if (isFocusedBuildTimer1()) {
                 clearFocusBuildTimer1();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        addTimer(holder, myPosition);
-                    }
-                }, 1000);
+                new Handler().postDelayed(() -> addTimer(holder, myPosition), 1000);
             } else {
                 addTimer(holder, myPosition);
             }

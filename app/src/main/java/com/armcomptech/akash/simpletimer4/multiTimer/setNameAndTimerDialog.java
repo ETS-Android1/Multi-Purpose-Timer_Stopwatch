@@ -28,6 +28,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -37,10 +38,10 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
     private setTimerDialogListener listener;
     private io.github.deweyreed.scrollhmspicker.ScrollHmsPicker timePicker;
 
-    private boolean updateExistingTimer;
-    private boolean creatingNewTimer;
-    private MultiTimerAdapter.Item holder;
-    private ArrayList<Timer> timers;
+    private final boolean updateExistingTimer;
+    private final boolean creatingNewTimer;
+    private final MultiTimerAdapter.Item holder;
+    private final ArrayList<Timer> timers;
 
     public setNameAndTimerDialog(boolean updateExistingTimer, boolean creatingNewTimer, MultiTimerAdapter.Item holder, ArrayList<Timer> timers) {
         this.updateExistingTimer = updateExistingTimer;
@@ -106,7 +107,7 @@ public class setNameAndTimerDialog extends AppCompatDialogFragment {
             autoCompleteTimerName.setText(timers.get(holder.getBindingAdapterPosition()).getTimerName());
             autoCompleteTimerName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
-            if (timePickerPreference.equals("Typing")) {
+            if (Objects.equals(timePickerPreference, "Typing")) {
                 timePicker.setEnabled(false);
                 timePicker.setVisibility(View.GONE);
                 editTextTimer.setOnFocusChangeListener((v, hasFocus) -> editTextTimer.post(() -> {

@@ -136,7 +136,7 @@ public class TabbedActivity extends AppCompatActivity implements PurchasesUpdate
             alwaysShowAds();
         }
 
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
@@ -408,12 +408,7 @@ public class TabbedActivity extends AppCompatActivity implements PurchasesUpdate
                         clearFocusSingleTimer();
                         clearFocusStopwatch();
 
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                showDialog(dialogLayout, inflater, alert, activity);
-                            }
-                        }, 1000);
+                        new Handler().postDelayed(() -> showDialog(dialogLayout, inflater, alert, activity), 1000);
                     } catch (ClassCastException classCastException) {
                         clearFocusSingleTimer();
                         clearFocusStopwatch();

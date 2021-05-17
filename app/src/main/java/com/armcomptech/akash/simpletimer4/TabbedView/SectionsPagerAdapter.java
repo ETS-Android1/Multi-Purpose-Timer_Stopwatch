@@ -1,7 +1,6 @@
 package com.armcomptech.akash.simpletimer4.TabbedView;
 
-import android.content.Context;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -17,13 +16,12 @@ import com.armcomptech.akash.simpletimer4.stopwatch.stopwatchFragment;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     private static final String[] TAB_TITLES = new String[]{"Timer", "Stopwatch"};
-    private final Context mContext;
 
-    public SectionsPagerAdapter(Context context, FragmentManager fm) {
+    public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
-        mContext = context;
     }
 
+    @NonNull
     @Override
     public Fragment getItem(int position) {
         if (position == 0) {

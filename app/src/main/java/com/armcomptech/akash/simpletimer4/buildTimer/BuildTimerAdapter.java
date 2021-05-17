@@ -25,14 +25,12 @@ import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.
 
 public class BuildTimerAdapter extends RecyclerView.Adapter {
 
-    private Context context;
-    private ArrayList<RecyclerView.ViewHolder> holders;
-    private ArrayList<BasicTimerInfo> timers;
+    private final Context context;
+    private final ArrayList<BasicTimerInfo> timers;
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    public BuildTimerAdapter(Context context, ArrayList<RecyclerView.ViewHolder> holders, ArrayList<BasicTimerInfo> timers) {
+    public BuildTimerAdapter(Context context, ArrayList<BasicTimerInfo> timers) {
         this.context = context;
-        this.holders = holders;
         this.timers = timers;
 
         if (TabbedActivity.isInProduction) {
@@ -69,12 +67,7 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
             if (isFocusedBuildTimer1()) {
                 clearFocusBuildTimer1();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        editTimer(holder);
-                    }
-                }, 1000);
+                new Handler().postDelayed(() -> editTimer(holder), 1000);
             } else {
                 editTimer(holder);
             }

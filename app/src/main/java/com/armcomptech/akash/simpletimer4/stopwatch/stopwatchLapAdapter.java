@@ -21,9 +21,9 @@ import java.util.ArrayList;
 
 public class stopwatchLapAdapter extends RecyclerView.Adapter {
 
-    private Context context;
-    private ArrayList<String> lapTime;
-    private ArrayList<String> lapName;
+    private final Context context;
+    private final ArrayList<String> lapTime;
+    private final ArrayList<String> lapName;
 
     public stopwatchLapAdapter(Context context, ArrayList<String> lapTime, ArrayList<String> lapName) {
         this.context = context;

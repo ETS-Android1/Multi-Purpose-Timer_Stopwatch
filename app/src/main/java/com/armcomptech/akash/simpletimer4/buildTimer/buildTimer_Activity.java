@@ -111,7 +111,7 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
         setContentView(R.layout.activity_build_timer);
 
         if (!isRemovedAds()) {
-            banner_adView = (AdView) findViewById(R.id.banner_ad);
+            banner_adView = findViewById(R.id.banner_ad);
             banner_adRequest = new AdRequest.Builder().build();
             banner_adView.loadAd(banner_adRequest);
             banner_adView.setAdListener(new AdListener(){
@@ -258,7 +258,7 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
                 saved_timers_names.add(masterInfo.masterName);
             }
         }
-        saved_timers_spinner_adapter = new ArrayAdapter<String>(this, R.layout.timername_autocomplete_textview, saved_timers_names);
+        saved_timers_spinner_adapter = new ArrayAdapter<>(this, R.layout.timername_autocomplete_textview, saved_timers_names);
         saved_timers_spinner.setAdapter(saved_timers_spinner_adapter);
         saved_timers_spinner.setPrompt("Past Timers");
 
@@ -794,12 +794,7 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
                 if (isFocusedBuildTimer1()) {
                     clearFocusBuildTimer1();
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            sendFeedbackDialog(dialogLayout, inflater, alert, activity);
-                        }
-                    }, 1000);
+                    new Handler().postDelayed(() -> sendFeedbackDialog(dialogLayout, inflater, alert, activity), 1000);
                 } else {
                     sendFeedbackDialog(dialogLayout, inflater, alert, activity);
                 }

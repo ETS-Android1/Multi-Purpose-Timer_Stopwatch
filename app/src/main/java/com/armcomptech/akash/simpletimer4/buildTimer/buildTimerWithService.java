@@ -31,10 +31,6 @@ public class buildTimerWithService extends Service {
     String timerAndGroupName;
     BroadcastReceiver broadcastReceiver2;
 
-    public long getTimeRemaining() {
-        return this.timeRemaining;
-    }
-
     public void setTimeRemaining(long timeRemaining) {
         this.timeRemaining = timeRemaining;
     }

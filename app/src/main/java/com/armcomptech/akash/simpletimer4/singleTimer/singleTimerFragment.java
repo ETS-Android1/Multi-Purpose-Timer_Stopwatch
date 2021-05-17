@@ -46,8 +46,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -69,7 +67,7 @@ import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.isInP
  */
 public class singleTimerFragment extends Fragment {
 
-    private static int notification_id = 1;
+    private static final int notification_id = 1;
     private static final String START_TIME = "start_time";
 
     private TextView mTextViewCountDown;
@@ -77,7 +75,6 @@ public class singleTimerFragment extends Fragment {
     private FloatingActionButton mButtonPause;
     private FloatingActionButton mButtonReset;
     private ProgressBar mProgressBar;
-    private Button mButtonSetTimer;
     private CountDownTimer mCountDownTimer;
     private TextView mMillis;
     private static AutoCompleteTextView mTimerNameAutoComplete;
@@ -105,7 +102,6 @@ public class singleTimerFragment extends Fragment {
     ArrayList<Integer> count = new ArrayList<>();
     ArrayList<Integer> timeInSeconds = new ArrayList<>();
 
-    @SuppressLint("StaticFieldLeak")
     private static TabbedActivity instance;
     public String currentTimerName;
     public int currentTimerNamePosition;
@@ -171,11 +167,8 @@ public class singleTimerFragment extends Fragment {
 
         if (!isRemovedAds()) {
             MobileAds.initialize(requireContext(),
-                    new OnInitializationCompleteListener() {
-                        @Override
-                        public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+                    initializationStatus -> {
 
-                        }
                     });
 
             //reset button ad
@@ -207,7 +200,7 @@ public class singleTimerFragment extends Fragment {
         setRetainInstance(true);
         View root = inflater.inflate(R.layout.fragment_single_timer, container, false);
 
-        banner_adView = (AdView) root.findViewById(R.id.banner_ad);
+        banner_adView = root.findViewById(R.id.banner_ad);
         banner_adView.setVisibility(View.GONE);
         if (!isRemovedAds()) {
             banner_adRequest = new AdRequest.Builder().build();
@@ -220,7 +213,7 @@ public class singleTimerFragment extends Fragment {
                 }
 
                 @Override
-                public void onAdFailedToLoad(LoadAdError loadAdError) {
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     banner_adView.setVisibility(View.GONE);
                     logFirebaseAnalyticsEvents("Failed to load banner ad");
                 }
@@ -252,19 +245,14 @@ public class singleTimerFragment extends Fragment {
         mTimerNameTextView = root.findViewById(R.id.timerNameTextView);
         mTimerNameTextView.setVisibility(View.INVISIBLE );
 
-        mButtonSetTimer = root.findViewById(R.id.setTimer);
+        Button mButtonSetTimer = root.findViewById(R.id.setTimer);
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
 
         mButtonSetTimer.setOnClickListener(v -> {
             if (mTimerNameAutoComplete.hasFocus()) {
                 mTimerNameAutoComplete.clearFocus();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        openTimerDialog();
-                    }
-                }, 1000);
+                new Handler().postDelayed(() -> openTimerDialog(), 1000);
             } else {
                 openTimerDialog();
             }
@@ -407,7 +395,7 @@ public class singleTimerFragment extends Fragment {
     }
 
     public boolean isRemovedAds() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         return sharedPreferences.getBoolean("removed_Ads", false);
     }
 
@@ -432,7 +420,7 @@ public class singleTimerFragment extends Fragment {
     }
 
     @Override
-    public void onViewStateRestored(@NonNull Bundle savedInstanceState) {
+    public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
         if (savedInstanceState == null) {
@@ -542,7 +530,7 @@ public class singleTimerFragment extends Fragment {
     }
 
     private void loadData() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
 
         String timerNameJson = sharedPreferences.getString("timerName", null);
