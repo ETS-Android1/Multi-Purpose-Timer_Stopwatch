@@ -49,7 +49,7 @@ import java.util.TimerTask;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
-import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.FirebaseLogging;
+import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.isInProduction;
 
 public class stopwatchFragment extends Fragment {
 
@@ -60,7 +60,7 @@ public class stopwatchFragment extends Fragment {
     private FloatingActionButton mButtonLap;
     private FloatingActionButton mButtonShare;
     private TextView mMillis;
-    private AutoCompleteTextView mTimerNameAutoComplete;
+    private static AutoCompleteTextView mTimerNameAutoComplete;
     private TextView mTimerNameTextView;
     private RecyclerView lapRecyclerView;
     ConstraintLayout lapListViewConstraintLayout;
@@ -105,8 +105,33 @@ public class stopwatchFragment extends Fragment {
         notificationManager = NotificationManagerCompat.from(requireContext());
         loadData();
 
-        if (FirebaseLogging) {
+        if (isInProduction) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(instance);
+        }
+
+        if (!isRemovedAds()) {
+            MobileAds.initialize(requireContext(),
+                    initializationStatus -> {
+                    });
+
+            //reset button ad
+            AdRequest adRequest = new AdRequest.Builder().build();
+            InterstitialAd.load(
+                    requireContext(),
+                    requireContext().getString(R.string.resetButton_interstitial_ad_id),
+                    adRequest,
+                    new InterstitialAdLoadCallback() {
+                        @Override
+                        public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                            mResetButtonInterstitialAd = interstitialAd;
+                        }
+
+                        @Override
+                        public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                            mResetButtonInterstitialAd = null;
+                        }
+                    }
+            );
         }
     }
 
@@ -240,32 +265,37 @@ public class stopwatchFragment extends Fragment {
             shareStopwatchTime();
         });
 
-        if (!isRemovedAds()) {
-            MobileAds.initialize(requireContext(),
-                    initializationStatus -> {
-                    });
-
-            //reset button ad
-            AdRequest adRequest = new AdRequest.Builder().build();
-            InterstitialAd.load(
-                    requireContext(),
-                    requireContext().getString(R.string.resetButton_interstitial_ad_id),
-                    adRequest,
-                    new InterstitialAdLoadCallback() {
-                        @Override
-                        public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                            mResetButtonInterstitialAd = interstitialAd;
-                        }
-
-                        @Override
-                        public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                            mResetButtonInterstitialAd = null;
-                        }
-                    }
-            );
-        }
+        mTimerNameAutoComplete.setOnEditorActionListener((view, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                hideKeyboard(view);
+                mTimerNameAutoComplete.clearFocus();
+                return true;
+            }
+            return false;
+        });
 
         return root;
+    }
+
+    public void hideKeyboard(TextView view) {
+        InputMethodManager imm = (InputMethodManager) view.getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    public static boolean isFocusedStopwatchTimer() {
+        if (mTimerNameAutoComplete != null) {
+            return mTimerNameAutoComplete.isFocused();
+        }
+        return false;
+    }
+
+    public static void clearFocusStopwatch() {
+        if (mTimerNameAutoComplete != null) {
+            mTimerNameAutoComplete.clearFocus();
+        }
     }
 
     private void shareStopwatchTime() {
@@ -582,7 +612,7 @@ public class stopwatchFragment extends Fragment {
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (FirebaseLogging) {
+        if (isInProduction) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

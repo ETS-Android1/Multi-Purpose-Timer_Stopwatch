@@ -69,11 +69,11 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notificationManager = NotificationManagerCompat.from(this.context);
         showNotification = false;
 
-        if (TabbedActivity.FirebaseLogging) {
+        if (TabbedActivity.isInProduction) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
         }
 
-        if (TabbedActivity.FirebaseLogging) {
+        if (TabbedActivity.isInProduction) {
             logFirebaseAnalyticsEvents("Reset Timer in Multi-Timer");
         }
 
@@ -108,7 +108,7 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (TabbedActivity.FirebaseLogging) {
+        if (TabbedActivity.isInProduction) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

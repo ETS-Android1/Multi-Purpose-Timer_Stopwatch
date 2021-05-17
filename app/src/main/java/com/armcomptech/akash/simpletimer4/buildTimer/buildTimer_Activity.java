@@ -78,7 +78,8 @@ import java.util.Objects;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.armcomptech.akash.simpletimer4.buildTimer.BuildGroupAdapter.clearFocus2;
+import static com.armcomptech.akash.simpletimer4.buildTimer.BuildGroupAdapter.clearFocusBuildTimer2;
+import static com.armcomptech.akash.simpletimer4.buildTimer.BuildGroupAdapter.isFocusedBuildTimer2;
 
 public class buildTimer_Activity extends AppCompatActivity implements setNameAndTimerDialogForBuildTimer.setTimerDialogListenerForBuildTimer, PurchasesUpdatedListener {
 
@@ -129,7 +130,7 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
             });
         }
 
-        if (TabbedActivity.FirebaseLogging) {
+        if (TabbedActivity.isInProduction) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         }
         load_data();
@@ -296,9 +297,13 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
         });
     }
 
-    public static void clearFocus1() {
+    public static boolean isFocusedBuildTimer1() {
+        return save_timer_editText.isFocused() || isFocusedBuildTimer2();
+    }
+
+    public static void clearFocusBuildTimer1() {
         save_timer_editText.clearFocus();
-        clearFocus2();
+        clearFocusBuildTimer2();
     }
 
     public void initializeBillingProcess() {
@@ -785,41 +790,18 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
 
                 LayoutInflater inflater = getLayoutInflater();
                 final View[] dialogLayout = new View[1];
-                try {
-                    clearFocus1();
+
+                if (isFocusedBuildTimer1()) {
+                    clearFocusBuildTimer1();
 
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            dialogLayout[0] = inflater.inflate(R.layout.feedback_layout, (ViewGroup) getCurrentFocus());
-
-                            Button cancelButton = dialogLayout[0].findViewById(R.id.cancel_feedback);
-                            Button sendButton = dialogLayout[0].findViewById(R.id.send_feedback);
-                            EditText editText = dialogLayout[0].findViewById(R.id.feedback_editText);
-
-                            alert.setView(dialogLayout[0]);
-
-                            sendButton.setOnClickListener(view_ -> {
-                                String feedback = String.valueOf(editText.getText());
-                                String subject = "Feedback for Timer Application";
-                                List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
-                                new SendMailTask(activity).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
-                                Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
-                                logFirebaseAnalyticsEvents("Sent Feedback");
-                                alert.dismiss();
-                            });
-
-                            cancelButton.setOnClickListener(view_ -> {
-                                Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
-                                logFirebaseAnalyticsEvents("Cancelled Feedback");
-                                alert.dismiss();
-                            });
-
-                            alert.show();
+                            sendFeedbackDialog(dialogLayout, inflater, alert, activity);
                         }
                     }, 1000);
-                } catch (ClassCastException classCastException) {
-                    clearFocus1();
+                } else {
+                    sendFeedbackDialog(dialogLayout, inflater, alert, activity);
                 }
                 break;
 
@@ -827,6 +809,39 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendFeedbackDialog(View[] dialogLayout, LayoutInflater inflater, AlertDialog alert, Activity activity) {
+        try {
+            dialogLayout[0] = inflater.inflate(R.layout.feedback_layout, (ViewGroup) getCurrentFocus());
+        } catch (ClassCastException classCastException) {
+            clearFocusBuildTimer1();
+            return;
+        }
+
+        Button cancelButton = dialogLayout[0].findViewById(R.id.cancel_feedback);
+        Button sendButton = dialogLayout[0].findViewById(R.id.send_feedback);
+        EditText editText = dialogLayout[0].findViewById(R.id.feedback_editText);
+
+        alert.setView(dialogLayout[0]);
+
+        sendButton.setOnClickListener(view_ -> {
+            String feedback = String.valueOf(editText.getText());
+            String subject = "Feedback for Timer Application";
+            List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
+            new SendMailTask(activity).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
+            Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
+            logFirebaseAnalyticsEvents("Sent Feedback");
+            alert.dismiss();
+        });
+
+        cancelButton.setOnClickListener(view_ -> {
+            Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
+            logFirebaseAnalyticsEvents("Cancelled Feedback");
+            alert.dismiss();
+        });
+
+        alert.show();
     }
 
     private void removeAds() {
@@ -837,7 +852,7 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (TabbedActivity.FirebaseLogging) {
+        if (TabbedActivity.isInProduction) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

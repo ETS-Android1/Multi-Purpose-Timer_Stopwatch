@@ -102,7 +102,7 @@ public class timerForBuilt_Activity extends AppCompatActivity {
             });
         }
 
-        if (TabbedActivity.FirebaseLogging) {
+        if (TabbedActivity.isInProduction) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         }
 
@@ -516,7 +516,7 @@ public class timerForBuilt_Activity extends AppCompatActivity {
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (TabbedActivity.FirebaseLogging) {
+        if (TabbedActivity.isInProduction) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

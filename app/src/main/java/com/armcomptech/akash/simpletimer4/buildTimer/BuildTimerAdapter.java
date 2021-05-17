@@ -20,7 +20,8 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 
-import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.clearFocus1;
+import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.clearFocusBuildTimer1;
+import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.isFocusedBuildTimer1;
 
 public class BuildTimerAdapter extends RecyclerView.Adapter {
 
@@ -34,7 +35,7 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
         this.holders = holders;
         this.timers = timers;
 
-        if (TabbedActivity.FirebaseLogging) {
+        if (TabbedActivity.isInProduction) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
         }
     }
@@ -65,20 +66,18 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
         int myPosition = holder.getBindingAdapterPosition();
 
         ((Item)holder).edit_timer_button.setOnClickListener(v -> {
-            clearFocus1();
+            if (isFocusedBuildTimer1()) {
+                clearFocusBuildTimer1();
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setNameAndTimerDialogForBuildTimer setNameAndTimerDialogForBuildTimer = new setNameAndTimerDialogForBuildTimer(
-                            true,
-                            false,
-                            holder.getBindingAdapterPosition(),
-                            timers);
-                    setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
-                    notifyDataSetChanged();
-                }
-            }, 1000);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        editTimer(holder);
+                    }
+                }, 1000);
+            } else {
+                editTimer(holder);
+            }
         });
 
         ((Item)holder).delete_timer_button.setOnClickListener(v -> {
@@ -102,6 +101,16 @@ public class BuildTimerAdapter extends RecyclerView.Adapter {
         String timerName = timers.get(myPosition).timerName;
         String timerTime = timers.get(myPosition).getTimeLeftFormatted();
         ((Item)holder).timer_info_textView.setText(timerName + " - " + timerTime);
+    }
+
+    private void editTimer(RecyclerView.ViewHolder holder) {
+        setNameAndTimerDialogForBuildTimer setNameAndTimerDialogForBuildTimer = new setNameAndTimerDialogForBuildTimer(
+                true,
+                false,
+                holder.getBindingAdapterPosition(),
+                timers);
+        setNameAndTimerDialogForBuildTimer.show( ((AppCompatActivity) context).getSupportFragmentManager(), "Set Name and Timer Here");
+        notifyDataSetChanged();
     }
 
     @Override

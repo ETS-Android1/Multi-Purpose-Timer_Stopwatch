@@ -24,7 +24,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.clearFocus1;
+import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.clearFocusBuildTimer1;
+import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.isFocusedBuildTimer1;
 
 public class BuildGroupAdapter extends RecyclerView.Adapter {
 
@@ -84,17 +85,18 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
                         masterInfo.basicGroupInfoArrayList.get(myPosition).basicTimerInfoArrayList));
 
         ((Item)holder).addTimerButton.setOnClickListener(v -> {
-            clearFocus1();
+            if (isFocusedBuildTimer1()) {
+                clearFocusBuildTimer1();
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    openNameAndTimerDialog((Item)holder);
-                }
-            }, 1000);
-
-            Objects.requireNonNull(((Item)holder).timerRecyclerView.getAdapter()).notifyDataSetChanged();
-            updateUI(holder, myPosition);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        addTimer(holder, myPosition);
+                    }
+                }, 1000);
+            } else {
+                addTimer(holder, myPosition);
+            }
         });
 
         ((Item)holder).addSetButton.setOnClickListener(v -> {
@@ -135,7 +137,22 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
         updateUI(holder, myPosition);
     }
 
-    public static void clearFocus2() {
+    private void addTimer(@NonNull RecyclerView.ViewHolder holder, int myPosition) {
+        openNameAndTimerDialog((Item) holder);
+        Objects.requireNonNull(((Item) holder).timerRecyclerView.getAdapter()).notifyDataSetChanged();
+        updateUI(holder, myPosition);
+    }
+
+    public static boolean isFocusedBuildTimer2() {
+        for (RecyclerView.ViewHolder holder : holders) {
+            if (((Item)holder).groupName.isFocused()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void clearFocusBuildTimer2() {
         for (RecyclerView.ViewHolder holder : holders) {
             ((Item)holder).groupName.clearFocus();
         }

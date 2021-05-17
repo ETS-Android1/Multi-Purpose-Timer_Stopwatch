@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
-import static com.armcomptech.akash.simpletimer4.buildTimer.buildTimer_Activity.clearFocus1;
 
 public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment {
     private AutoCompleteTextView autoCompleteTimerName;
@@ -63,20 +61,8 @@ public class setNameAndTimerDialogForBuildTimer extends AppCompatDialogFragment 
 
         LayoutInflater inflater = getLayoutInflater();
         final View[] dialogLayout = new View[1];
-        try {
-            dialogLayout[0] = inflater.inflate(R.layout.layout_dialog_nameandtimerset, (ViewGroup) requireActivity().getCurrentFocus());
-        } catch (ClassCastException classCastException) {
-            clearFocus1();
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    dialogLayout[0] = inflater.inflate(R.layout.layout_dialog_nameandtimerset, (ViewGroup) requireActivity().getCurrentFocus());
-                }
-            }, 3000);
-        }
-
-
+        dialogLayout[0] = inflater.inflate(R.layout.layout_dialog_nameandtimerset, (ViewGroup) requireActivity().getCurrentFocus());
         alertDialog.setView(dialogLayout[0]);
 
         TextView title = dialogLayout[0].findViewById(R.id.title);

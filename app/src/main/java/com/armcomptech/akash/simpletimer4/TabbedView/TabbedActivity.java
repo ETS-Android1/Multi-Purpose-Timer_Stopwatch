@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
@@ -64,11 +65,15 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
+import static com.armcomptech.akash.simpletimer4.singleTimer.singleTimerFragment.clearFocusSingleTimer;
+import static com.armcomptech.akash.simpletimer4.singleTimer.singleTimerFragment.isFocusedSingleTimer;
+import static com.armcomptech.akash.simpletimer4.stopwatch.stopwatchFragment.clearFocusStopwatch;
+import static com.armcomptech.akash.simpletimer4.stopwatch.stopwatchFragment.isFocusedStopwatchTimer;
 
 public class TabbedActivity extends AppCompatActivity implements PurchasesUpdatedListener {
 
     //TODO: Change FirebaseLogging to true when releasing
-    public static Boolean FirebaseLogging = false;
+    public static Boolean isInProduction = false;
 
     public static Boolean alwaysShowAd = false;
     private static FirebaseAnalytics mFirebaseAnalytics;
@@ -80,7 +85,7 @@ public class TabbedActivity extends AppCompatActivity implements PurchasesUpdate
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (FirebaseLogging) {
+        if (isInProduction) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "App Opened");
@@ -123,7 +128,7 @@ public class TabbedActivity extends AppCompatActivity implements PurchasesUpdate
 
         initializeBillingProcess();
 
-        if (!FirebaseLogging) {
+        if (!isInProduction) {
             removeAds(); // this removes all ads for new users
         }
 
@@ -166,14 +171,8 @@ public class TabbedActivity extends AppCompatActivity implements PurchasesUpdate
             }
         }
 
-
-        if (FirebaseLogging) {
-            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false);
-        } else {
-            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(true);
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
-        }
+        FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(isInProduction);
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(isInProduction);
     }
 
     public void initializeBillingProcess() {
@@ -400,33 +399,28 @@ public class TabbedActivity extends AppCompatActivity implements PurchasesUpdate
                 AlertDialog alert = new AlertDialog.Builder(this).create();
 
                 LayoutInflater inflater = getLayoutInflater();
-                View dialoglayout = inflater.inflate(R.layout.feedback_layout, (ViewGroup) getCurrentFocus());
-
-                Button cancelButton = dialoglayout.findViewById(R.id.cancel_feedback);
-                Button sendButton = dialoglayout.findViewById(R.id.send_feedback);
-                EditText editText = dialoglayout.findViewById(R.id.feedback_editText);
-
-                alert.setView(dialoglayout);
+                final View[] dialogLayout = new View[1];
 
                 Activity activity = this;
 
-                sendButton.setOnClickListener(view_ -> {
-                    String feedback = String.valueOf(editText.getText());
-                    String subject = "Feedback for Timer Application";
-                    List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
-                    new SendMailTask(activity).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
-                    Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
-                    logFirebaseAnalyticsEvents("Sent Feedback");
-                    alert.dismiss();
-                });
+                if (isFocusedSingleTimer() || isFocusedStopwatchTimer()) {
+                    try {
+                        clearFocusSingleTimer();
+                        clearFocusStopwatch();
 
-                cancelButton.setOnClickListener(view_ -> {
-                    Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
-                    logFirebaseAnalyticsEvents("Cancelled Feedback");
-                    alert.dismiss();
-                });
-
-                alert.show();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                showDialog(dialogLayout, inflater, alert, activity);
+                            }
+                        }, 1000);
+                    } catch (ClassCastException classCastException) {
+                        clearFocusSingleTimer();
+                        clearFocusStopwatch();
+                    }
+                } else {
+                    showDialog(dialogLayout, inflater, alert, activity);
+                }
                 break;
 
             default:
@@ -435,13 +429,41 @@ public class TabbedActivity extends AppCompatActivity implements PurchasesUpdate
         return super.onOptionsItemSelected(item);
     }
 
+    private void showDialog(View[] dialogLayout, LayoutInflater inflater, AlertDialog alert, Activity activity) {
+        dialogLayout[0] = inflater.inflate(R.layout.feedback_layout, (ViewGroup) getCurrentFocus());
+
+        Button cancelButton = dialogLayout[0].findViewById(R.id.cancel_feedback);
+        Button sendButton = dialogLayout[0].findViewById(R.id.send_feedback);
+        EditText editText = dialogLayout[0].findViewById(R.id.feedback_editText);
+
+        alert.setView(dialogLayout[0]);
+
+        sendButton.setOnClickListener(view_ -> {
+            String feedback = String.valueOf(editText.getText());
+            String subject = "Feedback for Timer Application";
+            List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
+            new SendMailTask(activity).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
+            Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
+            logFirebaseAnalyticsEvents("Sent Feedback");
+            alert.dismiss();
+        });
+
+        cancelButton.setOnClickListener(view_ -> {
+            Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
+            logFirebaseAnalyticsEvents("Cancelled Feedback");
+            alert.dismiss();
+        });
+
+        alert.show();
+    }
+
     public boolean isRemovedAds() {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         return sharedPreferences.getBoolean("removed_Ads", false);
     }
 
     public void logFirebaseAnalyticsEvents(String eventName) {
-        if (FirebaseLogging) {
+        if (isInProduction) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 

@@ -62,7 +62,7 @@ import java.util.Locale;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
-import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.FirebaseLogging;
+import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.isInProduction;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -80,7 +80,7 @@ public class singleTimerFragment extends Fragment {
     private Button mButtonSetTimer;
     private CountDownTimer mCountDownTimer;
     private TextView mMillis;
-    private AutoCompleteTextView mTimerNameAutoComplete;
+    private static AutoCompleteTextView mTimerNameAutoComplete;
     private TextView mTimerNameTextView;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch mRepeatSwitch;
@@ -156,7 +156,7 @@ public class singleTimerFragment extends Fragment {
         instance.registerReceiver(broadcastReceiver1, intentFilter1);
         instance.registerReceiver(broadcastReceiver2, intentFilter2);
 
-        if (FirebaseLogging) {
+        if (isInProduction) {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "App Opened");
@@ -205,7 +205,7 @@ public class singleTimerFragment extends Fragment {
             Bundle savedInstanceState) {
 
         setRetainInstance(true);
-        View root = inflater.inflate(R.layout.activity_single_timer, container, false);
+        View root = inflater.inflate(R.layout.fragment_single_timer, container, false);
 
         banner_adView = (AdView) root.findViewById(R.id.banner_ad);
         banner_adView.setVisibility(View.GONE);
@@ -281,7 +281,7 @@ public class singleTimerFragment extends Fragment {
 
         mButtonStart.setOnClickListener( v -> {
 
-            if (FirebaseLogging) {
+            if (isInProduction) {
                 Bundle bundle = new Bundle();
                 bundle.putString("Event", "Start Timer");
                 bundle.putString("Time", String.valueOf(mTimeLeftInMillis/1000));
@@ -359,14 +359,44 @@ public class singleTimerFragment extends Fragment {
             }
         });
 
+        mTimerNameAutoComplete.setOnEditorActionListener((view, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                hideKeyboard(view);
+                mTimerNameAutoComplete.clearFocus();
+                return true;
+            }
+            return false;
+        });
+
         showNotification = false;
         NotificationManagerCompat.from(requireContext()).cancel(1);
 
         return root;
     }
 
+    public void hideKeyboard(TextView view) {
+        InputMethodManager imm = (InputMethodManager) view.getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    public static boolean isFocusedSingleTimer() {
+        if (mTimerNameAutoComplete != null) {
+            return mTimerNameAutoComplete.isFocused();
+        }
+        return false;
+    }
+
+    public static void clearFocusSingleTimer() {
+        if (mTimerNameAutoComplete != null) {
+            mTimerNameAutoComplete.clearFocus();
+        }
+    }
+
     public static void logFirebaseAnalyticsEvents(String eventName) {
-        if (FirebaseLogging) {
+        if (isInProduction) {
             eventName = eventName.replace(" ", "_");
             eventName = eventName.replace(":", "");
 
