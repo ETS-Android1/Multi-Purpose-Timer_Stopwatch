@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,8 @@ import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.App.MULTI_TIMER_ID;
+import static com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity.clearFocusMultiTimer;
+import static com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity.isFocusedMultiTimer;
 
 public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements setNameAndTimerDialog.setTimerDialogListener {
 
@@ -268,7 +271,15 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         ((Item)holder).invisibleTimeButton.setBackgroundColor(Color.TRANSPARENT); //make button invisible
-        ((Item)holder).invisibleTimeButton.setOnClickListener(v -> openNameAndTimerDialog((Item)holder));
+        ((Item)holder).invisibleTimeButton.setOnClickListener(v -> {
+            if (isFocusedMultiTimer()) {
+                clearFocusMultiTimer();
+
+                new Handler().postDelayed(() -> openNameAndTimerDialog((Item) holder), 1000);
+            } else {
+                openNameAndTimerDialog((Item) holder);
+            }
+        });
     }
 
     public boolean isRemovedAds() {

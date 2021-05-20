@@ -56,6 +56,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
@@ -94,7 +95,7 @@ public class singleTimerFragment extends Fragment {
     MediaPlayer player;
     private NotificationManagerCompat notificationManager;
 
-    private AdView banner_adView;
+    private static AdView banner_adView;
     AdRequest banner_adRequest;
     InterstitialAd mResetButtonInterstitialAd;
 
@@ -249,8 +250,8 @@ public class singleTimerFragment extends Fragment {
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
 
         mButtonSetTimer.setOnClickListener(v -> {
-            if (mTimerNameAutoComplete.hasFocus()) {
-                mTimerNameAutoComplete.clearFocus();
+            if (isFocusedSingleTimer()) {
+                clearFocusSingleTimer();
 
                 new Handler().postDelayed(() -> openTimerDialog(), 1000);
             } else {
@@ -371,13 +372,14 @@ public class singleTimerFragment extends Fragment {
     }
 
     public static boolean isFocusedSingleTimer() {
-        if (mTimerNameAutoComplete != null) {
-            return mTimerNameAutoComplete.isFocused();
-        }
-        return false;
+        return Objects.requireNonNull(banner_adView).hasFocus() || mTimerNameAutoComplete.isFocused();
     }
 
     public static void clearFocusSingleTimer() {
+        if (banner_adView != null) {
+            banner_adView.clearFocus();
+        }
+
         if (mTimerNameAutoComplete != null) {
             mTimerNameAutoComplete.clearFocus();
         }

@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
@@ -88,7 +89,7 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
     final static int GROUP_NOTIFICATION_ID = 1000;
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    private AdView banner_adView;
+    private static AdView banner_adView;
     AdRequest banner_adRequest;
 
     BillingClient billingClient;
@@ -300,6 +301,20 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         }
     }
 
+    public static boolean isFocusedMultiTimer() {
+        if (banner_adView != null) {
+            return banner_adView.hasFocus();
+        } else {
+            return false;
+        }
+    }
+
+    public static void clearFocusMultiTimer() {
+        if (banner_adView != null) {
+            banner_adView.clearFocus();
+        }
+    }
+
     public void openNameAndTimerDialog() {
         setNameAndTimerDialog setNameAndTimerDialog = new setNameAndTimerDialog(false, true, null, timers);
         setNameAndTimerDialog.show(getSupportFragmentManager(), "Set Name and Timer Here");
@@ -423,41 +438,53 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
                 logFirebaseAnalyticsEvents("Opened Feedback");
 
                 AlertDialog alert = new AlertDialog.Builder(this).create();
-
-                LayoutInflater inflater = getLayoutInflater();
-                View dialoglayout = inflater.inflate(R.layout.feedback_layout, (ViewGroup) getCurrentFocus());
-
-                Button cancelButton = dialoglayout.findViewById(R.id.cancel_feedback);
-                Button sendButton = dialoglayout.findViewById(R.id.send_feedback);
-                EditText editText = dialoglayout.findViewById(R.id.feedback_editText);
-
-                alert.setView(dialoglayout);
-
                 Activity activity = this;
 
-                sendButton.setOnClickListener(view_ -> {
-                    String feedback = String.valueOf(editText.getText());
-                    String subject = "Feedback for Timer Application";
-                    List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
-                    new SendMailTask(activity).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
-                    Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
-                    logFirebaseAnalyticsEvents("Sent Feedback");
-                    alert.dismiss();
-                });
+                LayoutInflater inflater = getLayoutInflater();
 
-                cancelButton.setOnClickListener(view_ -> {
-                    Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
-                    logFirebaseAnalyticsEvents("Cancelled Feedback");
-                    alert.dismiss();
-                });
+                if (isFocusedMultiTimer()) {
+                    clearFocusMultiTimer();
 
-                alert.show();
+                    new Handler().postDelayed(() -> {
+                        showFeedbackDialog(alert, activity, inflater);
+                    }, 1000);
+                } else {
+                    showFeedbackDialog(alert, activity, inflater);
+                }
                 break;
 
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showFeedbackDialog(AlertDialog alert, Activity activity, LayoutInflater inflater) {
+        View dialogLayout = inflater.inflate(R.layout.feedback_layout, (ViewGroup) getCurrentFocus());
+
+        Button cancelButton = dialogLayout.findViewById(R.id.cancel_feedback);
+        Button sendButton = dialogLayout.findViewById(R.id.send_feedback);
+        EditText editText = dialogLayout.findViewById(R.id.feedback_editText);
+
+        alert.setView(dialogLayout);
+
+        sendButton.setOnClickListener(view_ -> {
+            String feedback = String.valueOf(editText.getText());
+            String subject = "Feedback for Timer Application";
+            List<String> toEmail = Collections.singletonList(getString(R.string.toEmail));
+            new SendMailTask(activity).execute(getString(R.string.fromEmail), getString(R.string.fromPassword), toEmail, subject, feedback, new ArrayList<File>());
+            Toast.makeText(getApplicationContext(), "Feedback sent successfully", Toast.LENGTH_SHORT).show();
+            logFirebaseAnalyticsEvents("Sent Feedback");
+            alert.dismiss();
+        });
+
+        cancelButton.setOnClickListener(view_ -> {
+            Toast.makeText(getApplicationContext(), "Feedback was not sent", Toast.LENGTH_SHORT).show();
+            logFirebaseAnalyticsEvents("Cancelled Feedback");
+            alert.dismiss();
+        });
+
+        alert.show();
     }
 
     public boolean isRemovedAds() {

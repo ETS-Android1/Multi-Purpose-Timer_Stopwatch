@@ -89,7 +89,7 @@ public class stopwatchFragment extends Fragment {
     private boolean fragmentAttached;
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    private AdView banner_adView;
+    private static AdView banner_adView;
     AdRequest banner_adRequest;
     InterstitialAd mResetButtonInterstitialAd;
 
@@ -283,13 +283,14 @@ public class stopwatchFragment extends Fragment {
     }
 
     public static boolean isFocusedStopwatchTimer() {
-        if (mTimerNameAutoComplete != null) {
-            return mTimerNameAutoComplete.isFocused();
-        }
-        return false;
+        return Objects.requireNonNull(banner_adView).hasFocus() || mTimerNameAutoComplete.isFocused();
     }
 
     public static void clearFocusStopwatch() {
+        if (banner_adView != null) {
+            banner_adView.clearFocus();
+        }
+
         if (mTimerNameAutoComplete != null) {
             mTimerNameAutoComplete.clearFocus();
         }

@@ -99,7 +99,7 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
     final ArrayList<String> saved_timers_names = new ArrayList<>();
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    private AdView banner_adView;
+    static AdView banner_adView;
     AdRequest banner_adRequest;
 
     BillingClient billingClient;
@@ -298,10 +298,14 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
     }
 
     public static boolean isFocusedBuildTimer1() {
-        return save_timer_editText.isFocused() || isFocusedBuildTimer2();
+        return Objects.requireNonNull(banner_adView).hasFocus() || save_timer_editText.isFocused() || isFocusedBuildTimer2();
     }
 
     public static void clearFocusBuildTimer1() {
+        if (banner_adView != null) {
+            banner_adView.clearFocus();
+        }
+
         save_timer_editText.clearFocus();
         clearFocusBuildTimer2();
     }
