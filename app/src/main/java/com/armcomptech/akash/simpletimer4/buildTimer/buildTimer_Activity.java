@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -36,6 +37,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -107,6 +110,10 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        setThemeForApp(sharedPreferences);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_build_timer);
 
@@ -295,6 +302,30 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
 
             save_timer_editText.clearFocus();
         });
+    }
+
+    private void setThemeForApp(SharedPreferences sharedPreferences) {
+        switch (Objects.requireNonNull(sharedPreferences.getString("theme", "Follow System Theme"))){
+            case "Light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "Dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "Follow System Default":
+                int currentNightMode = this.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                switch (currentNightMode) {
+                    case Configuration.UI_MODE_NIGHT_NO:
+                        // Night mode is not active, we're using the light theme
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        break;
+                    case Configuration.UI_MODE_NIGHT_YES:
+                        // Night mode is active, we're using dark theme
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        break;
+                }
+                break;
+        }
     }
 
     public static boolean isFocusedBuildTimer1() {

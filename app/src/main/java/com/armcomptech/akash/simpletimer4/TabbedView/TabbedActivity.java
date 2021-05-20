@@ -92,29 +92,8 @@ public class TabbedActivity extends AppCompatActivity implements PurchasesUpdate
             mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle);
         }
 
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        switch (Objects.requireNonNull(sharedPreferences.getString("theme", "Follow System Theme"))){
-            case "Light":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                break;
-            case "Dark":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                break;
-            case "Follow System Default":
-                int currentNightMode = this.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-                switch (currentNightMode) {
-                    case Configuration.UI_MODE_NIGHT_NO:
-                        // Night mode is not active, we're using the light theme
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                        break;
-                    case Configuration.UI_MODE_NIGHT_YES:
-                        // Night mode is active, we're using dark theme
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                        break;
-                }
-                break;
-        }
+        setThemeForApp(sharedPreferences);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbled);
@@ -173,6 +152,30 @@ public class TabbedActivity extends AppCompatActivity implements PurchasesUpdate
 
         FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(isInProduction);
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(isInProduction);
+    }
+
+    private void setThemeForApp(SharedPreferences sharedPreferences) {
+        switch (Objects.requireNonNull(sharedPreferences.getString("theme", "Follow System Theme"))){
+            case "Light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "Dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "Follow System Theme":
+                int currentNightMode = this.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                switch (currentNightMode) {
+                    case Configuration.UI_MODE_NIGHT_NO:
+                        // Night mode is not active, we're using the light theme
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        break;
+                    case Configuration.UI_MODE_NIGHT_YES:
+                        // Night mode is active, we're using dark theme
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        break;
+                }
+                break;
+        }
     }
 
     public void initializeBillingProcess() {

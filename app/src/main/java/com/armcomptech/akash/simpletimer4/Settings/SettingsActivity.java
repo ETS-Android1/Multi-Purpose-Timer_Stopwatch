@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +24,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.armcomptech.akash.simpletimer4.EmailLogic.SendMailTask;
@@ -61,6 +64,33 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
+
+            Preference themePref = findPreference("theme");
+            if (themePref != null) {
+
+                themePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                    if ("Light".equals(newValue)) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        return true;
+                    } else if ("Dark".equals(newValue)) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        return true;
+                    } else if ("Follow System Theme".equals(newValue)) {
+                        int currentNightMode = requireContext().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                        switch (currentNightMode) {
+                            case Configuration.UI_MODE_NIGHT_NO:
+                                // Night mode is not active, we're using the light theme
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                                return true;
+                            case Configuration.UI_MODE_NIGHT_YES:
+                                // Night mode is active, we're using dark theme
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                                return true;
+                        }
+                    }
+                    return true;
+                });
+            }
         }
     }
 

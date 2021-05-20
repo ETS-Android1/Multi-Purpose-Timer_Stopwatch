@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -33,9 +34,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -97,6 +100,10 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        setThemeForApp(sharedPreferences);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_timer);
 
@@ -171,6 +178,30 @@ public class MultiTimerActivity extends AppCompatActivity implements setNameAndT
         addTimerFab.setOnClickListener(v -> openNameAndTimerDialog());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             addTimerFab.setTooltipText("Add Timer");
+        }
+    }
+
+    private void setThemeForApp(SharedPreferences sharedPreferences) {
+        switch (Objects.requireNonNull(sharedPreferences.getString("theme", "Follow System Theme"))){
+            case "Light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "Dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "Follow System Default":
+                int currentNightMode = this.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                switch (currentNightMode) {
+                    case Configuration.UI_MODE_NIGHT_NO:
+                        // Night mode is not active, we're using the light theme
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        break;
+                    case Configuration.UI_MODE_NIGHT_YES:
+                        // Night mode is active, we're using dark theme
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        break;
+                }
+                break;
         }
     }
 

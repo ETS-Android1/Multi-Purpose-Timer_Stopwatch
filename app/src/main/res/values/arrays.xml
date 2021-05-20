@@ -26,7 +26,7 @@
     <string-array name="theme_entries">
         <item>Light</item>
         <item>Dark</item>
-        <item>Follow System Theme</item>
+        <item>Follow System Theme (Restart application to apply the theme)</item>
     </string-array>
 
     <string-array name="theme_values">
