@@ -132,7 +132,14 @@ public class BuildGroupAdapter extends RecyclerView.Adapter {
     }
 
     private void addTimer(@NonNull RecyclerView.ViewHolder holder, int myPosition) {
-        openNameAndTimerDialog((Item) holder);
+        if (isFocusedBuildTimer1()) {
+            clearFocusBuildTimer1();
+
+            new Handler().postDelayed(() -> openNameAndTimerDialog((Item) holder), 1000);
+        } else {
+            openNameAndTimerDialog((Item) holder);
+        }
+
         Objects.requireNonNull(((Item) holder).timerRecyclerView.getAdapter()).notifyDataSetChanged();
         updateUI(holder, myPosition);
     }

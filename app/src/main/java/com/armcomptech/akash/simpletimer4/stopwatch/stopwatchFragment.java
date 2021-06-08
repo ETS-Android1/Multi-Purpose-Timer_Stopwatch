@@ -283,7 +283,11 @@ public class stopwatchFragment extends Fragment {
     }
 
     public static boolean isFocusedStopwatchTimer() {
-        return Objects.requireNonNull(banner_adView).hasFocus() || mTimerNameAutoComplete.isFocused();
+        if (banner_adView == null) {
+            return mTimerNameAutoComplete.isFocused();
+        } else {
+            return banner_adView.hasFocus() || mTimerNameAutoComplete.isFocused();
+        }
     }
 
     public static void clearFocusStopwatch() {

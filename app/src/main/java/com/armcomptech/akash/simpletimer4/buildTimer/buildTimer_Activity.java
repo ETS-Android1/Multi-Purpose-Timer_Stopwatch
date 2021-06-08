@@ -329,7 +329,11 @@ public class buildTimer_Activity extends AppCompatActivity implements setNameAnd
     }
 
     public static boolean isFocusedBuildTimer1() {
-        return Objects.requireNonNull(banner_adView).hasFocus() || save_timer_editText.isFocused() || isFocusedBuildTimer2();
+        if (banner_adView == null) {
+            return save_timer_editText.isFocused() || isFocusedBuildTimer2();
+        } else {
+            return banner_adView.hasFocus() || save_timer_editText.isFocused() || isFocusedBuildTimer2();
+        }
     }
 
     public static void clearFocusBuildTimer1() {

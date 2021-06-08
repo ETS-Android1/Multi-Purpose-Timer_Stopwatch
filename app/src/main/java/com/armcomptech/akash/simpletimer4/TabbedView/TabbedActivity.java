@@ -72,6 +72,7 @@ import static com.armcomptech.akash.simpletimer4.stopwatch.stopwatchFragment.isF
 
 public class TabbedActivity extends AppCompatActivity implements PurchasesUpdatedListener {
 
+    // Upload mapping file: C:\Users\Akash\StudioProjects\SimpleTimer4\app\build\outputs\mapping\release\mapping.txt
     //TODO: Change isInProduction to true when releasing
     public static Boolean isInProduction = false;
 

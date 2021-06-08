@@ -18,8 +18,8 @@ android {
         applicationId "com.armcomptech.akash.simpletimer4"
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode 54
-        versionName "4.7.9"
+        versionCode 55
+        versionName "4.7.01"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

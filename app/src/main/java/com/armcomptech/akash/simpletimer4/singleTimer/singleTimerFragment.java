@@ -56,12 +56,13 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Objects;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static com.armcomptech.akash.simpletimer4.TabbedView.TabbedActivity.isInProduction;
+import static com.armcomptech.akash.simpletimer4.stopwatch.stopwatchFragment.clearFocusStopwatch;
+import static com.armcomptech.akash.simpletimer4.stopwatch.stopwatchFragment.isFocusedStopwatchTimer;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -250,8 +251,9 @@ public class singleTimerFragment extends Fragment {
         mButtonSetTimer.setBackgroundColor(Color.TRANSPARENT);
 
         mButtonSetTimer.setOnClickListener(v -> {
-            if (isFocusedSingleTimer()) {
+            if (isFocusedSingleTimer() || isFocusedStopwatchTimer()) {
                 clearFocusSingleTimer();
+                clearFocusStopwatch();
 
                 new Handler().postDelayed(() -> openTimerDialog(), 1000);
             } else {
@@ -372,7 +374,11 @@ public class singleTimerFragment extends Fragment {
     }
 
     public static boolean isFocusedSingleTimer() {
-        return Objects.requireNonNull(banner_adView).hasFocus() || mTimerNameAutoComplete.isFocused();
+        if (banner_adView == null) {
+            return mTimerNameAutoComplete.isFocused();
+        } else {
+            return banner_adView.hasFocus() || mTimerNameAutoComplete.isFocused();
+        }
     }
 
     public static void clearFocusSingleTimer() {
