@@ -558,8 +558,12 @@ public class MultiTimerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         Intent notificationIntent = new Intent(MultiTimerActivity.class.getName());
         notificationIntent.setComponent(new ComponentName("com.armcomptech.akash.simpletimer4", "com.armcomptech.akash.simpletimer4.multiTimer.MultiTimerActivity"));
 
-        final PendingIntent pendingIntent = PendingIntent.getActivity(this.context, 0,
-                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        final PendingIntent pendingIntent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            pendingIntent = PendingIntent.getActivity(this.context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            pendingIntent = PendingIntent.getActivity(this.context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
 
         String content;
         if (currentTimerName.equals("General")) {

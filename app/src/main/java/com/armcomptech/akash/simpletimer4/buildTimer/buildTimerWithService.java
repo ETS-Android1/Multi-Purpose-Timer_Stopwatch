@@ -136,8 +136,12 @@ public class buildTimerWithService extends Service {
         PackageManager client = this.getPackageManager();
         final Intent notificationIntent = client.getLaunchIntentForPackage("com.armcomptech.akash.simpletimer4");
 
-        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        final PendingIntent pendingIntent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
 
         String content = currentTimerName + " - " + timeLeft;
 

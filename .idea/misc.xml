@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout-land-notnight/activity_multi_timer.xml" value="0.15828924162257496" />
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout-land-notnight/multi_timer_recycler_view.xml" value="0.30952380952380953" />
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout-large-land-night/fragment_single_timer.xml" value="0.33801498127340823" />
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout-night/activity_build_timer.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout-night/activity_multi_timer.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout-normal-port-night/fragment_single_timer.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout-notnight/activity_multi_timer.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout-notnight/multi_timer_recycler_view.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout/activity_multi_timer.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Akash/StudioProjects/Multi-Purpose-Timer_Stopwatch/app/src/main/res/layout/fragment_single_timer.xml" value="0.18802083333333333" />
+      </map>
+    </option>
+  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
     <option name="myDefaultNotNull" value="androidx.annotation.NonNull" />
