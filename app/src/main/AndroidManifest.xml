@@ -33,7 +33,8 @@
         <activity
             android:name=".TabbedView.TabbedActivity"
             android:configChanges="screenSize|screenLayout|keyboardHidden"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
